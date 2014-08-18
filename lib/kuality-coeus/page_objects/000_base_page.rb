@@ -266,6 +266,10 @@ class BasePage < PageFactory
       buttons_text.each { |button| elementate(:button, button) }
     end
 
+    def select(method_name, attrib, value)
+      element(method_name) { |b| b.execute_script(%{jQuery("select[#{attrib}|='#{value}']").show();}); b.select(attrib => value) }
+    end
+
     # Use this to define methods to click on the green
     # buttons on the page, all of which can be identified
     # by the title tag. The method takes a hash, where the key
