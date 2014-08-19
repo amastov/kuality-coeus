@@ -40,8 +40,9 @@ class ProposalDevelopmentObject < DataFactory
   end
     
   def create
-    visit(Researcher).create_proposal
-    on Proposal do |doc|
+    on(Header).researcher
+    on(ResearcherMenu).create_proposal
+    on CreateProposal do |doc|
       doc.proposal_type.wait_until_present(10)
       @doc_header=doc.doc_title
       @document_id=doc.document_id

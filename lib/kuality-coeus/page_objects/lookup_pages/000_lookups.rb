@@ -4,7 +4,7 @@ class Lookups < BasePage
   search_results_table
 
   def self.url_info(title, class_name)
-    riceify = class_name[/^rice/] && $base_url[/kuali/] ? $context.gsub('c','r') : $context
+    riceify = class_name[/^rice/] && $base_url[/kuali/] ? $context : $context
     url = %|#{$base_url+$context
                   }portal.do?channelTitle=#{
                 title
@@ -28,4 +28,3 @@ class Lookups < BasePage
   alias_method :create, :create_new
 
 end
-
