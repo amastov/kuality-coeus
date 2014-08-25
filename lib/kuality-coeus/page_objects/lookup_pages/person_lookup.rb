@@ -3,6 +3,7 @@ class PersonLookup < Lookups
 
   expected_element :principal_name
 
+  old_ui
   results_multi_select
 
   url_info 'Person','rice.kim.api.identity.Person'

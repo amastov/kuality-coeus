@@ -57,10 +57,17 @@ end
 And /the Award Modifier edits the finalized Award$/ do
   steps '* log in with the Award Modifier user'
   @award.edit transaction_type: '::random::', anticipated_amount: '5', obligated_amount: '5'
+
+
+
+  DEBUG.message @award.prior_versions.inspect
+
+
+
 end
 
 When /^the original Award is edited again$/ do
-  visit(Researcher).doc_search
+  on(Header).doc_search
   on DocumentSearch do |search|
     search.document_id.set @award.prior_versions['1']
     search.search

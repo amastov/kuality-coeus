@@ -26,6 +26,7 @@ Then /^the new Award should not have any subawards or T&M document$/ do
 end
 
 Then /^the new Award's transaction type is 'New'$/ do
+  @award_2.view :award
   on(Award).transaction_type.selected?('New').should be_true
 end
 
@@ -219,4 +220,8 @@ end
 
 And /opens the Award$/ do
   @award.view :award
+end
+
+Then /^the cost share percentage should round to 2 decimal places$/ do
+  on(Commitments).page.cost_sharing_percentage(@award.cost_sharing[0].source, @award.cost_sharing[0].commitment_amount).value.should =~ /\.\d{2}/
 end

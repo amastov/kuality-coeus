@@ -44,21 +44,23 @@ class ProposalDevelopmentObject < DataFactory
     on(ResearcherMenu).create_proposal
     on CreateProposal do |doc|
       doc.proposal_type.wait_until_present(10)
-      @doc_header=doc.doc_title
-      @document_id=doc.document_id
-      @status=doc.document_status
-      @initiator=doc.initiator
-      @created=doc.created
-      doc.expand_all
+      #@doc_header=doc.doc_title
+      #@document_id=doc.document_id
+      #@status=doc.document_status
+      #@initiator=doc.initiator
+      #@created=doc.created
+      doc.lookup_sponsor
       set_sponsor_code
-      fill_out doc, :proposal_type, :activity_type,
-                    :project_title, :project_start_date, :project_end_date,
-                    :sponsor_deadline_date, :mail_by, :mail_type, :nsf_science_code
-      set_lead_unit
-      doc.save
-      @proposal_number=doc.proposal_number.strip
-      @search_key={ document_id: @document_id }
-      @permissions = make PermissionsObject, merge_settings(aggregators: [@initiator])
+      doc.unit_number.pick! @lead_unit
+      fill_out doc, :proposal_type, :activity_type, :project_title,
+               :project_start_date, :project_end_date
+      doc.save_and_continue
+
+
+      DEBUG.pause
+
+
+      #@permissions = make PermissionsObject, merge_settings(aggregators: [@initiator])
     end
   end
 
@@ -363,8 +365,24 @@ class ProposalDevelopmentObject < DataFactory
     object
   end
 
-  def page_class
-    Proposal
+  # FIXME!
+  def set_sponsor_code
+    on(CreateProposal).lookup_sponsor
+    if @sponsor_id=='::random::'
+      on SponsorLookup do |look|
+        fill_out look, :sponsor_type_code
+        look.search
+        look.page_links[rand(look.page_links.size)].click if look.page_links.size > 0
+        look.select_random
+      end
+      @sponsor_id=on(CreateProposal).sponsor_id.value
+
+
+      DEBUG.message @sponsor_id.inspect
+
+    else
+      on(CreateProposal).sponsor_id.fit @sponsor_id
+    end
   end
 
 end

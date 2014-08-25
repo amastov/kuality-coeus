@@ -17,7 +17,7 @@ Feature: Copying Awards
     Then the new Award's transaction type is 'New'
     And  the new Award should not have any subawards or T&M document
     And  the anticipated and obligated amounts are zero
-
+  @broken
   Scenario: Award copied to a child of itself
     When I copy the Award as a child of itself
     Then the new Award's transaction type is 'New'

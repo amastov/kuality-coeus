@@ -1,6 +1,8 @@
 # coding: UTF-8
 class KcPersonLookup < Lookups
 
+  old_ui
+
   ID        = 1
   FULL_NAME = 2
   USER_NAME = 3

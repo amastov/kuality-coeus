@@ -12,12 +12,12 @@ Feature: Basic Award Validations
     Given the Award Modifier creates an Award
     When  I start adding a Payment & Invoice item to the Award
     Then  a warning appears saying tracking details won't be added until there's a PI
-
+  @broken
   Scenario: Attempt to create a KC Award document with a missing required field
     Given I log in with the Award Modifier user
     When  I create an Award with a missing required field
     Then  an error should appear saying the field is required
-
+  @broken
   Scenario: Enter an account ID that contains non-alphanumeric characters
     Given the Award Modifier creates an Award
     When  an Account ID with special characters is added to the Award details
@@ -36,7 +36,7 @@ Feature: Basic Award Validations
   Scenario: The anticipated amount is less than the obligated amount
     When  the Award Modifier creates an Award with more obligated than anticipated amounts
     Then  an error should appear that says the anticipated amount must be equal to or more than obligated
-
+  @proposal @broken
   Scenario: Attempt to link an IP that has not been approved
     Given the Proposal Creator submits a new Proposal into routing
     And   the OSP Administrator submits the Proposal to its sponsor
@@ -55,7 +55,7 @@ Feature: Basic Award Validations
     And   adds a $0.00 Subaward to the Award
     When  data validation is turned on for the Award
     Then  an error is shown that says the subaward's amount can't be zero
-  @test
+
   Scenario: Missing required field in F&A Rate entry
     Given the Award Modifier creates an Award
     When  the Award Modifier adds an F&A rate to the Award but misses a required field

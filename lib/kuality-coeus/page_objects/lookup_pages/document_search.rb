@@ -1,5 +1,7 @@
 class DocumentSearch < Lookups
 
+  old_ui
+
   expected_element :document_id
 
   element(:document_id) { |b| b.frm.text_field(id: 'documentId') }

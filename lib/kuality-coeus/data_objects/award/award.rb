@@ -8,11 +8,14 @@ class AwardObject < DataFactory
               :nsf_science_code, :account_id, :account_type, :prime_sponsor, :cfda_number,
               :version, :prior_versions,
               :creation_date, :key_personnel, :cost_sharing, :fa_rates,
+              :anticipated_fna, :obligated_fna,
               :funding_proposals, #TODO: Add Benefits rates and preaward auths...
               :budget_versions, :sponsor_contacts, :payment_and_invoice, :terms, :reports,
               :approved_equipment,
               :children
-  attr_accessor :document_status, :document_id, :subawards, :transaction_type, :id, :anticipated_amount, :obligated_amount,
+  attr_accessor :document_status, :document_id, :subawards, :transaction_type, :id, :anticipated_direct, :obligated_direct,
+                # These will probably need to be removed:
+                :anticipated_amount, :obligated_amount,
                 :custom_data, :description, :project_start_date, :project_end_date, :obligation_start_date,
                 :obligation_end_date, :time_and_money, :parent
   def_delegators :@key_personnel, :principal_investigator
@@ -39,8 +42,8 @@ class AwardObject < DataFactory
       account_type:          '::random::',
       prime_sponsor:         '::random::',
       cfda_number:           "#{"%02d"%rand(99)}.#{"%03d"%rand(999)}",
-      anticipated_amount:    amount,
-      obligated_amount:      amount,
+      anticipated_direct:    amount,
+      obligated_direct:      amount,
       funding_proposals:     [], # Contents MUST look like: {ip_number: '00001', merge_type: 'No Change'}, ...
       subawards:             [], # Contents MUST look like: {org_name: 'Org Name', amount: '999.99'}, ...
       sponsor_contacts:      [], # Contents MUST look like: {non_employee_id: '333', project_role: 'Close-out Contact'}, ...
@@ -66,10 +69,19 @@ class AwardObject < DataFactory
       @doc_header=create.doc_title
       create.expand_all
       fill_out create, :description, :transaction_type, :award_status, :award_title,
-               :activity_type, :award_type, :obligated_amount, :anticipated_amount,
+               :activity_type, :award_type,
+               #:obligated_direct, :anticipated_direct,
+               #:obligated_fna, :anticipated_fna,
+               :account_type,
                :project_start_date, :project_end_date, :obligation_start_date,
-               :obligation_end_date, :nsf_science_code, :account_id, :account_type,
+               :obligation_end_date, :nsf_science_code, :account_id,
                :cfda_number
+      if create.obligated_amount.present?
+        fill_out create, :obligated_amount, :anticipated_amount
+      else
+        fill_out create, :obligated_direct, :anticipated_direct,
+                         :obligated_fna, :anticipated_fna
+      end
     end
     set_sponsor_id
     set_prime_sponsor
@@ -94,20 +106,35 @@ class AwardObject < DataFactory
   end
 
   def edit opts={}
+
+    DEBUG.message @document_id
+
+
     view :award
     on Award do |edit|
+
+      DEBUG.pause 300
+
       if edit.edit_button.present?
         edit.edit
         @prior_versions.store(@version, @document_id)
+
+
+
+        DEBUG.message @prior_versions.inspect
+
+
+
+
         @version = edit.version
         @document_id = edit.header_document_id
         # TODO: update child objects with new @document_id value!
       end
       edit_fields opts, edit, :description, :transaction_type, :award_status, :award_title,
-                  :activity_type, :award_type, :obligated_amount, :anticipated_amount,
+                  :activity_type, :award_type, :obligated_direct, :anticipated_direct,
                   :project_start_date, :project_end_date, :obligation_start_date,
                   :obligation_end_date, :nsf_science_code, :account_id, :account_type,
-                  :cfda_number
+                  :cfda_number, :obligated_fna, :anticipated_fna
       edit.save
     end
     set_options(opts)
@@ -276,6 +303,14 @@ class AwardObject < DataFactory
       page.expand_all
       page.award_hierarchy_link.wait_until_present
       page.submit
+
+
+      DEBUG.message 'submitted?'
+      DEBUG.pause 300
+
+
+
+
       # TODO: Code for intelligently handling the appearance of this (It's a screen about validation warnings)
       confirmation
 
@@ -390,16 +425,16 @@ class AwardObject < DataFactory
 
   def set_prime_sponsor
     if @prime_sponsor=='::random::'
-      on(page_class).lookup_prime_sponsor
-      on SponsorLookup do |look|
+      on(Award).lookup_prime_sponsor
+      on OLDSponsorLookup do |look|
         fill_out look, :sponsor_type_code
         look.search
         look.page_links[rand(look.page_links.length)].click if look.page_links.size > 0
         look.return_random
       end
-      @prime_sponsor=on(page_class).prime_sponsor.value
+      @prime_sponsor=on(Award).prime_sponsor.value
     else
-      on(page_class).prime_sponsor.fit @prime_sponsor
+      on(Award).prime_sponsor.fit @prime_sponsor
     end
   end
 
@@ -434,7 +469,7 @@ class AwardObject < DataFactory
       begin
         page.medusa
       rescue Watir::Exception::UnknownObjectException
-        visit(Researcher).doc_search
+        on(Header).doc_search
         on DocumentSearch do |search|
           search.document_id.set @document_id
           search.search
@@ -456,8 +491,19 @@ class AwardObject < DataFactory
     @browser.frm.button(name: 'methodToCall.returnToAward').present? && !(on(Award).t_m_button.present?)
   end
 
-  def page_class
-    Award
+  def set_sponsor_id
+    if @sponsor_id=='::random::'
+      on(Award).lookup_sponsor
+      on OLDSponsorLookup do |look|
+        fill_out look, :sponsor_type_code
+        look.search
+        look.page_links[rand(look.page_links.size)].click if look.page_links.size > 0
+        look.return_random
+      end
+      @sponsor_id=on(Award).sponsor_id.value
+    else
+      on(Award).sponsor_id.fit @sponsor_id
+    end
   end
 
 end

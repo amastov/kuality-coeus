@@ -15,7 +15,7 @@ class Commitments < KCAwards
   p_element(:cost_sharing_source) { |source, amount, b| b.target_cost_sharing_item(source, amount).text_field(title: 'Source') }
   p_element(:cost_sharing_commitment_amount) { |source, amount, b| b.target_cost_sharing_item(source, amount).text_field(title: '* Commitment Amount') }
 
-  element(:cost_sharing_comments) { |b| b.frm.text_field(name: 'document.awardList[0].awardCostShareComment.comments') }
+  element(:cost_sharing_comments) { |b| b.frm.textarea(name: 'document.awardList[0].awardCostShareComment.comments') }
 
   value(:cost_share_sources) { |b| b.noko.table(id: 'cost-share-table').text_fields(title: 'Source').collect{ |field| field.value }[1..-1] }
 

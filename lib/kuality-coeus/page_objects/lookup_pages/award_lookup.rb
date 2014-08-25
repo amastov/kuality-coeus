@@ -1,5 +1,7 @@
 class AwardLookup < Lookups
 
+  old_ui
+
   expected_element :award_id
 
   url_info 'Award','kra.award.home.Award'

@@ -1,5 +1,6 @@
 class NonOrgAddressBookLookup < Lookups
 
+  old_ui
   results_multi_select
 
   alias_method :select_person, :check_item

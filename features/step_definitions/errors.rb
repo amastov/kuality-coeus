@@ -92,14 +92,6 @@ Then /^the Award should throw an error saying (.*)/ do |error|
   $current_page.errors.should include errors[error]
 end
 
-Then /^an error should say that the (cost share|F&A rate) percentage can only have 2 decimal places$/ do |type|
-  items = {
-      'cost share' => [:cost_sharing, :percentage],
-      'F&A rate'   => [:fa_rates, :rate]
-  }
-  $current_page.errors.should include "Invalid value #{@award.send(items[type][0])[0].send(items[type][1])}: at most 2 digits may follow the decimal point."
-end
-
 #-----------------------#
 # Subaward              #
 #-----------------------#

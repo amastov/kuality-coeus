@@ -312,6 +312,11 @@ class UserObject < DataFactory
         log_in.username.set @user_name
         log_in.login
       end
+
+
+      #DEBUG.message "just signed in as #{@user_name}"
+
+
       on(Header).doc_search_link.wait_until_present
       $current_user=self
     end
@@ -319,16 +324,12 @@ class UserObject < DataFactory
   alias_method :log_in, :sign_in
 
   def sign_out
-    if $cas
-      on(BasePage).close_extra_windows
-      @browser.goto "#{$base_url+$cas_context}logout"
-    else
-      visit(Researcher)
-      visit(login_class).close_extra_windows
-      on BasePage do |page|
-        page.logout if page.logout_button.present?
-      end
-    end
+    on(BasePage).close_extra_windows
+    @browser.goto "#{$base_url+$context}kr-login/login"
+
+    #DEBUG.message "just signed out as #{@user_name}"
+    #DEBUG.pause 5
+
     $current_user=nil
   end
   alias_method :log_out, :sign_out
@@ -337,28 +338,29 @@ class UserObject < DataFactory
     $users.admin.log_in if $current_user==nil
 
 
-
-    DEBUG.message
-
+    #DEBUG.message @browser.url.inspect
 
 
-    visit PersonLookup do |search|
+    visit SystemAdmin do |page|
 
 
+      #DEBUG.message page.url.inspect
+      #DEBUG.pause 10
 
-      DEBUG.message
 
-
-
+      page.person
+    end
+    on PersonLookup do |search|
       search.principal_name.set @user_name
       search.search
       begin
+        search.results_table.wait_until_present(2)
         if search.item_row(@user_name).present?
           # TODO!
           # This is a coding abomination to include
           # this here, but it's here until I can come
           # up with a better solution...
-          @principal_id = search.item_row(@user_name).link(title: /^Person Principal ID=\d+/).text
+          @principal_id = search.item_row(@user_name).link(title: /Person Principal ID=\d+/).text
           return true
         else
           return false

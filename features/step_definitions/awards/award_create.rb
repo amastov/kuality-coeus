@@ -22,18 +22,18 @@ end
 #Award Validations Based on Errors During Creation
 #----------------------#
 When /^I ? ?creates? an Award with a missing required field$/ do
-  required_field = ['Description','Transaction Type', 'Award Status',
+  required_field = ['Transaction Type', 'Award Status',
                     'Award Title', 'Activity Type', 'Award Type',
-                    'Project End Date', 'Lead Unit'
+                    'Project End Date', 'Lead Unit ID'
   ].sample
   required_field=~/(Type|Status)/ ? value='select' : value=' '
   field = damballa(required_field)
   @award = create AwardObject, field=>value
   text = ' is a required field.'
   @required_field_error = case(required_field)
-                            when 'Description'
-                              "Document #{required_field} (#{required_field})#{text}"
-                            when 'Transaction Type', 'Award Status', 'Award Title', 'Activity Type', 'Award Type', 'Project End Date', 'Lead Unit'
+                            when 'Award Title'
+                              "#{required_field} (Title)#{text}"
+                            when 'Transaction Type', 'Award Status', 'Activity Type', 'Award Type', 'Project End Date', 'Lead Unit ID'
                               "#{required_field} (#{required_field})#{text}"
                             end
 end

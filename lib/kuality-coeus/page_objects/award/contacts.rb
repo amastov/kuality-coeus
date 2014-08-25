@@ -5,8 +5,8 @@ class AwardContacts < KCAwards
   expected_element :close_button
 
   # Key Personnel
-  action(:employee_search) { |b| b.frm.button(name: 'methodToCall.performLookup.(!!org.kuali.kra.bo.KcPerson!!).(((personId:projectPersonnelBean.personId))).((`projectPersonnelBean.newProjectPerson.person.fullName:lastName`)).((<>)).(([])).((**)).((^^)).((&&)).((//)).((~~)).(::::;;::::).anchorKeyPersonnelandCreditSplit').click }
-  action(:non_employee_search) { |b| b.frm.button(name: 'methodToCall.performLookup.(!!org.kuali.kra.bo.NonOrganizationalRolodex!!).(((rolodexId:projectPersonnelBean.rolodexId))).((`projectPersonnelBean.rolodexId:rolodexId,projectPersonnelBean.newProjectPerson.rolodex.fullName:lastName`)).((<>)).(([])).((**)).((^^)).((&&)).((//)).((~~)).(::::;;::::).anchorKeyPersonnelandCreditSplit').click }
+  action(:employee_search) { |b| b.frm.button(name: 'methodToCall.performLookup.(!!org.kuali.coeus.common.framework.person.KcPerson!!).(((personId:projectPersonnelBean.personId))).((`projectPersonnelBean.newProjectPerson.person.fullName:lastName`)).((<>)).(([])).((**)).((^^)).((&&)).((//)).((~~)).(::::;;::::).anchorKeyPersonnelandCreditSplit').click }
+  action(:non_employee_search) { |b| b.frm.button(name: 'methodToCall.performLookup.(!!org.kuali.coeus.common.framework.rolodex.NonOrganizationalRolodex!!).(((rolodexId:projectPersonnelBean.rolodexId))).((`projectPersonnelBean.rolodexId:rolodexId,projectPersonnelBean.newProjectPerson.rolodex.fullName:lastName`)).((<>)).(([])).((**)).((^^)).((&&)).((//)).((~~)).(::::;;::::).anchorKeyPersonnelandCreditSplit').click }
   element(:kp_employee_user_name) { |b| b.frm.text_field(name: 'projectPersonnelBean.newProjectPerson.person.fullName') }
   value(:kp_employee_full_name) { |b| b.frm.div(id: 'per.fullName.div').text }
   element(:kp_non_employee_id) { |b| b.frm.text_field(name: 'projectPersonnelBean.newProjectPerson.rolodex.fullName') }
