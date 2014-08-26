@@ -23,7 +23,7 @@ Feature: IRB Protocol Actions
     Given the IRB Admin creates a Committee
     And   schedules at least one event for the Committee
     And   submits the Committee
-    When  creates an IRB Protocol with expedited submissions review type for lead unit '000001'
+    When  the IRB Admin creates an IRB Protocol with expedited submissions review type for lead unit '000001'
     And   submits the Protocol to the Committee for expedited review, with an approval date of last year
     And   creates an amendment for the Protocol
     And   submits the Protocol to the Committee for review, with:

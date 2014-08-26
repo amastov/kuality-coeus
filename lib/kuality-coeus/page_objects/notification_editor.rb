@@ -3,6 +3,10 @@ class NotificationEditor < BasePage
   global_buttons
   document_header_elements
 
+  undefine :send_notification
+
+  action(:send_notification) { |b| b.frm.button(name: 'methodToCall.sendNotification').click }
+
   action(:employee_search) { |b| b.frm.button(name: 'methodToCall.performLookup.(!!org.kuali.kra.bo.KcPerson!!).(((personId:notificationHelper.newPersonId))).((``)).((<>)).(([])).((**)).((^^)).((&&)).((//)).((~~)).(::::;;::::).anchor').click }
   
   action(:add) { |b| b.frm.button(name: 'methodToCall.addNotificationRecipient.anchor').click }

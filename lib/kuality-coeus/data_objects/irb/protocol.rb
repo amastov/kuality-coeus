@@ -35,8 +35,14 @@ class IRBProtocolObject < DataFactory
   end
 
   def create
-    on(Header).researcher
-    on(ResearcherMenu).create_irb_protocol
+    #FIXME when the new UI is more solid...
+    if on(Header).researcher_link.present?
+      on(Header).researcher
+      on(ResearcherMenu).create_irb_protocol
+    else
+      @browser.goto 'http://test.kc.kuali.org/kc-trunk/portal.do?selectedTab=portalResearcherBody'
+      @browser.link(text: 'Create IRB Protocol').click
+    end
     on ProtocolOverview do |doc|
       @document_id=doc.document_id
       @doc_header=doc.doc_title
@@ -66,6 +72,8 @@ class IRBProtocolObject < DataFactory
     view 'Protocol Actions'
     @reviews = make ReviewObject, opts
     @reviews.create
+    # FIXME Dangerous:
+    confirmation
     on SubmitForReview do |page|
       page.expand_all
       @status=page.document_status
@@ -156,6 +164,11 @@ class IRBProtocolObject < DataFactory
       page.comments.fit @return_to_pi[:comments]
       page.submit
       @document_id=page.document_id
+      @status=page.status
+
+      # TODO: Make filling this out more robust...
+      on(NotificationEditor).send_notification
+
     end
   end
 

@@ -20,7 +20,7 @@ Feature: Creating IRB Protocols
     And   the Protocol Creator creates an IRB Protocol in the Committee's home unit
     When  the Protocol is being submitted to that Committee for review
     Then  the earliest available schedule date is based on the Committee's Adv Submission Days value
-  @test
+
   Scenario: Exceeding Maximum Protocols
     Given a User exists with the role: 'IRB Administrator'
     And   the IRB Admin submits a Committee that allows a maximum of 1 protocol
