@@ -6,14 +6,14 @@ class IRBProtocolObject < DataFactory
                :other_identifier_type, :other_identifier_name, :organization_id, :organization_type,
                :funding_type, :funding_number, :source, :participant_type, :document_id, :initiator,
                :protocol_number, :status, :submission_status, :expiration_date, :personnel,
-               # Submit for review...
-               :reviews,
                # Withdraw
                :withdrawal_reason,
                # Amendment
                :amendment,
                # Return to PI
                :return_to_pi
+                # Submit for Review
+  attr_accessor :reviews
 
   def_delegators :@personnel, :principal_investigator
   def_delegators :@reviews, :add_comment_for, :approve_review_of, :accept_comments_of, :comments_of,
@@ -35,7 +35,8 @@ class IRBProtocolObject < DataFactory
   end
 
   def create
-    visit(Researcher).create_irb_protocol
+    on(Header).researcher
+    on(ResearcherMenu).create_irb_protocol
     on ProtocolOverview do |doc|
       @document_id=doc.document_id
       @doc_header=doc.doc_title
@@ -66,6 +67,7 @@ class IRBProtocolObject < DataFactory
     @reviews = make ReviewObject, opts
     @reviews.create
     on SubmitForReview do |page|
+      page.expand_all
       @status=page.document_status
       @document_id=page.document_id
     end

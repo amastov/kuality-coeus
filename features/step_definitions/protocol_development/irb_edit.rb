@@ -8,7 +8,7 @@ end
 
 When /the Protocol is being submitted to that Committee for review/ do
   @irb_protocol.view 'Protocol Actions'
-  on ProtocolActions do |page|
+  on SubmitForReview do |page|
     page.expand_all
     page.committee.select @committee.name
   end
@@ -77,7 +77,9 @@ And /^(the principal investigator |)submits the Protocol to the Committee for ex
 end
 
 When /the second Protocol is submitted to the Committee for review on the same date/ do
-  @irb_protocol2.submit_for_review committee: @committee.name, schedule_date: @irb_protocol.schedule_date
+  @irb_protocol2.view 'Protocol Actions'
+  @irb_protocol2.reviews = make ReviewObject, committee: @committee.name, schedule_date: @irb_protocol.reviews.schedule_date
+  @irb_protocol2.reviews.create
 end
 
 And /suspends? the Protocol$/ do
@@ -98,7 +100,7 @@ And /the principal investigator approves the Protocol$/ do
   @irb_protocol.principal_investigator.log_in
 
   # TODO: This is probably not the right pathway through the UI...
-  visit(Researcher).action_list
+  visit(CentralAdmin).action_list
   on(ActionList).filter
   on ActionListFilter do |page|
 

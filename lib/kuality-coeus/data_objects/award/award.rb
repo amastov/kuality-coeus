@@ -41,7 +41,7 @@ class AwardObject < DataFactory
       account_id:            random_alphanums(7),
       account_type:          '::random::',
       prime_sponsor:         '::random::',
-      cfda_number:           "#{"%02d"%rand(99)}.#{"%03d"%rand(999)}",
+      cfda_number:           '10.001',#"#{"%02d"%rand(99)}.#{"%03d"%rand(999)}",
       anticipated_direct:    amount,
       obligated_direct:      amount,
       funding_proposals:     [], # Contents MUST look like: {ip_number: '00001', merge_type: 'No Change'}, ...

@@ -14,7 +14,7 @@ And /the IRB Admin submits a Committee with events scheduled before and after it
 end
 
 Then /the earliest available schedule date is based on the Committee's Adv Submission Days value/ do
-  on(ProtocolActions).schedule_date.options[1].text[/^\d+-\d+-\d+/].should==(Time.now+(86400*(@committee.adv_submission_days.to_i))).strftime('%m-%d-%Y')
+  on(SubmitForReview).schedule_date.options[1].text[/^\d+-\d+-\d+/].should==(Time.now+(86400*(@committee.adv_submission_days.to_i))).strftime('%m-%d-%Y')
 end
 
 And /the IRB Admin submits a Committee that allows a maximum of 1 protocol/ do
