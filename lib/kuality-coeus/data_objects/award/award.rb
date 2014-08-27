@@ -4,7 +4,7 @@ class AwardObject < DataFactory
   include Navigation, DateFactory, StringFactory, DocumentUtilities
 
   attr_reader :award_status,
-              :award_title, :lead_unit, :activity_type, :award_type, :sponsor_id, :sponsor_type_code,
+              :award_title, :lead_unit_id, :activity_type, :award_type, :sponsor_id, :sponsor_type_code,
               :nsf_science_code, :account_id, :account_type, :prime_sponsor, :cfda_number,
               :version, :prior_versions,
               :creation_date, :key_personnel, :cost_sharing, :fa_rates,
@@ -35,7 +35,7 @@ class AwardObject < DataFactory
       project_end_date:      in_a_year[:date_w_slashes],
       sponsor_type_code:     '::random::',
       sponsor_id:            '::random::',
-      lead_unit:             '::random::',
+      lead_unit_id:             '::random::',
       obligation_start_date: right_now[:date_w_slashes],
       obligation_end_date:   in_a_year[:date_w_slashes],
       account_id:            random_alphanums(7),
@@ -440,17 +440,23 @@ class AwardObject < DataFactory
 
   def set_lead_unit
     lu_edit = on(Award).lead_unit_id.present?
-    randomize = @lead_unit=='::random::'
+    randomize = @lead_unit_id=='::random::'
     if lu_edit && randomize
+
+      DEBUG.message 'We don\'t want to be here'
+
       on(Award).lookup_lead_unit
       on UnitLookup do |lk|
         lk.search
         lk.return_random
       end
     elsif lu_edit && !randomize
-      on(Award).lead_unit_id.fit @lead_unit
+
+      DEBUG.message 'We wan\'t to be here'
+
+      on(Award).lead_unit_id.fit @lead_unit_id
     else
-      @lead_unit=on(Award).lead_unit_ro
+      @lead_unit_id=on(Award).lead_unit_ro
     end
   end
 

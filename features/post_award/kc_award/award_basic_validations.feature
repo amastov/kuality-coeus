@@ -12,12 +12,12 @@ Feature: Basic Award Validations
     Given the Award Modifier creates an Award
     When  I start adding a Payment & Invoice item to the Award
     Then  a warning appears saying tracking details won't be added until there's a PI
-  @broken
+
   Scenario: Attempt to create a KC Award document with a missing required field
     Given I log in with the Award Modifier user
     When  I create an Award with a missing required field
     Then  an error should appear saying the field is required
-  @broken
+
   Scenario: Enter an account ID that contains non-alphanumeric characters
     Given the Award Modifier creates an Award
     When  an Account ID with special characters is added to the Award details
@@ -36,7 +36,7 @@ Feature: Basic Award Validations
   Scenario: The anticipated amount is less than the obligated amount
     When  the Award Modifier creates an Award with more obligated than anticipated amounts
     Then  an error should appear that says the anticipated amount must be equal to or more than obligated
-  @proposal @broken
+  @proposal
   Scenario: Attempt to link an IP that has not been approved
     Given the Proposal Creator submits a new Proposal into routing
     And   the OSP Administrator submits the Proposal to its sponsor
@@ -86,7 +86,7 @@ Feature: Basic Award Validations
     And   adds an item of approved equipment to the Award
     When  the AM adds a duplicate item of approved equipment to the Award
     Then  an error should appear that says the approved equipment can't have duplicates
-  @test
+
   Scenario: Cancelling and Restarting a T&M document
     Given a User exists with the role: 'Time And Money Modifier'
     And   the Award Modifier creates an Award
