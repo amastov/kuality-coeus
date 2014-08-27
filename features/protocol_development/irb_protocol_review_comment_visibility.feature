@@ -52,7 +52,7 @@ Feature: IRB Protocol Review Comment Visibility
     And   the primary reviewer can see the primary reviewer's comment in the meeting minutes
     And   the uninvolved committee member can't see the primary reviewer's comment in the meeting minutes
     And   the non-reviewing committee member can't see the primary reviewer's comment in the meeting minutes
-  @test
+
   Scenario: Approved Primary Reviewer Comments are not Private and not Final
     Given the IRB Admin sets the flags of the primary reviewers comments to clear
     And   the IRB Admin approves the primary reviewers review(s)

@@ -1,5 +1,7 @@
 class RoleLookup < Lookups
 
+  old_ui
+
   expected_element :id
 
   url_info 'Role','rice.kim.impl.role.RoleBo'

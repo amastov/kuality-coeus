@@ -9,12 +9,13 @@ class UserRoleObject < DataFactory
     @browser = browser
 
     defaults = {
-        id:         '106',
         name:       'unassigned',
         qualifiers: [{:unit=>'000001'}]
     }
     set_options defaults.merge(opts)
     requires :user_name
+    @id = RoleObject::ROLES[@name]
+    raise "Can't find role ID based on the name given (#{@name}). Is the ROLES constant in RoleObject updated?" if @id.nil?
     # Need to groom the nil(s) from the @qualifiers array
     @qualifiers = @qualifiers.compact
   end

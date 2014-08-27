@@ -1,5 +1,7 @@
 class ResearchAreasLookup < Lookups
 
+  old_ui
+
   expected_element :research_area_code
 
   results_multi_select
