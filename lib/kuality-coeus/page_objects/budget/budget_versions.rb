@@ -1,4 +1,4 @@
-class BudgetVersions < ProposalDevelopmentDocument
+class BudgetVersions < BasePage
 
   budget_versions_elements
 

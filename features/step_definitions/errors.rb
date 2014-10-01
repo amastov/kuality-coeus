@@ -4,7 +4,7 @@
 #----------------------#
 Then /^an error should appear that says (.*)$/ do |error|
   errors = {'to select a valid unit' => 'Please select a valid Unit.',
-            'a key person role is required' => 'Key Person Role is a required field.',
+            'a key person role is required' => 'Key Person\'s role will be: Required',
             'the credit split is not a valid percentage' => 'Credit Split is not a valid percentage.',
             'only one PI is allowed' => 'Only one proposal role of Principal Investigator is allowed.',
             'the Award has no PI' => 'There is no Principal Investigator selected. Please enter a Principal Investigator',
@@ -18,7 +18,7 @@ Then /^an error should appear that says (.*)$/ do |error|
             'an original proposal ID is needed'=>'Please provide an original institutional proposal ID that has been previously submitted to Grants.gov for a Change\/Corrected Application.',
             'the prior award number is required'=> %|require the sponsor's prior award number in the "sponsor proposal number."|,
             'sponsor deadline date not entered' => 'Sponsor deadline date has not been entered.',
-            'a valid sponsor is required' => 'A valid Sponsor Code (Sponsor) must be selected.',
+            'a valid sponsor is required' => 'Sponsor: A valid Sponsor (Sponsor) must be selected.',
             'the Account ID may only contain letters or numbers' => 'The Account ID (Account ID) may only consist of letters or digits.',
             'the Award\'s title contains invalid characters' => 'The Award Title (Title) may only consist of visible characters, spaces, or tabs.',
             'the anticipated amount must be equal to or more than obligated' => 'The Anticipated Amount must be greater than or equal to Obligated Amount.',
@@ -37,7 +37,7 @@ Then /^an error requiring at least one unit for the co-investigator is shown$/ d
 end
 
 Then /^an error about un-certified personnel is shown$/ do
-  $current_page.validation_errors_and_warnings.should include %|The Investigators are not all certified. Please certify #{@proposal.key_personnel[0].first_name} #{@proposal.key_personnel[0].last_name}.|
+  $current_page.errors.should include %|The Investigators are not all certified. Please certify #{@proposal.key_personnel[0].first_name} #{@proposal.key_personnel[0].last_name}.|
 end
 
 Then /^an error is shown that says (.*)$/ do |error|

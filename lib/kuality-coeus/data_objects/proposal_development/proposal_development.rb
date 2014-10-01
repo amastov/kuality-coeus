@@ -1,6 +1,6 @@
 class ProposalDevelopmentObject < DataFactory
 
-  include StringFactory, DateFactory, Navigation, DocumentUtilities
+  include StringFactory, DateFactory, DocumentUtilities
   
   attr_reader :proposal_type, :lead_unit, :activity_type, :project_title, :proposal_number,
               :sponsor_id, :sponsor_type_code, :project_start_date, :project_end_date, :document_id,
@@ -35,7 +35,6 @@ class ProposalDevelopmentObject < DataFactory
       personnel_attachments: collection('PersonnelAttachments'),
       proposal_attachments:  collection('ProposalAttachments')
     }
-    @lookup_class=DocumentSearch
     set_options(defaults.merge(opts))
   end
     
@@ -43,23 +42,24 @@ class ProposalDevelopmentObject < DataFactory
     on(Header).researcher
     on(ResearcherMenu).create_proposal
     on CreateProposal do |doc|
-      doc.proposal_type.wait_until_present(10)
-      #@doc_header=doc.doc_title
-      #@document_id=doc.document_id
-      #@status=doc.document_status
-      #@initiator=doc.initiator
-      #@created=doc.created
-      doc.lookup_sponsor
+      # Because of the Date Picker box that appears when clicking on the
+      # Date fields, we need this special handling here. Otherwise
+      # the select lists might not all get filled out, causing the
+      # create to error out inappropriately.
+      fill_out doc, :project_start_date, :project_end_date
+      doc.date_picker.button(text: 'Done').click if doc.date_picker.button(text: 'Done').present?
+      fill_out doc,  :project_title, :proposal_type, :activity_type, :lead_unit
       set_sponsor_code
-      doc.unit_number.pick! @lead_unit
-      fill_out doc, :proposal_type, :activity_type, :project_title,
-               :project_start_date, :project_end_date
       doc.save_and_continue
-
-
-      DEBUG.pause
-
-
+      return if doc.errors.size > 0
+    end
+    on ProposalDetails do |page|
+      page.more
+      @doc_header=page.doc_title
+      @document_id=page.document_id
+      @status=page.document_status
+      @initiator=page.initiator
+      @created=page.created
       #@permissions = make PermissionsObject, merge_settings(aggregators: [@initiator])
     end
   end
@@ -103,18 +103,6 @@ class ProposalDevelopmentObject < DataFactory
 
   def add_personnel_attachment opts={}
     @personnel_attachments.add merge_settings(opts)
-  end
-
-  def complete_s2s_questionnaire opts={}
-    @s2s_questionnaire = prep(S2SQuestionnaireObject, opts)
-  end
-
-  def complete_phs_fellowship_questionnaire opts={}
-    @phs_fellowship_questionnaire = prep(PHSFellowshipQuestionnaireObject, opts)
-  end
-
-  def complete_phs_training_questionnaire opts={}
-    @phs_training_questionnaire = prep(PHSTrainingQuestionnaireObject, opts)
   end
 
   def make_institutional_proposal
@@ -203,13 +191,13 @@ class ProposalDevelopmentObject < DataFactory
   end
 
   def close
-    open_document
+    navigate unless on_document?
     on(Proposal).close
   end
 
   def view(tab)
-    open_document
-    on(ProposalDevelopmentDocument).send(damballa(tab.to_s)) unless @status=='CANCELED' || on(ProposalDevelopmentDocument).send(damballa("#{tab}_button")).parent.class_name=~/tabcurrent$/
+    navigate unless on_document?
+    on(ProposalSidebar).send(damballa(tab.to_s))
   end
 
   def submit(type=:s)
@@ -328,12 +316,20 @@ class ProposalDevelopmentObject < DataFactory
   # =======
 
   def navigate
-    visit(Researcher).doc_search
-    on DocumentSearch do |search|
-      search.close_parents
-      search.document_id.set @document_id
+    on(Header).researcher
+    on(ResearcherMenu).search_proposals
+    on DevelopmentProposalLookup do |search|
+      search.proposal_number.set @proposal_number
       search.search
-      search.open_doc @document_id
+      search.edit_proposal @proposal_number
+    end
+  end
+
+  def on_document?
+    begin
+      on(NewDocumentHeader).document_title==@doc_header
+    rescue Watir::Exception::UnknownObjectException, Selenium::WebDriver::Error::StaleElementReferenceError, WatirNokogiri::Exception::UnknownObjectException, Watir::Wait::TimeoutError
+      false
     end
   end
 
@@ -341,9 +337,7 @@ class ProposalDevelopmentObject < DataFactory
     defaults = {
         document_id: @document_id,
         doc_header: @doc_header,
-        proposal_number: @proposal_number,
-        lookup_class: @lookup_class,
-        search_key: @search_key
+        proposal_number: @proposal_number
     }
     opts.merge!(defaults)
   end
@@ -365,23 +359,21 @@ class ProposalDevelopmentObject < DataFactory
     object
   end
 
-  # FIXME!
   def set_sponsor_code
-    on(CreateProposal).lookup_sponsor
     if @sponsor_id=='::random::'
+      on(CreateProposal).lookup_sponsor
       on SponsorLookup do |look|
+        # Necessary here because of how the HTML gets instantiated...
+        look.sponsor_name.wait_until_present(10)
         fill_out look, :sponsor_type_code
         look.search
-        look.page_links[rand(look.page_links.size)].click if look.page_links.size > 0
+        look.page_links.to_a.sample.click if look.page_links.size > 0
+        look.results_table.wait_until_present
         look.select_random
       end
-      @sponsor_id=on(CreateProposal).sponsor_id.value
-
-
-      DEBUG.message @sponsor_id.inspect
-
+      @sponsor_id=on(CreateProposal).sponsor_code.value
     else
-      on(CreateProposal).sponsor_id.fit @sponsor_id
+      on(CreateProposal).sponsor_code.fit @sponsor_id
     end
   end
 

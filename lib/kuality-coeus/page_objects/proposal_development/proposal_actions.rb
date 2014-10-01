@@ -1,4 +1,4 @@
-class ProposalActions < ProposalDevelopmentDocument
+class ProposalActions < BasePage
 
   expected_element :data_validation_header
 

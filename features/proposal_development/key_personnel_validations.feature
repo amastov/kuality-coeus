@@ -23,17 +23,9 @@ Feature: Proposal Key Personnel Validations
     When I add a key person without a key person role
     Then an error should appear that says a key person role is required
 
-  Scenario: Error when adding a co-investigator without a unit
-    When I add a co-investigator without a unit to the Proposal
-    Then an error requiring at least one unit for the co-investigator is shown
-
   Scenario: Error when adding multiple principle investigators
     When I try to add two principal investigators
     Then an error should appear that says only one PI is allowed
-
-  Scenario: Error when adding a key person with an invalid unit
-    When I add a key person with an invalid unit type
-    Then an error should appear that says to select a valid unit
 
   Scenario: Error when adding the same user as a PI and Co-Investigator
     When I add the same person to the Proposal as a PI and Co-Investigator

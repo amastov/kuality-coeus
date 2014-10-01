@@ -11,5 +11,4 @@ module Watir
       end
     end
   end
-
 end

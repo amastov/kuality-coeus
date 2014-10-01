@@ -1,4 +1,4 @@
-class Proposal < ProposalDevelopmentDocument
+class Proposal < BasePage
 
   value(:feedback) { |b| b.frm.div(class: 'left-errmsg').text }
 

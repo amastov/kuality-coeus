@@ -55,10 +55,6 @@ After do |scenario|
 
   # A temp solution while the logout problem exists...
   @browser.close
-
-  #DEBUG.message 'In After block. Just went to logout.do'
-
-
 end
 
 # Uncomment when fix to logging in/out arrives

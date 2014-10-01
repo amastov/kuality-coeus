@@ -1,4 +1,4 @@
-class ResubmissionOptions < ProposalDevelopmentDocument
+class ResubmissionOptions < BasePage
 
   glbl 'continue'
 

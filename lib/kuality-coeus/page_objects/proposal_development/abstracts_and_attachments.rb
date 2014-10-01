@@ -1,4 +1,4 @@
-class AbstractsAndAttachments < ProposalDevelopmentDocument
+class AbstractsAndAttachments < BasePage
 
   # Proposal Attachments
   element(:proposal_attachment_type) { |b| b.frm.select(id: 'newNarrative.narrativeTypeCode') }

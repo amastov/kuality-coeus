@@ -28,26 +28,16 @@ end
 When /^(the (.*) |)creates a Proposal while missing a required field$/ do |text, role_name|
   steps %{ * I log in with the #{role_name} user } unless text==''
   # Pick a field at random for the test...
-  required_field = [ 'Proposal Type', 'Activity Type', 'Project Title',
-       'Sponsor Code',
-       'Project Start Date', 'Project End Date'
+  required_field = [ 'Proposal Type', 'Activity Type', 'Project Title'#,
+       #'Sponsor Code',
+       #'Project Start Date', 'Project End Date'
           ].sample
   # Properly set the nil value depending on the field type...
   required_field=~/Type/ ? value='select' : value=''
   # Transform the field name to the appropriate symbol...
   field = damballa(required_field.gsub('Code','id'))
   @proposal = create ProposalDevelopmentObject, field=>value
-  text = ' is a required field.'
-  @required_field_error = case(required_field)
-                            when 'Project End Date'
-                              "#{required_field} (End Dt)#{text}"
-                            when 'Project Title'
-                              "#{required_field} (Title)#{text}"
-                            when 'Sponsor Code'
-                              "#{required_field} (Sponsor)#{text}"
-                            else
-                              "#{required_field} (#{required_field})#{text}"
-  end
+  @required_field_error = "#{required_field}: Required"
 end
 
 When /^(the (.*) |)creates a Proposal with an? '(.*)' sponsor type$/ do |text, role_name, type|

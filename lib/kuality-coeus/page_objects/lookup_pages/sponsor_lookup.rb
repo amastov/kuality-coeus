@@ -1,14 +1,14 @@
 class SponsorLookup < Lookups
 
-  element(:frm) { |b| b.frame(class: 'uif-iFrame uif-lookupDialog-iframe') }
+  element(:frm) { |b| b.iframe(class: 'uif-iFrame uif-lookupDialog-iframe') }
 
-  expected_element :sponsor_name
+  dialog_ui
 
-  new_ui
+  element(:header) { |b| b.frm.header(id: 'Sponsor-LookupView_headerWrapper') }
 
   element(:sponsor_name) { |b| b.frm.text_field(name: 'lookupCriteria[sponsorName]') }
-  element(:sponsor_type_code) { |b| b.select(name: 'lookupCriteria[sponsorTypeCode]') }
-  element(:page_links) { |b| b.frm.links(tabindex: '0') }
+  select(:sponsor_type_code, :name, 'lookupCriteria[sponsorTypeCode]')
+  element(:page_links) { |b| b.frm.links(class: 'paginate_active') }
 
   p_value(:sponsor_code_of) { |name, b| b.item_row(name).link(title: /Sponsor Code=/).text }
 

@@ -1,4 +1,4 @@
-class PDCustomData < ProposalDevelopmentDocument
+class PDCustomData < BasePage
 
   custom_data
 

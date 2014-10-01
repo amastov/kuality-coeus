@@ -1,101 +1,51 @@
-class KeyPersonnel < ProposalDevelopmentDocument
+class KeyPersonnel < BasePage
 
-  combined_credit_splits
+  document_buttons
+  
+  buttons 'Add Personnel'
 
-  action(:employee_search) { |b| b.frm.button(name: 'methodToCall.performLookup.(!!org.kuali.kra.bo.KcPerson!!).(((personId:newPersonId))).((``)).((<>)).(([])).((**)).((^^)).((&&)).((//)).((~~)).(::::;;::::).anchor').click }
-  action(:non_employee_search) { |b| b.frm.button(name: 'methodToCall.performLookup.(!!org.kuali.kra.bo.NonOrganizationalRolodex!!).(((rolodexId:newRolodexId))).((``)).((<>)).(([])).((**)).((^^)).((&&)).((//)).((~~)).(::::;;::::).anchor').click }
-  element(:proposal_role) { |b| b.frm.select(id: 'newProposalPerson.proposalPersonRoleId') }
-  element(:key_person_role) { |b| b.frm.text_field(id: 'newProposalPerson.projectRole') }
-  action(:add_person) { |b| b.frm.button(name: 'methodToCall.insertProposalPerson').click }
-  action(:clear) { |b| b.frm.button(name: 'methodToCall.clearProposalPerson').click }
+  new_error_messages
 
-  value(:person_name) { |b| b.frm.table(class: 'grid')[0][1].text }
+  p_element(:section_of) { |name, b| b.h4(text: /#{name}/).parent.parent }
 
-  # Use to check if there are errors present or not...
-  element(:add_person_errors_div) { |b| b.frm.div(class: 'annotate-container').div(class: 'left-errmsg-tab').div }
+  # Details
 
-  # The catch-all container for all errors that appear on the page
+  p_element(:user_name_of) { |name, b| b.section_of(name).text_field(name: /userName/) }
+  p_element(:home_unit_of) { |name, b| b.section_of(name).text_field(name: /homeUnit/) }
+  p_element(:era_commons_name_of) { |name, b| b.section_of(name).text_field(name: /eraCommonsUserName/) }
 
-  value(:add_person_errors) { |b| b.frm.div(class: 'annotate-container').div(class: 'left-errmsg-tab').divs.collect{ |div| div.text} }
-  value(:add_validation_errors) { |b| b.frm.div(class: 'annotate-container').div(class: 'left-errmsg-tab', index: 1).lis.collect{ |li| li.text} }
-  value(:combined_credit_split_errors) { |b| b.frm.div(id: 'tab-CombinedCreditSplit-div').div(class: 'left-errmsg-tab').divs.collect{ |div| div.text } }
+  # Unit Details
 
-  # Person info...
+  # This method makes an Array containing Hashes with :name and :number keys...
+  # FIXME: This method will NOT WORK if, by some odd chance, the person has more
+  # than 10 units. This is such an unlikely scenario, however, that we are not
+  # coding for it.
+  p_value(:units_of) { |name, b|
+    units= []
+    b.section_of(name).table().rows[1..-1].each{ |row| units << {name: row.td.text, number: row.td(index: 1).text} }
+    units
+  }
 
-  # Note this is a *setting* of the person's checkbox, since this method is only used
-  # in the context of deleting the person from the Personnel
-  action(:check_person) { |full_name, b| b.frm.h2(text: full_name).parent.checkbox(title: 'Generic Boolean Attribute').set }
+  p_value(:lead_unit_of) { |name, b| b.section_of(name).table.row(text: /Lead Unit - Cannot delete/).td(index: 1).text }
 
-  action(:show_person) { |full_name, b| b.frm.button(title: "open #{twospace(full_name)}").click }
-
-  # Person Details...
-  action(:show_person_details) { |full_name, b| b.frm.button(id: "tab-#{nsp(full_name)}:PersonDetails-imageToggle").click }
-
-  # Note this method ONLY relates to the select list for the role, not
-  # the read-only field that appears when the role is "Key Person"
-  action(:role) { |full_name, p| p.person_div(full_name).select(name: /document.developmentProposalList[\d+].proposalPersons[\d+].proposalPersonRoleId/) }
-  p_value(:user_name_of) { |full_name, p| p.person_div(full_name).table[1][3].text }
-  p_value(:home_unit_of) { |full_name, p| p.person_div(full_name).table[8][1].text }
-  action(:era_commons_name) { |full_name, p| p.person_div(full_name).text_field(name: /eraCommonsUserName/) }
-
-  # Degrees...
-  action(:degree_type) { |full_name, p| p.degrees_div(full_name).select(name: 'newProposalPersonDegree[0].degreeCode') }
-  action(:degree_description) { |full_name, p| p.degrees_div(full_name).text_field(name: 'newProposalPersonDegree[0].degree') }
-  action(:graduation_year) { |full_name, p| p.degrees_div(full_name).text_field(name: 'newProposalPersonDegree[0].graduationYear') }
-  action(:school) { |full_name, p| p.degrees_div(full_name).text_field(name: 'newProposalPersonDegree[0].school') }
-  action(:add_degree) { |full_name, p| p.degrees_div(full_name).button(name: 'methodToCall.insertDegree.document.developmentProposalList[0].proposalPersons[0].line').click }
-
-  # Unit Details...
-  action(:unit_details_errors_div) { |full_name, p| p.unit_div(full_name).div(class: 'left-errmsg-tab').div }
-  action(:unit_details_errors) { |full_name, p| p.unit_details_errors_div(full_name).divs.collect { |div| div.text } }
-
-  # This button is only present in the context of a Key Person...
-  action(:add_unit_details) { |full_name, p| p.unit_div(full_name).button(title: 'Add Unit Details').click }
-
-  action(:show_unit_details) { |full_name, b| b.frm.button(id: "tab-#{nsp(full_name)}:UnitDetails-imageToggle").click }
-  action(:lookup_unit) { |full_name, p| p.unit_div(full_name).button(name: 'methodToCall.performLookup.(!!org.kuali.kra.bo.Unit!!).(((unitNumber:newProposalPersonUnit[0].unitNumber,unitName:newProposalPersonUnit[0].unitName))).((``)).((<>)).(([])).((**)).((^^)).((&&)).((//)).((~~)).(::::;;::::).anchor').click }
-  action(:add_unit_number) { |full_name, p| p.unit_div(full_name).text_field(id: /unitNumber/) }
-  action(:add_unit) { |full_name, p| p.unit_div(full_name).button(title: 'Add Unit').click }
-  action(:delete_unit) { |full_name, unit_number, p| p.unit_div(full_name).table(class: 'tab').row(text: /#{unit_number}/).button(title: 'Remove Unit').click }
-
-  # This returns an array of hashes, like so:
-  # [{:name=>"Unit1 Name", :number=>"Unit1 Number"}, {:name=>"Unit2 Name", :number=>"Unit2 Number"}]
-  p_action(:units) { |full_name, p| units = []; p.unit_div(full_name).table.to_a[2..-1].each { |unit| units << {name: unit[1], number: unit[2]} }; units }
-
-  # Proposal Person Certification
-  p_action(:include_certification_questions) { |full_name, b| b.certification_div(full_name).button(title: 'Add Certification Question').click }
-  p_element(:show_prop_pers_cert_button) { |full_name, b| b.certification_div(full_name).button(title: /open Proposal Person Certification/) }
-  p_action(:show_proposal_person_certification) { |full_name, b| b.show_prop_pers_cert_button(full_name).click }
-  # Questions...
-  {
-    :certify_info_true=>0,
-    :potential_for_conflict=>1,
-    :submitted_financial_disclosures=>2,
-    :lobbying_activities=>3,
-    :excluded_from_transactions=>4,
-    :familiar_with_pla=>5
-  }.each { |key, value| action(key) { |full_name, answer, p| p.questions_div(full_name).table(data_kc_questionindex: value.to_s).radio(value: answer).set } }
-
-  # IMPORTANT NOTE: This field does not actually exist on this page. However, we have it defined here
-  # anyway because it's needed for the Personnel Module...
-  element(:lead_unit_radio_button) { |b| b.frm.radio(name: 'selectedLeadUnit') }
-
-  # =======
-  private
-  # =======
-
-  element(:credit_split_div_table) { |b| b.frm.div(id: 'tab-CombinedCreditSplit-div').table }
-
-  action(:target_unit_row) do |full_name, unit_number, p|
-    trows = p.credit_split_div_table.rows
-    index = trows.find_index { |row| row.text=~/#{Regexp.escape(full_name)}/ }
-    trows[index..-1].find { |row| row.text=~/#{unit_number}/ }
+  # Person Certification
+  [:certify_info_true,
+      :potential_for_conflict,
+      :submitted_financial_disclosures,
+      :lobbying_activities,
+      :excluded_from_transactions,
+      :familiar_with_pla
+  ].each_with_index do |methd, index|
+    p_action(methd) { |name, value, b| b.section_of(name).radio(name: /questionnaireHelper.answerHeaders\[\d+\].questions\[#{index}\].answers\[\d+\].answer/, value: value).set }
   end
 
-  action(:person_div) { |full_name, b| b.frm.div(id: "tab-#{nsp(full_name)}:PersonDetails-div") }
-  action(:degrees_div) { |full_name, b| b.frm.div(id: "tab-#{nsp(full_name)}:Degrees-div") }
-  action(:unit_div) { |full_name, b| b.frm.div(id: "tab-#{nsp(full_name)}:UnitDetails-div") }
-  action(:questions_div) { |full_name, b| b.frm.span(class: 'subhead-left', text: full_name).parent.parent.div(class: 'questionnaireContent') }
-  action(:certification_div) { |full_name, b| b.frm.div(id: "tab-#{nsp(full_name)}:Certify-div") }
+  # TODO: Genericize and move this method...
+  def self.tabs(*tab_text)
+    tab_text.each do |text|
+      p_action("#{damballa(text)}_of") { |name, b| b.section_of(name).link(text: text).click; b.loading }
+    end
+  end
+
+  tabs 'Details', 'Organization', 'Extended Details', 'Degrees', 'Unit Details', 'Person Training Details', 'Proposal Person Certification'
 
 end

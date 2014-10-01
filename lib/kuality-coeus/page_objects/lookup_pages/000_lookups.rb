@@ -2,6 +2,11 @@ class Lookups < BasePage
 
   class << self
 
+    # We must override the method in the base page because of the iframe container in the new UI...
+    def select(method_name, attrib, value)
+      element(method_name) { |b| b.execute_script(%{jQuery("select[#{attrib}|='#{value}']").show();}); b.frm.select(attrib => value) }
+    end
+
     def old_ui
       element(:results_table) { |b| b.frm.table(id: 'row') }
 
@@ -19,7 +24,7 @@ class Lookups < BasePage
 
       p_action(:return_value) { |match, p| p.item_row(match).link(text: 'return value').click }
       p_action(:select_item) { |match, p| p.item_row(match).link(text: 'select').click }
-      action(:return_random) { |b| b.return_value_links[rand(b.return_value_links.length)].click }
+      action(:return_random) { |b| b.return_value_links.to_a.sample.click }
       element(:return_value_links) { |b| b.results_table.links(text: 'return value') }
 
       p_value(:docs_w_status) { |status, b| array = []; (b.results_table.rows.find_all{|row| row[3].text==status}).each { |row| array << row[0].text }; array }
@@ -41,11 +46,11 @@ class Lookups < BasePage
       alias_method :create, :create_new
     end
 
-    def new_ui
-      action(:search) { |b| b.frm.button(data_submit_data: '{"methodToCall":"search","displayResults":"true"}').click }
+    def dialog_ui
+      action(:search) { |b| b.frm.button(id: 'ufuknop').click; b.results_table.wait_until_present }
       element(:results_table) { |b| b.frm.table(id: 'uLookupResults_layout') }
-      action(:select_random) { |b| b.select_links[rand(b.select_links.length)].click }
-      element(:select_links) { |b| b.results_table.links(text: 'return value') }
+      action(:select_random) { |b| b.select_links.to_a.sample.click; b.header.wait_while_present }
+      element(:select_links) { |b| b.results_table.links(text: 'select') }
     end
 
     def url_info(title, class_name)

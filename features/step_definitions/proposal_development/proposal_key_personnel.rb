@@ -31,17 +31,6 @@ And /adds? a co-investigator to the Proposal$/ do
   @proposal.add_key_person role: 'Co-Investigator'
 end
 
-When /^I? ?add a co-investigator without a unit to the Proposal$/ do
-  @proposal.add_key_person role: 'Co-Investigator'
-  @proposal.co_investigator.delete_units
-end
-
-When /^I? ?add a key person with an invalid unit type$/ do
-  @proposal.add_key_person role: 'Key Person',
-                           key_person_role: 'king',
-                           units: [{number: 'invalid'}]
-end
-
 When /^I? ?adds? a principal investigator to the Proposal$/ do
   @proposal.add_principal_investigator
 end

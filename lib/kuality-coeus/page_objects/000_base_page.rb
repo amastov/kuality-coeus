@@ -5,7 +5,7 @@ class BasePage < PageFactory
   action(:close_extra_windows) { |b| b.close_children if b.windows.length > 1 }
   action(:close_children) { |b| b.windows[0].use; b.windows[1..-1].each{ |w| w.close} }
   action(:close_parents) { |b| b.windows[0..-2].each{ |w| w.close} }
-  action(:loading) { |b| b.frm.image(alt: 'working...').wait_while_present }
+  action(:loading) { |b| b.image(alt: 'Loading...').wait_while_present }
   element(:return_to_portal_button) { |b| b.frm.button(title: 'Return to Portal') }
   action(:awaiting_doc) { |b| b.return_to_portal_button.wait_while_present }
   action(:processing_document) { |b| b.frm.div(text: /The document is being processed. You will be returned to the document once processing is complete./ ).wait_while_present }
@@ -33,6 +33,12 @@ class BasePage < PageFactory
       end
     end
 
+    # New UI...
+    def document_buttons
+      action(:back) { |b| b.button(data_submit_data: '{"methodToCall":"navigate","actionParameters[navigateToPageId]":"PropDev-OrganizationLocationsPage"}').click }
+      buttons 'Save', 'Save and Continue', 'Close'
+    end
+
     def document_header_elements
       value(:doc_title) { |b| b.headerarea.h1.text.strip }
       value(:headerinfo_table) { |b| b.noko.div(id: 'headerarea').table(class: 'headerinfo') }
@@ -52,6 +58,16 @@ class BasePage < PageFactory
       alias_method :pi, :committee_name
       alias_method :expiration_date, :committee_name
       element(:headerarea) { |b| b.frm.div(id: 'headerarea') }
+    end
+
+    def new_doc_header
+      value(:document_title) { |b| b.h1(id: /header/).span(class: 'uif-headerText-span').text }
+      value(:section_header) { |b| b.h3.span(class: 'uif-headerText-span').text }
+      action(:more) { |b| b.link(text: 'more...').click }
+      value(:document_id) { |b| b.div(data_label: 'Doc Nbr').p.text }
+      value(:document_status) { |b| b.div(data_label: 'Status').text }
+      value(:created) { |b| b.div(data_label: 'Created').p.text }
+      value(:initiator) { |b| b.div(data_label: 'Initiator').text }
     end
 
     # Included here because this is such a common field in KC
@@ -199,6 +215,15 @@ class BasePage < PageFactory
       value(:error_messages_div) { |b| b.noko.div(class: 'error') }
     end
 
+    def new_error_messages
+      value(:errors) do |b|
+        errs = []
+        b.error_lis.each { |li| errs << li.text }
+        errs.flatten
+      end
+      element(:error_lis) { |b| b.lis(class: 'uif-errorMessageItem') }
+    end
+
     def validation_elements
       element(:validation_button) { |b| b.frm.button(name: 'methodToCall.activate') }
       action(:show_data_validation) { |b| b.frm.button(id: 'tab-DataValidation-imageToggle').click; b.validation_button.wait_until_present }
@@ -237,7 +262,7 @@ class BasePage < PageFactory
     end
 
     def select(method_name, attrib, value)
-      element(method_name) { |b| b.execute_script(%{jQuery("select[#{attrib}|='#{value}']").show();}); b.select(attrib => value) }
+      element(method_name) { |b| b.execute_script(%{jQuery("select[#{attrib}|='#{value}']").show();}) unless b.select(attrib => value).visible?; b.select(attrib => value) }
     end
 
     # Use this to define methods to click on the green
@@ -252,11 +277,10 @@ class BasePage < PageFactory
     end
 
     def elementate(type, text)
-      identifiers={:link=>:text, :button=>:value}
-      el_name=damballa("#{text}_#{type}")
+      el_name=damballa("#{text}_element")
       act_name=damballa(text)
-      element(el_name) { |b| b.frm.send(type, identifiers[type]=>text) }
-      action(act_name) { |b| b.frm.send(type, identifiers[type]=>text).click }
+      element(el_name) { |b| b.send(type, text: text) }
+      action(act_name) { |b| b.send(type, text: text).click; b.loading }
     end
 
     # Used for getting rid of the space and comma in the full name

@@ -33,9 +33,9 @@ Then /^The proposal route log's 'Pending Action Requests' should include '(.*)'$
   end
 end
 
-Then /^The S2S tab should become available$/ do
-  @proposal.view 'S2S'
-  on(S2S).s2s_header.should be_present
+Then /^The S2S opportunity search should become available$/ do
+  @proposal.view 'S2S Opportunity Search'
+  expect{on(S2S).find_opportunity_button}.to be_present
 end
 
 When /^The Proposal's 'Future Action Requests' should include 'PENDING APPROVE' for the principal investigator$/ do

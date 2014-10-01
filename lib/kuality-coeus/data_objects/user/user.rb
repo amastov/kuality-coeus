@@ -257,9 +257,7 @@ class UserObject < DataFactory
       add.blanket_approve
     end
 
-    # Logic removed until https://jira.kuali.org/browse/KRAFDBCK-11119 is resolved.
-    # This also means that S2S tests will have no hope of working.
-    unless 1==1 #extended_attributes.compact.length==0
+    unless extended_attributes.compact.length==0
       visit(SystemAdmin).person_extended_attributes
       on(PersonExtendedAttributesLookup).create
       on PersonExtendedAttributes do |page|
@@ -312,11 +310,6 @@ class UserObject < DataFactory
         log_in.username.set @user_name
         log_in.login
       end
-
-
-      #DEBUG.message "just signed in as #{@user_name}"
-
-
       on(Header).doc_search_link.wait_until_present
       $current_user=self
     end
@@ -325,29 +318,14 @@ class UserObject < DataFactory
 
   def sign_out
     on(BasePage).close_extra_windows
-    @browser.goto "#{$base_url+$context}kr-login/login"
-
-    #DEBUG.message "just signed out as #{@user_name}"
-    #DEBUG.pause 5
-
+    @browser.goto "#{$base_url+$context}kr-krad/login?methodToCall=logout&viewId=DummyLoginView"
     $current_user=nil
   end
   alias_method :log_out, :sign_out
 
   def exist?
     $users.admin.log_in if $current_user==nil
-
-
-    #DEBUG.message @browser.url.inspect
-
-
     visit SystemAdmin do |page|
-
-
-      #DEBUG.message page.url.inspect
-      #DEBUG.pause 10
-
-
       page.person
     end
     on PersonLookup do |search|

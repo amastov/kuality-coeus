@@ -24,11 +24,6 @@ Feature: Proposal Actions Validations
       Then  an error about un-certified personnel is shown
 
     Examples:
-      | Person                  |
-      | Co-Investigator         |
-      | Principal Investigator  |
-
-    Scenario: A Key Person is added but not certified
-      Given the Proposal Creator creates a Proposal where the un-certified key person has included certification questions
-      When  I activate a validation check
-      Then  an error about un-certified personnel is shown
+      | Person                 |
+      | Co-Investigator        |
+      | Principal Investigator |

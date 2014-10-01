@@ -1,4 +1,4 @@
-class SpecialReview < ProposalDevelopmentDocument
+class SpecialReview < BasePage
 
   special_review
 

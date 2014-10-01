@@ -1,5 +1,7 @@
 class Header < BasePage
 
+  expected_element :doc_search_link
+
   # Header elements
   links 'RESEARCHER', 'UNIT', 'CENTRAL ADMIN', 'MAINTENANCE', 'SYSTEM ADMIN', 'KNS PORTAL'#, 'Doc Search', 'Action List'
 

@@ -1,10 +1,7 @@
-class ProposalSummary < ProposalDevelopmentDocument
+class ProposalSummary < BasePage
 
-  expected_element :proposal_summary_div
-
-  element(:proposal_summary_div) { |b| b.frm.div(id: 'tab-ProposalSummary-div') }
-  
-  element(:disapprove_button) { |b| b.frm.button(name: 'methodToCall.disapprove') }
-  element(:reject_button) { |b| b.frm.button(name: 'methodToCall.reject') }
+  links 'Proposal Summary', 'Personnel', 'Credit Allocation', 'Questionnaire', 'Supplemental Info',
+        'View Route Log', 'More Actions'
+  buttons 'Submit for Review'
 
 end

@@ -1,6 +1,6 @@
  class KeyPersonObject < DataFactory
 
-  include StringFactory, Navigation, Personnel
+  include StringFactory, Personnel
 
   attr_reader :first_name, :last_name, :type, :role, :document_id, :key_person_role,
               :full_name, :user_name, :home_unit, :units, :responsibility,
@@ -24,72 +24,55 @@
       submitted_financial_disclosures: 'Y',
       lobbying_activities:             'Y',
       excluded_from_transactions:      'Y',
-      familiar_with_pla:               'Y'
+      familiar_with_pla:               'Y',
     }
 
     set_options(defaults.merge(opts))
-    requires :document_id
+    requires :document_id; :doc_header
     @full_name="#{@first_name} #{@last_name}"
   end
 
   def create
-    view
+    view 'Personnel'
+    on(KeyPersonnel).add_personnel
     get_person
+    # Assign the role...
+    on AddPersonnel do |page|
+      page.set_role(role_value[@role])
+      page.key_person_role.fit @key_person_role
+      page.add_person
+    end
     on KeyPersonnel do |person|
-      # This conditional exists to deal with the fact that
-      # a Principal Investigator can also be called a "PI/Contact",
-      # in cases where it's an NIH proposal.
-      if person.proposal_role.include? @role
-        person.proposal_role.select @role
-      else
-        person.proposal_role.select_value role_value[@role]
-        @role = person.proposal_role.selected_options[0].text
-      end
-      person.key_person_role.fit @key_person_role
-      person.add_person
-      break unless person.add_person_errors.empty? # ..we've thrown an error, so no need to continue this method...
-      person.expand_all
-      @user_name=person.user_name_of @full_name
-      @home_unit=person.home_unit_of @full_name
-      set_up_units
-      break if person.unit_details_errors_div(@full_name).present?
-      # If it's a key person without units then they won't have credit splits,
-      # otherwise, the person will, so fill them out...
-      if @key_person_role==nil || !@units.empty?
-        fill_out_item @full_name, person, :space, :responsibility, :financial, :recognition
-      end
-
-      # Proposal Person Certification
-      unless @key_person_role==nil
-        person.include_certification_questions(@full_name)
-        person.show_proposal_person_certification(@full_name) if person.show_prop_pers_cert_button(@full_name).present?
-      end
-      certification
-
-      # Add gathering/setting of more attributes here as needed
-      fill_out_item @full_name, person, :era_commons_name
       person.save
+      @user_name=person.user_name_of(@full_name).value
+      @home_unit=person.home_unit_of(@full_name).value
+    end
+    return unless on(KeyPersonnel).errors.empty?
+    set_up_units
+
+    # Proposal Person Certification
+    certification
+
+    # Add gathering/setting of more attributes here as needed
+    on KeyPersonnel do |person|
+      person.details_of @full_name
+      person.era_commons_name_of(@full_name).fit @era_commons_name
+      person.save
+    end
+
+    # Set credit splits
+    view 'Credit Allocation'
+    on CreditAllocation do |page|
+      fill_out_item @full_name, page, :recognition, :responsibility, :space, :financial
+      page.save
     end
   end
 
-  # IMPORTANT NOTE:
-  # Add edit options to this method as needed.
-  #
-  # HOWEVER:
-  # Do NOT add updating of Unit Credit Splits here.
-  # Those require special handling and
-  # thus have their own method: #update_unit_credit_splits
-  def edit opts={}
-    view
-    on KeyPersonnel do |update|
-      # TODO: This will eventually need to be fixed...
-      # Note: This is a dangerous short cut, as it may not
-      # apply to every field that could be edited with this
-      # method...
-      opts.each do |field, value|
-        update.send(field, @full_name).fit value
-      end
-      update.save
+  def update_splits opts={}
+    view 'Credit Allocation'
+    on CreditAllocation do |page|
+      edit_item_fields opts, @full_name, page, :recognition, :responsibility, :space, :financial
+      page.save
     end
     update_options(opts)
   end
@@ -100,14 +83,13 @@
     @degrees.add defaults.merge(opts)
   end
 
-  def view
-    open_document
-    on(Proposal).key_personnel unless on_page?(on(KeyPersonnel).proposal_role)
-    on(KeyPersonnel).expand_all
+  def view(page)
+    open_document unless on_document?
+    open_page(page) unless on_page?(page)
   end
 
   def delete
-    view
+    view 'Personnel'
     on KeyPersonnel do |person|
       person.check_person @full_name
       person.delete_selected
@@ -116,7 +98,8 @@
 
   def certification
     if @certified
-      view
+      view 'Personnel'
+      on(KeyPersonnel).proposal_person_certification_of @full_name
       cert_questions.each { |q| on(KeyPersonnel).send(q, @full_name, get(q)) }
     else
       cert_questions.each { |q| set(q, nil) }
@@ -133,6 +116,39 @@
   private
   # =======
 
+  def open_document
+    on(Header).researcher
+    on(ResearcherMenu).search_proposals
+    on DevelopmentProposalLookup do |search|
+      search.proposal_number.set @proposal_number
+      search.search
+      search.edit_proposal @proposal_number
+    end
+  end
+
+  def open_page(page)
+    #TODO: Add case logic here for documents other than Proposal...
+    on(ProposalSidebar).send(damballa(page))
+  end
+
+  def on_document?
+    begin
+      # TODO: Fix this when the Document header isn't "New" any more...
+      on(NewDocumentHeader).document_title==@doc_header
+    rescue Watir::Exception::UnknownObjectException, Selenium::WebDriver::Error::StaleElementReferenceError, WatirNokogiri::Exception::UnknownObjectException, Watir::Wait::TimeoutError
+      false
+    end
+  end
+
+  def on_page?(page)
+    begin
+      # TODO: Fix this when the Document header isn't "New" any more...
+      on(NewDocumentHeader).section_header==page
+    rescue Watir::Exception::UnknownObjectException, Selenium::WebDriver::Error::StaleElementReferenceError, WatirNokogiri::Exception::UnknownObjectException, Watir::Wait::TimeoutError
+      false
+    end
+  end
+
   def cert_questions
     [:certify_info_true,
      :potential_for_conflict,
@@ -142,8 +158,35 @@
      :familiar_with_pla]
   end
 
-  def page_class
-    KeyPersonnel
+
+  def set_up_units
+    on KeyPersonnel do |page|
+      page.unit_details_of @full_name
+      if @units.empty? # No units in @units, so we're not setting units
+        # ...so, get the units from the UI:
+        @units=page.units_of @full_name if @key_person_role.nil?
+        @units.uniq!
+      else # We have Units to add and update...
+        # Temporarily store any existing units...
+        page.add_unit_details(@full_name) unless @key_person_role.nil?
+
+        units=page.units_of @full_name
+        # Note that this assumes we're adding
+        # Unit(s) that aren't already present
+        # in the list, so be careful!
+        @units.each do |unit|
+          page.add_unit_number(@full_name).set unit[:number]
+          page.add_unit @full_name
+        end
+        # Now add the previously existing units to
+        # @units
+        units.each { |unit| @units << unit }
+      end
+      @units.uniq!
+      unless @units.size < 2
+        @lead_unit = page.lead_unit_of @full_name
+      end
+    end
   end
 
 end # KeyPersonObject

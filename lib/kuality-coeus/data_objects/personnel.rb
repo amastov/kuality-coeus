@@ -22,23 +22,23 @@ module Personnel
   end
 
   def get_person
-    on(page_class).send("#{@type}_search")
-    on lookup_page do |page|
+    on(AddPersonnel) do |page|
+      page.send(@type).set
       if @last_name.nil?
         if @type=='non_employee'
           until page.results_table.present? do
             page.state.pick '::random::'
-            page.search
+            page.continue
           end
         else
-          page.search
+          page.last_name.set("*#{%w{b c g h k l p r w}.sample}*")
+          page.continue
         end
-
         # We need to exclude the set of test users from the list
         # of names we'll randomly select from...
         names = page.returned_full_names - $users.full_names
         name = 'William Lloyd Garrison'
-        while name.scan(' ').size > 1
+        while name.scan(' ').size != 1
           name = names.sample
         end
         @first_name = name[/^\w+/]
@@ -46,42 +46,11 @@ module Personnel
         @full_name = @type=='employee' ? "#{@first_name} #{@last_name}" : "#{@last_name}, #{@first_name}"
       else
         fill_out page, :first_name, :last_name
-        page.search
+        page.continue
       end
       item = @type=='employee' ? @full_name : "#{@first_name} #{@last_name}"
-      page.return_value item
-    end
-  end
-
-  def set_up_units
-    on page_class do |page|
-      page.expand_all
-      if @units.empty? # No units in @units, so we're not setting units
-                       # ...so, get the units from the UI:
-        @units=page.units @full_name if @key_person_role.nil?
-        @units.uniq!
-      else # We have Units to add and update...
-           # Temporarily store any existing units...
-        page.add_unit_details(@full_name) unless @key_person_role.nil?
-
-        units=page.units @full_name
-        # Note that this assumes we're adding
-        # Unit(s) that aren't already present
-        # in the list, so be careful!
-        @units.each do |unit|
-          page.add_unit_number(@full_name).set unit[:number]
-          page.add_unit @full_name
-        end
-        # Now add the previously existing units to
-        # @units
-        units.each { |unit| @units << unit }
-      end
-      @units.uniq!
-      if @units.size==1
-        @lead_unit = @units[0][:number]
-      elsif page.lead_unit_radio_button.exists?
-        @lead_unit = @units.find { |unit| page.lead_unit_radio(@full_name, unit[:number]).set? == true }[:number]
-      end
+      page.select_person item
+      page.continue
     end
   end
 
@@ -103,7 +72,7 @@ module Personnel
   # [{:number=>"UNIT NUMBER", :responsibility=>"33.33"}]
   def update_unit_credit_splits(units=@units)
     units.each do |unit|
-      on page_class do |update|
+      on CreditAllocation do |update|
         update.unit_space(@full_name, unit[:number]).fit unit[:space]
         update.unit_responsibility(@full_name, unit[:number]).fit unit[:responsibility]
         update.unit_financial(@full_name, unit[:number]).fit unit[:financial]
