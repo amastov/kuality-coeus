@@ -3,6 +3,9 @@
 # $current_page makes this possible.
 #----------------------#
 Then /^an error should appear that says (.*)$/ do |error|
+
+  DEBUG.pause 200
+
   errors = {'to select a valid unit' => 'Please select a valid Unit.',
             'a key person role is required' => 'Key Person\'s role will be: Required',
             'the credit split is not a valid percentage' => 'Credit Split is not a valid percentage.',

@@ -1,6 +1,6 @@
-class SpecialReviewObject < DataFactory
+class ComplianceObject < DataFactory
 
-  include StringFactory, Navigation
+  include StringFactory
 
   attr_reader :type, :approval_status, :document_id, :protocol_number,
               :application_date, :approval_date, :expiration_date,
@@ -20,22 +20,18 @@ class SpecialReviewObject < DataFactory
     }
 
     set_options(defaults.merge(opts))
-    requires :document_id, :doc_header
   end
 
   def create
     view
-    on SpecialReview do |add|
-      add.add_type.pick! @type
-      add.add_approval_status.pick! @approval_status
-      add.add_protocol_number.fit @protocol_number
-      add.add_application_date.fit @application_date
-      add.add_approval_date.fit @approval_date
-      add.add_expiration_date.fit @expiration_date
-      add.add_exemption_number.fit @exemption_number
-      add.add
-      break unless add.errors.empty? # No need to save if we've thrown an error already
-      add.save
+    on(Compliance).add_compliance_entry
+    on AddNewProtocol do |add|
+      fill_out add, :type, :approval_status, :protocol_number,
+               :application_date, :approval_date, :expiration_date
+
+      # TODO: add.add_exemption_number.fit @exemption_number
+
+      add.add_entry
     end
   end
 
@@ -46,19 +42,19 @@ class SpecialReviewObject < DataFactory
   end
 
   def view
-    open_document
-    on(Proposal).special_review unless on_page?(on(SpecialReview).add_type)
+    @navigate.call
+    on(ProposalSidebar).compliance unless on(Compliance).add_compliance_entry_element.present?
   end
 
   def update_from_parent(id)
     @document_id=id
   end
 
-end # SpecialReviewObject
+end # ComplianceObject
 
-class SpecialReviewCollection < CollectionsFactory
+class ComplianceCollection < CollectionsFactory
 
-  contains SpecialReviewObject
+  contains ComplianceObject
 
   def types
     self.collect { |s_r| s_r.type }
@@ -71,9 +67,9 @@ class SpecialReviewCollection < CollectionsFactory
   # A warning about this method:
   # it's going to return the FIRST match in the collection,
   # under the assumption that there won't be multiple
-  # Special Review items of the same type.
+  # Compliance items of the same type.
   def type(srtype)
     self.find { |s_r| s_r.type==srtype}
   end
 
-end # SpecialReviewCollection
+end # ComplianceCollection

@@ -61,13 +61,15 @@ class BasePage < PageFactory
     end
 
     def new_doc_header
-      value(:document_title) { |b| b.h1(id: /header/).span(class: 'uif-headerText-span').text }
+      element(:title_element) { |b| b.h1(id: /header/).span(class: 'uif-headerText-span') }
+      value(:document_title) { |b| b.title_element.text }
       value(:section_header) { |b| b.h3.span(class: 'uif-headerText-span').text }
       action(:more) { |b| b.link(text: 'more...').click }
       value(:document_id) { |b| b.div(data_label: 'Doc Nbr').p.text }
       value(:document_status) { |b| b.div(data_label: 'Status').text }
       value(:created) { |b| b.div(data_label: 'Created').p.text }
       value(:initiator) { |b| b.div(data_label: 'Initiator').text }
+      value(:proposal_number) { |b| b.div(data_label: 'Proposal Nbr').text }
     end
 
     # Included here because this is such a common field in KC

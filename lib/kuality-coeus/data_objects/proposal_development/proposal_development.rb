@@ -6,7 +6,7 @@ class ProposalDevelopmentObject < DataFactory
               :sponsor_id, :sponsor_type_code, :project_start_date, :project_end_date, :document_id,
               :status, :initiator, :created, :sponsor_deadline_date, :key_personnel,
               :opportunity_id, # Maybe add competition_id and other stuff here...
-              :special_review, :budget_versions, :permissions, :s2s_questionnaire, :proposal_attachments,
+              :compliance, :budget_versions, :permissions, :s2s_questionnaire, :proposal_attachments,
               :proposal_questions, :compliance_questions, :kuali_u_questions, :custom_data, :recall_reason,
               :personnel_attachments, :mail_by, :mail_type, :institutional_proposal_number, :nsf_science_code,
               :original_ip_id
@@ -30,12 +30,13 @@ class ProposalDevelopmentObject < DataFactory
       mail_by:               '::random::',
       mail_type:             '::random::',
       key_personnel:         collection('KeyPersonnel'),
-      special_review:        collection('SpecialReview'),
+      compliance:            collection('Compliance'),
       budget_versions:       collection('BudgetVersions'),
       personnel_attachments: collection('PersonnelAttachments'),
       proposal_attachments:  collection('ProposalAttachments')
     }
     set_options(defaults.merge(opts))
+    @navigate = navigate
   end
     
   def create
@@ -60,6 +61,7 @@ class ProposalDevelopmentObject < DataFactory
       @status=page.document_status
       @initiator=page.initiator
       @created=page.created
+      @proposal_number=page.proposal_number
       #@permissions = make PermissionsObject, merge_settings(aggregators: [@initiator])
     end
   end
@@ -84,8 +86,13 @@ class ProposalDevelopmentObject < DataFactory
   # using this method with no options.
   alias_method :add_principal_investigator, :add_key_person
 
-  def add_special_review opts={}
-    @special_review.add merge_settings(opts)
+  def add_compliance opts={}
+
+
+    DEBUG.message @navigate.inspect
+
+
+    @compliance.add merge_settings(opts)
   end
 
   def add_budget_version opts={}
@@ -196,7 +203,7 @@ class ProposalDevelopmentObject < DataFactory
   end
 
   def view(tab)
-    navigate unless on_document?
+    navigate
     on(ProposalSidebar).send(damballa(tab.to_s))
   end
 
@@ -316,28 +323,30 @@ class ProposalDevelopmentObject < DataFactory
   # =======
 
   def navigate
-    on(Header).researcher
-    on(ResearcherMenu).search_proposals
-    on DevelopmentProposalLookup do |search|
-      search.proposal_number.set @proposal_number
-      search.search
-      search.edit_proposal @proposal_number
-    end
+    lambda{
+      unless on(NewDocumentHeader).title_element.present? && on(NewDocumentHeader).document_title==@doc_header
+        on(Header).researcher
+        on(ResearcherMenu).search_proposals
+        on DevelopmentProposalLookup do |search|
+          search.proposal_number.set @proposal_number
+          search.search
+          search.edit_proposal @proposal_number
+        end
+      end
+    }
   end
 
-  def on_document?
-    begin
-      on(NewDocumentHeader).document_title==@doc_header
-    rescue Watir::Exception::UnknownObjectException, Selenium::WebDriver::Error::StaleElementReferenceError, WatirNokogiri::Exception::UnknownObjectException, Watir::Wait::TimeoutError
-      false
-    end
-  end
+  #def on_document?
+  #  begin
+  #    on(NewDocumentHeader).document_title==@doc_header
+  #  rescue Watir::Exception::UnknownObjectException, Selenium::WebDriver::Error::StaleElementReferenceError, WatirNokogiri::Exception::UnknownObjectException, Watir::Wait::TimeoutError
+  #    false
+  #  end
+  #end
 
   def merge_settings(opts)
     defaults = {
-        document_id: @document_id,
-        doc_header: @doc_header,
-        proposal_number: @proposal_number
+        navigate: @navigate
     }
     opts.merge!(defaults)
   end
