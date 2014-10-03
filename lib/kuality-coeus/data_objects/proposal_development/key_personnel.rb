@@ -28,7 +28,7 @@
     }
 
     set_options(defaults.merge(opts))
-    requires :document_id; :doc_header
+    requires :navigate
     @full_name="#{@first_name} #{@last_name}"
   end
 

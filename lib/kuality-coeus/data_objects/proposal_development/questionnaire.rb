@@ -1,37 +1,33 @@
-class ComplianceQuestionsObject < DataFactory
+class QuestionnaireObject < DataFactory
 
-  include DateFactory, Navigation
+  include Navigation
 
-  attr_reader :document_id, :agree_to_ethical_conduct, :conduct_review_date
+  attr_reader :inventor, :rights, :non_university_investigators, :position_0
 
   def initialize(browser, opts={})
     @browser = browser
     defaults = {
-        agree_to_ethical_conduct: 'Y',
-        conduct_review_date:      right_now[:date_w_slashes],
+        inventor: 'Y',
+        rights:   'Y',
+        non_university_investigators: 'N',
+        position_0: random_alphanums_plus
     }
     set_options(defaults.merge(opts))
-    requires :document_id
+    requires :navigate
   end
 
   def create
-    navigate
+    view
     on Questions do |cq|
-      cq.show_compliance_questions
-      fill_out cq, :agree_to_ethical_conduct, :conduct_review_date
-      cq.save
+      ordered_fill cq, :inventor, :rights, :non_university_investigators, :position_0
+      # TODO: Add more position fields...
+      cq.save_and_continue
     end
   end
 
-  # =======
-  private
-  # =======
-
-  # Nav Aids...
-
-  def navigate
-    open_document @doc_type
-    on(Proposal).questions unless on_page?(on(Questions).questions_header)
+  def view
+    @navigate.call
+    on(ProposalSidebar).questionnaire unless on(Questions).header_span.present?
   end
 
 end

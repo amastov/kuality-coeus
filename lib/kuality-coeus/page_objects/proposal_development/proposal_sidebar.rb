@@ -13,7 +13,7 @@ class ProposalSidebar < BasePage
   action(:credit_allocation) { |b| b.key_personnel unless b.credit_allocation_link.present?; b.credit_allocation_link.click; b.loading }
   action(:compliance) { |b| b.span(text: 'Compliance').click; b.loading }
   action(:attachments) { |b| b.span(text: 'Attachments').click; b.loading }
-
+  action(:questionnaire) { |b| b.span(text: 'Questionnaire').click; b.loading }
   action(:budget) { |b| b.span(text: 'Budget').click; b.loading }
   action(:access) { |b| b.span(text: 'Access').click; b.loading }
   action(:supplemental_information) { |b| b.span(text: 'Supplemental Information').click; b.loading }

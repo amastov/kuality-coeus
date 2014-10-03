@@ -174,6 +174,7 @@ class BasePage < PageFactory
 
     end
 
+    # TODO: Remove this, as it is old UI stuff...
     def custom_data
       element(:graduate_student_count) { |b| b.target_row('Graduate Student Count').text_field }
       element(:billing_element) { |b| b.target_row('Billing Element').text_field }

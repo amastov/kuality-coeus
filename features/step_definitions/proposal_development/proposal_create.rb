@@ -85,13 +85,17 @@ When /^I? ?completes? the Proposal$/ do
   @proposal.add_custom_data
 end
 
-When /completes? the required custom fields on the Proposal$/ do
-  @proposal.add_custom_data
+When /completes? the required supplemental info on the Proposal$/ do
+  @proposal.add_supplemental_info
 end
 
 When /^I? ?add (.*) as an? (.*) to the proposal permissions$/ do |username, role|
   @proposal.permissions.send("#{damballa(role)}s") << username
   @proposal.permissions.assign
+end
+
+And /answers the Proposal's questionnaire$/ do
+  @proposal.fill_out_questionnaire
 end
 
 When /^I? ?save and close the Proposal document$/ do
