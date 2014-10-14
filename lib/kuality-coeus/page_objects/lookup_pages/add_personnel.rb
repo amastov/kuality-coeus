@@ -3,6 +3,7 @@ class AddPersonnel < BasePage
   element(:employee) { |b| b.radio(name: 'addKeyPersonHelper.lineType', value: 'E') }
   element(:non_employee) { |b| b.radio(name: 'addKeyPersonHelper.lineType', value: 'N') }
 
+  element(:first_name) { |b| b.text_field(name: "addKeyPersonHelper.lookupFieldValues['firstName']") }
   element(:last_name) { |b| b.text_field(name: "addKeyPersonHelper.lookupFieldValues['lastName']") }
 
   element(:results_table) { |b| b.div(data_parent: 'PropDev-PersonnelPage-Wizard').table }

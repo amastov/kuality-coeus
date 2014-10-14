@@ -24,16 +24,12 @@ module DocumentUtilities
     # for their own splits as well as for their units
     @key_personnel.with_units.each do |person|
       person.update_splits splits
-    #  units_split = (100.0/person.units.size).round(2)
-      # Make a temp container for the units we're updating...
-    #  units = []
-    #  person.units.each { |unit| units << {:number=>unit[:number]} }
-      # Iterate through the units, updating their credit splits with the
-      # valid split amount...
-    #  units.each do |unit|
-    #    CREDIT_SPLITS.keys.each { |item| unit[item]=units_split }
-    #  end
-    # person.update_unit_credit_splits units
+      units_split = (100.0/person.units.size).round(2)
+      unit_splits = {}
+      CREDIT_SPLITS.keys.each { |type| unit_splits.store(type, units_split) }
+      person.units.each do |unit|
+        person.update_unit_splits(unit[:number], unit_splits)
+      end
     end
   end
 

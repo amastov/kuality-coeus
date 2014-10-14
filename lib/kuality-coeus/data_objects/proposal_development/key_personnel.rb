@@ -43,11 +43,12 @@
       page.add_person
     end
     on KeyPersonnel do |person|
-      person.save
       @user_name=person.user_name_of(@full_name).value
-      @home_unit=person.home_unit_of(@full_name).value
+      person.save
+      return unless person.errors.empty?
+      person.organization_of @full_name
+      @home_unit=person.home_unit_of(@full_name)
     end
-    return unless on(KeyPersonnel).errors.empty?
     set_up_units
 
     # Proposal Person Certification
@@ -77,14 +78,25 @@
     update_options(opts)
   end
 
+  # The opts parameter must be a Hash containing at least one
+  # of the credit split types.
+  def update_unit_splits(unit_number, opts)
+    on CreditAllocation do |page|
+      opts.each do |type, value|
+        page.send("unit_#{type}", @full_name, unit_number).fit value
+      end
+      page.save
+    end
+    @units.find{ |u| u[:number]==unit_number}.merge!(opts)
+  end
+
   def add_degree_info opts={}
-    defaults = { document_id: @document_id,
-                 person: @full_name }
+    defaults = { navigate: @navigate }
     @degrees.add defaults.merge(opts)
   end
 
   def view(page)
-    open_document unless on_document?
+    @navigate.call
     open_page(page) unless on_page?(page)
   end
 
@@ -106,38 +118,18 @@
     end
   end
 
-  def update_from_parent(doc_id)
-    @document_id=doc_id
-    @search_key[:document_id]=doc_id
-    notify_collections doc_id
+  def update_from_parent(navigate)
+    @navigate=navigate
+    notify_collections navigate
   end
 
   # =======
   private
   # =======
 
-  def open_document
-    on(Header).researcher
-    on(ResearcherMenu).search_proposals
-    on DevelopmentProposalLookup do |search|
-      search.proposal_number.set @proposal_number
-      search.search
-      search.edit_proposal @proposal_number
-    end
-  end
-
   def open_page(page)
     #TODO: Add case logic here for documents other than Proposal...
     on(ProposalSidebar).send(damballa(page))
-  end
-
-  def on_document?
-    begin
-      # TODO: Fix this when the Document header isn't "New" any more...
-      on(NewDocumentHeader).document_title==@doc_header
-    rescue Watir::Exception::UnknownObjectException, Selenium::WebDriver::Error::StaleElementReferenceError, WatirNokogiri::Exception::UnknownObjectException, Watir::Wait::TimeoutError
-      false
-    end
   end
 
   def on_page?(page)
@@ -157,7 +149,6 @@
      :excluded_from_transactions,
      :familiar_with_pla]
   end
-
 
   def set_up_units
     on KeyPersonnel do |page|

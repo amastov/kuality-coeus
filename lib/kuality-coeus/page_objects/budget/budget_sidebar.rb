@@ -1,19 +1,19 @@
 class BudgetSidebar < BasePage
 
   action(:return_to_proposal) { |b| b.button(data_submit_data: '{"methodToCall":"openProposal"}').click }
-  action(:periods_and_totals) { |b| b.link(data_submit_data: '{"methodToCall":"navigate","actionParameters[navigateToPageId]":"PropBudget-PeriodsPage"}').click; b.loading }
-  action(:rates) { |b| b.link(data_submit_data: '{"methodToCall":"navigate","actionParameters[navigateToPageId]":"PropBudget-RatesPage"}').click; b.loading }
+  action(:periods_and_totals) { |b| b.link(name: 'PropBudget-PeriodsPage').click; b.loading }
+  action(:rates) { |b| b.link(name: 'PropBudget-RatesPage').click; b.loading }
   action(:personnel_costs) { |b| b.link(text: /Personnel Costs/).click }
-  action(:project_personnel) { |b| b.link(data_submit_data: '{"methodToCall":"navigate","actionParameters[navigateToPageId]":"PropBudget-ProjectPersonnelPage"}').click; b.loading }
-  action(:assign_personnel) { |b| b.link(data_submit_data: '{"methodToCall":"navigate","actionParameters[navigateToPageId]":"PropBudget-PersonnelPeriodsPage"}').click; b.loading }
-  action(:non_personnel_costs) { |b| b.link(data_submit_data: '{"methodToCall":"navigate","actionParameters[navigateToPageId]":"PropBudget-NonPersonnelPage"}').click; b.loading }
-  action(:subawards) { |b| b.link(data_submit_data: '{"methodToCall":"navigate","actionParameters[navigateToPageId]":"PropBudget-SubawardsPage"}').click; b.loading }
+  element(:project_personnel_link) { |b| b.link(name: 'PropBudget-ProjectPersonnelPage') }
+  action(:project_personnel) { |b| b.personnel_costs unless b.project_personnel_link.present?; b.project_personnel_link.click;  b.loading }
+  action(:assign_personnel) { |b| b.personnel_costs unless b.project_personnel_link.present?; b.link(name: 'PropBudget-AssignPersonnelToPeriodsPage').click; b.loading }
+  action(:non_personnel_costs) { |b| b.link(data_submit_data: 'PropBudget-NonPersonnelCostsPage').click; b.loading }
+  action(:subawards) { |b| b.link(name: 'PropBudget-SubawardsPage').click; b.loading }
   action(:institutional_commitments) { |b| b.link(text: /Institutional Commitments/).click }
-  action(:cost_sharing) { |b| b.link(data_submit_data: '{"methodToCall":"navigate","actionParameters[navigateToPageId]":"PropBudget-CostSharingPage"}').click; b.loading }
-  action(:unrecovered_fna) { |b| b.link(data_submit_data: '{"methodToCall":"navigate","actionParameters[navigateToPageId]":"PropBudget-UnrecoveredFandAPage"}').click; b.loading }
-  action(:project_income) { |b| b.link(data_submit_data: '{"methodToCall":"navigate","actionParameters[navigateToPageId]":"PropBudget-ProjectIncomePage"}').click; b.loading }
-  action(:modular) { |b| b.link(data_submit_data: '{"methodToCall":"navigate","actionParameters[navigateToPageId]":"PropBudget-ModularPage"}').click; b.loading }
-  action(:budget_notes) { |b| b.link(data_submit_data: '{"methodToCall":"navigate","actionParameters[navigateToPageId]":"PropBudget-NotesPage"}').click; b.loading }
-  action(:budget_summary) { |b| b.link(data_submit_data: '{"methodToCall":"navigate","actionParameters[navigateToPageId]":"PropBudget-SummaryPage"}').click; b.loading }
+  element(:cost_sharing_link) { |b| b.link(name: 'PropBudget-CostSharingPage') }
+  action(:cost_sharing) { |b| b.institutional_commitments unless b.cost_sharing_link.present?; b.cost_sharing_link.click; b.loading }
+  action(:unrecovered_fna) { |b| b.institutional_commitments unless b.cost_sharing_link.present?; b.link(name: 'PropBudget-UnrecoveredFandAPage').click; b.loading }
+  action(:project_income) { |b| b.link(name: 'PropBudget-ProjectIncomePage').click; b.loading }
+  action(:modular) { |b| b.link(name: 'PropBudget-ModularPage').click; b.loading }
 
 end

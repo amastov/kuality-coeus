@@ -8,5 +8,5 @@ Feature: Special Review Validation
   Scenario: The application date must be prior to the approval date
     Given a User exists with the role: 'Proposal Creator'
     And   the Proposal Creator creates a Proposal
-    When  a special review item is added to the Proposal with an approval date earlier than the application date
+    When  a compliance item is added to the Proposal with an approval date earlier than the application date
     Then  an error should appear that says the approval should occur later than the application

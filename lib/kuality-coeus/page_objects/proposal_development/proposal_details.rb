@@ -1,6 +1,7 @@
 class ProposalDetails < BasePage
 
   new_doc_header
+  document_buttons
   new_error_messages
   
   element(:doc_title) { |b| b.h1(id: 'PropDev-DefaultView_header').span.text }

@@ -37,6 +37,6 @@ Feature: Creating/Editing Budget Versions in Proposal Documents
     Then  the Budget Version is no longer editable
 
   Scenario: Adding years to the Proposal
-    Given the Proposal Creator pushes the end date 2 more years
+    Given the Proposal Creator pushes the Proposal end date 2 more years
     When  the Proposal Creator selects the default periods for the Budget Version
     Then  the Budget Version should have two more budget periods

@@ -1,6 +1,8 @@
-And /^I? ?activates? a validation check$/ do
+And /(activates? data validation|data validation is activated)$/ do |x|
   on(NewDocumentHeader).data_validation
   on(DataValidation).turn_on
+  # Temporary, until https://jira.kuali.org/browse/KRAFDBCK-11352 is fixed:
+  on(NewDocumentHeader).data_validation
 end
 
 When /^the Proposal has no principal investigator$/ do

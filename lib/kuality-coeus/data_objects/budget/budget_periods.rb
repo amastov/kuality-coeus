@@ -1,6 +1,6 @@
 class BudgetPeriodObject < DataFactory
 
-  include StringFactory, Navigation
+  include StringFactory
 
   attr_reader :start_date, :end_date, :total_sponsor_cost,
               :direct_cost, :f_and_a_cost, :unrecovered_f_and_a,
@@ -21,13 +21,13 @@ class BudgetPeriodObject < DataFactory
     }
 
     set_options(defaults.merge(opts))
-    requires :start_date, :budget_name, :lookup_class, :doc_header, :search_key
+    requires :start_date, :open_budget
     datify
     add_cost_sharing @cost_sharing
   end
 
   def create
-    open_budget
+    @open_budget.call
     on Parameters do |create|
       create.period_start_date.fit @start_date
       create.period_end_date.fit @end_date
@@ -41,7 +41,7 @@ class BudgetPeriodObject < DataFactory
   end
 
   def edit opts={}
-    open_budget
+    @open_budget.call
     on Parameters do |edit|
       edit.start_date_period(@number).fit opts[:start_date]
       edit.end_date_period(@number).fit opts[:end_date]
@@ -71,13 +71,13 @@ class BudgetPeriodObject < DataFactory
   end
 
   def add_participant_support opts={}
-    open_budget
+    @open_budget.call
     on(Parameters).non_personnel
     @participant_support.add opts
   end
 
   def delete
-    open_budget
+    @open_budget.call
     on(Parameters).delete_period @number
   end
 
@@ -89,25 +89,6 @@ class BudgetPeriodObject < DataFactory
   # =======
   private
   # =======
-
-  # Nav Aids
-
-  def open_budget
-    open_document
-    unless on_page?(on(Parameters).on_off_campus) && on_budget?
-      on(Proposal).budget_versions
-      on(BudgetVersions).open @budget_name
-      confirmation
-    end
-  end
-
-  def on_budget?
-    begin
-      on(Parameters).budget_name==@budget_name
-    rescue Selenium::WebDriver::Error::StaleElementReferenceError
-      false
-    end
-  end
 
   # This takes the period start date and converts it into a Date object
   # which is then stored in @datified.

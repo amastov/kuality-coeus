@@ -108,7 +108,7 @@ And /^the (.*) submits a new Proposal into routing$/ do |role_name|
     * the #{role_name} creates a Proposal
     * adds a principal investigator to the Proposal
     * sets valid credit splits for the Proposal
-    * completes the required custom fields on the Proposal
+    * completes the required supplemental info on the Proposal
     * the #{role_name} submits the Proposal into routing
 }
 end

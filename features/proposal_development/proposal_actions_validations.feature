@@ -10,17 +10,17 @@ Feature: Proposal Actions Validations
     Scenario: A PI has not been added to the proposal
       Given the Proposal Creator creates a Proposal
       And   the Proposal has no principal investigator
-      When  I activate a validation check
+      When  data validation is activated
       Then  an error is shown that says there is no principal investigator
 
     Scenario: Sponsor deadline date is missing
       Given the Proposal Creator creates a Proposal without a sponsor deadline date
-      When  I activate a validation check
+      When  data validation is activated
       Then  an error is shown that says sponsor deadline date not entered
 
     Scenario Outline: Investigators added but not certified
       Given the Proposal Creator creates a Proposal with an un-certified <Person>
-      When  I activate a validation check
+      When  data validation is activated
       Then  an error about un-certified personnel is shown
 
     Examples:

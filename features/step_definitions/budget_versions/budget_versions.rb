@@ -9,7 +9,7 @@ When /^I add a subaward budget to the Budget Version$/ do
 end
 
 Then /^opening the Budget Version will display a warning about the date change$/ do
-  @budget_version.open_budget
+  @budget_version.view 'Periods And Totals'
   on(Parameters).warnings.should include 'The Project Start and/or End Dates have changed from the previous version of this budget. Please update the Project Start and/or End Dates.'
 end
 

@@ -59,20 +59,13 @@ When /^the (.*) user approves the Proposal$/ do |role|
   on(Confirmation).yes
 end
 
-When /^I try to add the (.*) user as a (.*) to the key personnel Proposal roles$/ do |user_role, proposal_role|
+When /add the (.*) user as a (.*) to the key personnel Proposal roles$/ do |user_role, proposal_role|
   user = get(user_role)
   @proposal.add_key_person first_name: user.first_name, last_name: user.last_name, role: proposal_role
 end
 
-When /^I add the same person to the Proposal as a PI and Co-Investigator$/ do
-  visit PersonLookup do |page|
-    page.search
-    names = page.returned_full_names
-    index = rand(names.size)
-    @user_name = page.returned_principal_names[index]
-    @last_name = names[index][/^.+(?=,)/]
-    @first_name = names[index][/(?<=, ).+$/]
-  end
-  @proposal.add_principal_investigator last_name: @last_name, first_name: @first_name
-  @proposal.add_key_person role: 'Co-Investigator', last_name: @last_name, first_name: @first_name
+Then /^the same person cannot be added to the Proposal personnel again$/ do
+  @last_name = @proposal.principal_investigator.last_name
+  @first_name = @proposal.principal_investigator.first_name
+  expect{@proposal.add_key_person role: 'Co-Investigator', last_name: @last_name, first_name: @first_name}.to raise_error
 end

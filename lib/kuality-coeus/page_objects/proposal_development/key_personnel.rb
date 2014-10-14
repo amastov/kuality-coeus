@@ -11,7 +11,7 @@ class KeyPersonnel < BasePage
   # Details
 
   p_element(:user_name_of) { |name, b| b.section_of(name).text_field(name: /userName/) }
-  p_element(:home_unit_of) { |name, b| b.section_of(name).text_field(name: /homeUnit/) }
+  p_element(:home_unit_of) { |name, b| b.section_of(name).div(data_label: 'Home Unit') }
   p_element(:era_commons_name_of) { |name, b| b.section_of(name).text_field(name: /eraCommonsUserName/) }
 
   # Unit Details

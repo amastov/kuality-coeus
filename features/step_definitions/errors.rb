@@ -3,13 +3,9 @@
 # $current_page makes this possible.
 #----------------------#
 Then /^an error should appear that says (.*)$/ do |error|
-
-  DEBUG.pause 200
-
   errors = {'to select a valid unit' => 'Please select a valid Unit.',
             'a key person role is required' => 'Key Person\'s role will be: Required',
             'the credit split is not a valid percentage' => 'Credit Split is not a valid percentage.',
-            'only one PI is allowed' => 'Only one proposal role of Principal Investigator is allowed.',
             'the Award has no PI' => 'There is no Principal Investigator selected. Please enter a Principal Investigator',
             'only one PI is allowed in the Contacts' => 'Only one Principal Investigator is allowed',
             'the IP can not be added because it\'s not fully approved' => 'Cannot add this funding proposal. The associated Development Proposal has "Approval Pending - Submitted" status.',
@@ -20,7 +16,6 @@ Then /^an error should appear that says (.*)$/ do |error|
             %|I need to select the 'Other' revision type| => %|The revision 'specify' field is only applicable when the revision type is "Other"|,
             'an original proposal ID is needed'=>'Please provide an original institutional proposal ID that has been previously submitted to Grants.gov for a Change\/Corrected Application.',
             'the prior award number is required'=> %|require the sponsor's prior award number in the "sponsor proposal number."|,
-            'sponsor deadline date not entered' => 'Sponsor deadline date has not been entered.',
             'a valid sponsor is required' => 'Sponsor: A valid Sponsor (Sponsor) must be selected.',
             'the Account ID may only contain letters or numbers' => 'The Account ID (Account ID) may only consist of letters or digits.',
             'the Award\'s title contains invalid characters' => 'The Award Title (Title) may only consist of visible characters, spaces, or tabs.',
@@ -40,7 +35,7 @@ Then /^an error requiring at least one unit for the co-investigator is shown$/ d
 end
 
 Then /^an error about un-certified personnel is shown$/ do
-  $current_page.errors.should include %|The Investigators are not all certified. Please certify #{@proposal.key_personnel[0].first_name} #{@proposal.key_personnel[0].last_name}.|
+  on(DataValidation).errors.should include %|The Investigators are not all certified. Please certify #{@proposal.key_personnel[0].first_name} #{@proposal.key_personnel[0].last_name}.|
 end
 
 Then /^an error is shown that says (.*)$/ do |error|
@@ -51,7 +46,8 @@ Then /^an error is shown that says (.*)$/ do |error|
              'there are duplicate cost share lines' => 'A duplicate row has been entered.',
              'the subaward\'s amount can\'t be zero' => 'Approved Subaward amount must be greater than zero.'
   }
-  $current_page.validation_errors_and_warnings.should include errors[error]
+
+  on(DataValidation).validation_errors_and_warnings.should include errors[error]
 end
 
 Then /^errors about the missing terms are shown$/ do
@@ -128,4 +124,8 @@ end
 
 Then /^there are no errors on the page$/ do
   $current_page.errors.size.should==0
+end
+
+And /^there are no data validation errors or warnings$/ do
+  on(DataValidation).errors_list.should_not be_present
 end

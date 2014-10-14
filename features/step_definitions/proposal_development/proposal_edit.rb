@@ -55,7 +55,7 @@ When /^I? ?push the Proposal's project start date ahead (\d+) years?$/ do |year|
   @proposal.edit project_start_date: new_date
 end
 
-When /^(the Proposal Creator |)pushes the end date (\d+) more years?$/ do |usr, year|
+When /(the Proposal Creator |)pushes the Proposal end date (\d+) more years?$/ do |usr, year|
   steps %|* I log in with the Proposal Creator user| if usr=='the Proposal Creator '
   new_year=@proposal.project_end_date[/\d+$/].to_i+year.to_i
   new_date="#{@proposal.project_end_date[/^\d+\/\d+/]}/#{new_year}"

@@ -7,7 +7,7 @@ class ProposalDevelopmentObject < DataFactory
               :status, :initiator, :created, :sponsor_deadline_date, :key_personnel,
               :opportunity_id, # Maybe add competition_id and other stuff here...
               :compliance, :questionnaire, :budget_versions, :permissions, :s2s_questionnaire, :proposal_attachments,
-              :proposal_questions, :compliance_questions, :kuali_u_questions, :supplemental_info, :recall_reason,
+              :proposal_questions, :supplemental_info, :recall_reason,
               :personnel_attachments, :mail_by, :mail_type, :institutional_proposal_number, :nsf_science_code,
               :original_ip_id
   def_delegators :@key_personnel, :principal_investigator, :co_investigator
@@ -24,7 +24,7 @@ class ProposalDevelopmentObject < DataFactory
       sponsor_id:            '::random::',
       sponsor_type_code:     '::random::',
       nsf_science_code:      '::random::',
-      project_start_date:    next_week[:date_w_slashes], # TODO: Think about using the date object here, and not the string
+      project_start_date:    next_week[:date_w_slashes],
       project_end_date:      next_year[:date_w_slashes],
       sponsor_deadline_date: next_year[:date_w_slashes],
       mail_by:               '::random::',
@@ -64,15 +64,18 @@ class ProposalDevelopmentObject < DataFactory
       @proposal_number=page.proposal_number
       #@permissions = make PermissionsObject, merge_settings(aggregators: [@initiator])
     end
+    on(ProposalSidebar).sponsor_and_program_info
+    on SponsorAndProgram do |page|
+      fill_out page, :sponsor_deadline_date, :nsf_science_code, :opportunity_id
+      page.save_and_continue
+    end
   end
 
   def edit opts={}
-    open_document
-    on Proposal do |edit|
-      edit.proposal
-      edit.expand_all
-      edit_fields opts, edit, :project_title, :project_start_date, :opportunity_id, :proposal_type,
-                              :original_ip_id, :project_end_date
+    view 'Proposal Details'
+    on ProposalDetails do |edit|
+      edit_fields opts, edit, :project_title, :project_start_date, :proposal_type,
+                              :project_end_date
       # TODO: Add more stuff here as necessary
       edit.save
     end
@@ -167,22 +170,12 @@ class ProposalDevelopmentObject < DataFactory
   end
 
   def delete
-    view 'Proposal Actions'
-    on(ProposalActions).delete_proposal
-    on(Confirmation).yes
-    # Have to update the data object's status value
-    # in a valid way (getting it from the system)
-    visit(Researcher).doc_search
-    on DocumentSearch do |search|
-      search.document_id.set @document_id
-      search.search
-      @status=search.doc_status @document_id
-    end
+
   end
 
   def recall(reason=random_alphanums)
     @recall_reason=reason
-    open_document
+
     on(ProposalActions).recall
     on Confirmation do |conf|
       conf.reason.set @recall_reason
@@ -197,12 +190,12 @@ class ProposalDevelopmentObject < DataFactory
   end
 
   def close
-    navigate unless on_document?
+    @navigate.call
     on(Proposal).close
   end
 
   def view(tab)
-    navigate
+    @navigate.call
     on(ProposalSidebar).send(damballa(tab.to_s))
   end
 
@@ -323,7 +316,12 @@ class ProposalDevelopmentObject < DataFactory
 
   def navigate
     lambda{
-      unless on(NewDocumentHeader).title_element.present? && on(NewDocumentHeader).document_title==@doc_header
+      begin
+        condition = on(NewDocumentHeader).document_title==@doc_header
+      rescue
+        condition = false
+      end
+      unless condition
         on(Header).researcher
         on(ResearcherMenu).search_proposals
         on DevelopmentProposalLookup do |search|

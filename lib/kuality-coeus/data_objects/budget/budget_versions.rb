@@ -1,15 +1,8 @@
 class BudgetVersionsObject < DataFactory
 
-  include StringFactory, Navigation
+  include StringFactory
 
-  attr_reader :document_id, :status,
-              # Stuff on Budget Versions page...
-              # TODO: Because of their location in the UI, these are barely useful.
-              # Need to decide what to do with them...
-              :direct_cost, :f_and_a, :on_off_campus,
-              :total, :final, :residual_funds, :cost_sharing, :unrecovered_fa,
-              :comments, :f_and_a_rate_type, :last_updated, :last_updated_by,
-              # Stuff on the Parameters page...
+  attr_reader :document_id, :status, :summary, :modular,
               :project_start_date, :project_end_date, :total_direct_cost_limit,
               :budget_periods, :unrecovered_fa_rate_type, :f_and_a_rate_type,
               :submit_cost_sharing, :residual_funds, :total_cost_limit,
@@ -20,63 +13,36 @@ class BudgetVersionsObject < DataFactory
     @browser = browser
 
     defaults = {
-      name:              random_alphanums_plus(40),
+      name:              random_alphanums(40), # System can't currently handle this char set: random_alphanums_plus(40),
       budget_periods:    collection('BudgetPeriods'),
       subaward_budgets:  collection('SubawardBudget'),
-      personnel:         collection('BudgetPersonnel')
+      personnel:         collection('BudgetPersonnel'),
+      summary:           'Y',
+      modular:           'N'
     }
 
     set_options(defaults.merge(opts))
-    requires :document_id, :lookup_class
+    requires :navigate
+    @open_budget = open_budget
   end
 
   def create
-    open_document
-    on(Proposal).budget_versions unless on_page?(on(BudgetVersions).name)
-    on BudgetVersions do |add|
+    @navigate.call
+    on(ProposalSidebar).budget
+    on(Budgets).add_budget
+    on BudgetWizard do |add|
       add.name.wait_until_present
-      @doc_header=add.doc_title
       add.name.set @name
-      add.add
-      add.final(@name).fit @final
-      add.budget_status(@name).pick! @status
-      add.save
-      break if parameters.compact==nil # No reason to continue if there aren't other things to do
-      # Otherwise, go to parameters page and fill out the rest of the stuff...
-      add.open(@name)
+      add.type @summary
+      add.modular @modular
+      add.create_budget
     end
-    #TODO: This needs to be dealt with more intelligently.
-    # It's clear that we need to learn more about how to set up
-    # sponsors better, so that we can predict when this dialog
-    # will show up and when it won't...
-    confirmation
-    on Parameters do |parameters|
-      @project_start_date=parameters.project_start_date
-      @project_end_date=parameters.project_end_date
-      parameters.total_direct_cost_limit.fit @total_direct_cost_limit
-      fill_out parameters, :comments, :modular_budget,
-               :residual_funds, :total_cost_limit, :unrecovered_fa_rate_type,
-               :f_and_a_rate_type, :submit_cost_sharing
-      @unrecovered_fa_rate_type=parameters.unrecovered_fa_rate_type.selected_options[0].text if @unrecovered_fa_rate_type.nil?
-      @f_and_a_rate_type=parameters.f_and_a_rate_type.selected_options[0].text if @f_and_a_rate_type.nil?
-      parameters.on_off_campus.fit @on_off_campus
-      parameters.alert.ok if parameters.alert.exists?
-      parameters.save
-    end
-    confirmation
     get_budget_periods
   end
 
   def add_period opts={}
-    defaults={
-        budget_name: @name,
-        doc_header: @doc_header,
-        lookup_class: @lookup_class,
-        search_key: @search_key,
-        start_date: @project_start_date
-    }
-    @budget_periods.add defaults.merge(opts)
-    return if on(Parameters).errors.size > 0 # No need to continue the method if we have an error
+    @budget_periods.add(opts)
+    return if on(PeriodsAndTotals).errors.size > 0 # No need to continue the method if we have an error
     @budget_periods.number! # This updates the number value of all periods, as necessary
   end
 
@@ -92,7 +58,7 @@ class BudgetVersionsObject < DataFactory
   end
 
   def edit opts={}
-    open_budget
+
     on Parameters do |edit|
       edit.parameters unless edit.parameters_button.parent.class_name=='tabright tabcurrent'
       edit_fields opts, edit, :final, :total_direct_cost_limit
@@ -103,27 +69,14 @@ class BudgetVersionsObject < DataFactory
     set_options(opts)
   end
 
-  def open_budget
-    unless on(DocumentHeader).budget_name==@name
-      open_document
-      on(Proposal).budget_versions unless on_page?(on(BudgetVersions).name)
-      on(BudgetVersions).open(@name) unless on(DocumentHeader).budget_name==@name
-      #TODO: This needs to be dealt with more intelligently.
-      # It's clear that we need to learn more about how to set up
-      # sponsors better, so that we can predict when this dialog
-      # will show up and when it won't...
-      confirmation
-    end
-  end
-
   def view(tab)
-    open_budget
-    on(Parameters).send(damballa(tab.to_s))
+    @open_budget.call
+    on(BudgetSidebar).send(damballa(tab.to_s))
   end
 
   def copy_all_periods(new_name)
-    open_document
-    on(Proposal).budget_versions unless on_page?(on(BudgetVersions).name)
+    @open_document.call
+
     new_version_number='x'
     on(BudgetVersions).copy @name
     on(Confirmation).copy_all_periods
@@ -143,10 +96,9 @@ class BudgetVersionsObject < DataFactory
   end
 
   def default_periods
-    open_budget
-    on Parameters do |page|
-      page.parameters unless page.parameters_button.parent.class_name=='tabright tabcurrent'
-      page.default_periods
+    view 'Periods And Totals'
+    on PeriodsAndTotals do |page|
+      page.reset_to_period_defaults
     end
     @budget_periods.clear
     get_budget_periods
@@ -168,41 +120,38 @@ class BudgetVersionsObject < DataFactory
     @personnel << person
   end
 
-  def update_from_parent(id)
-    @document_id=id
+  def update_from_parent(navigate_method)
+    @navigate=navigate_method
   end
 
   # =======
   private
   # =======
 
-  # This is just a collection of the instance variables
-  # associated with the Parameters page. It's used to determine
-  # whether or not the create method should go to that page
-  # and fill stuff out.
-  def parameters
-    [@total_direct_cost_limit, @on_off_campus, @comments, @modular_budget,
-     @residual_funds, @total_cost_limit, @unrecovered_fa_rate_type, @f_and_a_rate_type,
-     @submit_cost_sharing]
+  def open_budget
+    lambda{
+      @navigate.call
+      unless on(NewDocumentHeader).document_title[/: .+/]==": #{@name}"
+        on(ProposalSidebar).budget
+        on(Budgets).open @name
+      end
+    }
   end
 
   def get_budget_periods
-    on Parameters do |page|
-      @doc_header=page.doc_title
+    on PeriodsAndTotals do |page|
       1.upto(page.period_count) do |number|
-        period = make BudgetPeriodObject, document_id: @document_id,
-                      budget_name: @name, start_date: page.start_date_period(number).value,
-                      end_date: page.end_date_period(number).value,
-                      total_sponsor_cost: page.total_sponsor_cost_period(number).value.groom,
-                      direct_cost: page.direct_cost_period(number).value.groom,
-                      f_and_a_cost: page.fa_cost_period(number).value.groom,
-                      unrecovered_f_and_a: page.unrecovered_fa_period(number).value.groom,
-                      cost_sharing: page.cost_sharing_period(number).value.groom,
-                      cost_limit: page.cost_limit_period(number).value.groom,
-                      direct_cost_limit: page.direct_cost_limit_period(number).value.groom,
-                      lookup_class: @lookup_class,
-                      doc_header: @doc_header,
-                      search_key: @search_key
+        page.edit_period number
+        period = make BudgetPeriodObject, open_budget: @open_budget,
+                      start_date: page.start_date_of(number).value,
+                      end_date: page.end_date_of(number).value,
+                      total_sponsor_cost: page.total_sponsor_cost_of(number).value.groom,
+                      direct_cost: page.direct_cost_of(number).value.groom,
+                      f_and_a_cost: page.fa_cost_of(number).value.groom,
+                      unrecovered_f_and_a: page.unrecovered_fa_of(number).value.groom,
+                      cost_sharing: page.cost_sharing_of(number).value.groom,
+                      cost_limit: page.cost_limit_of(number).value.groom,
+                      direct_cost_limit: page.direct_cost_limit_of(number).value.groom
         @budget_periods << period
       end
     end

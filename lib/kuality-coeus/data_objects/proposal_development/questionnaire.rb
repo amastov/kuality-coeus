@@ -1,6 +1,6 @@
 class QuestionnaireObject < DataFactory
 
-  include Navigation
+  include StringFactory
 
   attr_reader :inventor, :rights, :non_university_investigators, :position_0
 

@@ -1,7 +1,8 @@
 class ProposalSidebar < BasePage
                                                       # FIXME!
   action(:basics) { |b| b.span(text: 'Basics').click; sleep 1 }
-  action(:proposal_details) { |b| b.link(name: 'PropDev-DetailsPage').click; b.loading }
+  element(:proposal_details_link) { |b| b.link(name: 'PropDev-DetailsPage') }
+  action(:proposal_details) { |b| b.basics unless b.proposal_details_link.present?; b.proposal_details_link.click; b.loading }
   action(:s2s_opportunity_search) { |b| b.link(name: 'PropDev-OpportunityPage').click; b.loading }
   action(:delivery_info) { |b| b.link(name: 'PropDev-DeliveryInfoPage').click; b.loading }
   action(:sponsor_and_program_info) { |b| b.link(name: 'PropDev-SponsorProgramInfoPage').click; b.loading }

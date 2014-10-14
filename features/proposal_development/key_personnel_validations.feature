@@ -23,10 +23,6 @@ Feature: Proposal Key Personnel Validations
     When I add a key person without a key person role
     Then an error should appear that says a key person role is required
 
-  Scenario: Error when adding multiple principle investigators
-    When I try to add two principal investigators
-    Then an error should appear that says only one PI is allowed
-
-  Scenario: Error when adding the same user as a PI and Co-Investigator
-    When I add the same person to the Proposal as a PI and Co-Investigator
-    Then an error is shown that indicates the user is already an investigator
+  Scenario: Can't add the same person to Personnel twice
+    When I add a principal investigator to the Proposal
+    Then the same person cannot be added to the Proposal personnel again
