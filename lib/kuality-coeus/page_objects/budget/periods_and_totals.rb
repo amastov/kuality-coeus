@@ -1,6 +1,7 @@
 class PeriodsAndTotals < BasePage
 
   document_buttons
+  new_error_messages
 
   value(:warnings) { |b| b.div(text: 'TO DO!')  }
 
@@ -16,8 +17,8 @@ class PeriodsAndTotals < BasePage
   p_element(:end_date_of) { |number, b|  b.text_field(name:"budget.budgetPeriods\[#{number.to_i-1}\].endDate") }
   p_element(:total_sponsor_cost_of) { |number, b|  b.text_field(name:"budget.budgetPeriods\[#{number.to_i-1}\].totalCost") }
   p_element(:direct_cost_of) { |number, b|  b.text_field(name:"budget.budgetPeriods\[#{number.to_i-1}\].totalDirectCost") }
-  p_element(:fa_cost_of) { |number, b|  b.text_field(name:"budget.budgetPeriods\[#{number.to_i-1}\].totalIndirectCost") }
-  p_element(:unrecovered_fa_of) { |number, b|  b.text_field(name:"budget.budgetPeriods\[#{number.to_i-1}\].underrecoveryAmount") }
+  p_element(:f_and_a_cost_of) { |number, b|  b.text_field(name:"budget.budgetPeriods\[#{number.to_i-1}\].totalIndirectCost") }
+  p_element(:unrecovered_f_and_a_of) { |number, b|  b.text_field(name:"budget.budgetPeriods\[#{number.to_i-1}\].underrecoveryAmount") }
   p_element(:cost_sharing_of) { |number, b|  b.text_field(name:"budget.budgetPeriods\[#{number.to_i-1}\].costSharingAmount") }
   p_element(:cost_limit_of) { |number, b|  b.text_field(name:"budget.budgetPeriods\[#{number.to_i-1}\].totalCostLimit") }
   p_element(:direct_cost_limit_of) { |number, b|  b.text_field(name:"budget.budgetPeriods\[#{number.to_i-1}\].directCostLimit") }

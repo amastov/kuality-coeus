@@ -33,6 +33,7 @@ class ComplianceObject < DataFactory
 
       add.add_entry
     end
+    on(Compliance).save
   end
 
   def edit opts={}

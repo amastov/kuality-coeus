@@ -28,7 +28,7 @@ class BudgetPeriodObject < DataFactory
 
   def create
     @open_budget.call
-    on Parameters do |create|
+    on PeriodsAndTotals do |create|
       create.period_start_date.fit @start_date
       create.period_end_date.fit @end_date
       create.total_sponsor_cost.fit @total_sponsor_cost
@@ -42,15 +42,16 @@ class BudgetPeriodObject < DataFactory
 
   def edit opts={}
     @open_budget.call
-    on Parameters do |edit|
-      edit.start_date_period(@number).fit opts[:start_date]
-      edit.end_date_period(@number).fit opts[:end_date]
+    on(BudgetSidebar).periods_and_totals
+    on PeriodsAndTotals do |edit|
+      edit.edit_period @number unless edit.start_date_of(@number).present?
+      edit.start_date_of(@number).fit opts[:start_date]
+      edit.end_date_of(@number).fit opts[:end_date]
       dollar_fields.each do |field|
-        confirmation
-        edit.send("#{field}_period", @number).fit opts[field]
+        edit.send("#{field}_of", @number).fit opts[field]
       end
       edit.save
-      break if edit.errors.size > 0
+      return if edit.errors.size > 0
     end
     datify
     add_cost_sharing opts[:cost_sharing]
@@ -110,7 +111,7 @@ class BudgetPeriodObject < DataFactory
 
   def initialize_unrecovered_fa unrec_fa
     if @unrecovered_fa_dist_list.empty? && !unrec_fa.nil? && unrec_fa.to_f > 0
-      on(Parameters).distribution__income
+      on(BudgetSidebar).unrecovered_fna
       on DistributionAndIncome do |page|
         page.expand_all
         page.existing_fna_rows.each_with_index do |row, index|

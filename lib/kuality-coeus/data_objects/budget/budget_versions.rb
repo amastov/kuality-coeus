@@ -130,8 +130,8 @@ class BudgetVersionsObject < DataFactory
 
   def open_budget
     lambda{
-      @navigate.call
       unless on(NewDocumentHeader).document_title[/: .+/]==": #{@name}"
+        @navigate.call
         on(ProposalSidebar).budget
         on(Budgets).open @name
       end
@@ -147,8 +147,8 @@ class BudgetVersionsObject < DataFactory
                       end_date: page.end_date_of(number).value,
                       total_sponsor_cost: page.total_sponsor_cost_of(number).value.groom,
                       direct_cost: page.direct_cost_of(number).value.groom,
-                      f_and_a_cost: page.fa_cost_of(number).value.groom,
-                      unrecovered_f_and_a: page.unrecovered_fa_of(number).value.groom,
+                      f_and_a_cost: page.f_and_a_cost_of(number).value.groom,
+                      unrecovered_f_and_a: page.unrecovered_f_and_a_of(number).value.groom,
                       cost_sharing: page.cost_sharing_of(number).value.groom,
                       cost_limit: page.cost_limit_of(number).value.groom,
                       direct_cost_limit: page.direct_cost_limit_of(number).value.groom
