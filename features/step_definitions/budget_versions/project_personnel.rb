@@ -73,6 +73,6 @@ And /assigns a '(.*)' Person to Period (\d+), where the charged percentage is lo
 end
 
 And /^the Project Person's requested salary for the Budget period is as expected$/ do
-  @project_person.monthly_base_salary = @budget_version.personnel.person(@project_person.person).monthly_base_salary
+  @project_person.monthly_base_salary = @budget_version.person(@project_person.person).monthly_base_salary
   on(AssignPersonnelToPeriods).requested_salary_of(@project_person.person).to_f.should be_within(0.02).of(@project_person.requested_salary)
 end

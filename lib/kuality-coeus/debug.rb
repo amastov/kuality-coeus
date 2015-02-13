@@ -8,7 +8,14 @@ module DEBUG
 
     def pause(seconds=30)
       puts "Pausing #{seconds} seconds..."
-      sleep seconds
+      sleep seconds - 3
+      puts 'Three...'
+      sleep 1
+      puts 'Two...'
+      sleep 1
+      puts 'One...'
+      sleep 1
+      puts 'Resuming...'
     end
 
     def do message='Performing debug code block...', &block

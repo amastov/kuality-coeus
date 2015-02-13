@@ -4,12 +4,9 @@ module Personnel
 
   include Utilities
 
-  CERTIFICATION_QUESTIONS = [:certify_info_true,
-                             :potential_for_conflict,
-                             :submitted_financial_disclosures,
-                             :lobbying_activities,
-                             :excluded_from_transactions,
-                             :familiar_with_pla
+  CERTIFICATION_QUESTIONS = [
+                             :understand_coi_obligation,
+                             :agree_with_sponsor_terms
   ]
 
   def role_value
@@ -81,10 +78,8 @@ module Personnel
   def update_unit_credit_splits(units=@units)
     units.each do |unit|
       on CreditAllocation do |update|
-        update.unit_space(@full_name, unit[:number]).fit unit[:space]
         update.unit_responsibility(@full_name, unit[:number]).fit unit[:responsibility]
         update.unit_financial(@full_name, unit[:number]).fit unit[:financial]
-        update.unit_recognition(@full_name, unit[:number]).fit unit[:recognition]
         update.save
       end
       # This updates the @units variable, in case

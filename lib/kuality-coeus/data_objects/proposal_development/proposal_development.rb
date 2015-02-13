@@ -22,7 +22,8 @@ class ProposalDevelopmentObject < DataFactory
       activity_type:         '::random::',
       project_title:         random_multiline(11, 1, :string),
       sponsor_id:            '::random::',
-      sponsor_type_code:     '::random::',
+      # Commented out for CX... Maybe remove permanently from defaults?
+      #sponsor_type_code:     '::random::',
       nsf_science_code:      '::random::',
       project_start_date:    next_week[:date_w_slashes],
       project_end_date:      next_year[:date_w_slashes],
@@ -103,6 +104,7 @@ class ProposalDevelopmentObject < DataFactory
     @budget_versions.add merge_settings(opts)
   end
 
+  # Note: this is not currently a Proposal requirement in CX...
   def add_supplemental_info opts={}
     @supplemental_info = prep(SupplementalInfoObject, opts)
   end
@@ -216,6 +218,7 @@ class ProposalDevelopmentObject < DataFactory
         to_s2s: :submit_to_s2s
     }
     view 'Summary/Submit'
+
     case(type)
       when :to_sponsor
 
@@ -238,6 +241,7 @@ class ProposalDevelopmentObject < DataFactory
           @status=page.document_status
         end
       else
+        view 'Summary/Submit'
         on(ProposalSummary).submit_for_review
         @status=on(NewDocumentHeader).document_status
     end
@@ -380,7 +384,8 @@ class ProposalDevelopmentObject < DataFactory
       on SponsorLookup do |look|
         # Necessary here because of how the HTML gets instantiated...
         look.sponsor_name.wait_until_present(10)
-        fill_out look, :sponsor_type_code
+        # Commented out for CX...
+        #fill_out look, :sponsor_type_code
         look.search
         look.results_table.wait_until_present
         look.page_links.to_a.sample.click if look.page_links.size > 1

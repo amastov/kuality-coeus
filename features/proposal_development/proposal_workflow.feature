@@ -21,7 +21,7 @@ Feature: Proposal Workflows and Routing
     When  the OSPApprover user approves the Proposal
     Then  the principal investigator can access the Proposal from their action list
     And   can approve the Proposal
-  @test
+
   Scenario: Approval Requests are sent to OSP representatives
     When  the Proposal Creator submits a new Proposal into routing
     Then  the OSPApprover can access the Proposal from their action list

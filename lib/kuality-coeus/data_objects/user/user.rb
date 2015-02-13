@@ -266,14 +266,13 @@ class UserObject < DataFactory
       @principal_id = add.principal_id
       add.blanket_approve
     end
-
     unless extended_attributes.compact.length==0
       visit(SystemAdmin).person_extended_attributes
       on(PersonExtendedAttributesLookup).create
       on PersonExtendedAttributes do |page|
         page.expand_all
         fill_out page, :description, :primary_title, :directory_title, :citizenship_type,
-                 :era_commons_user_name, :graduate_student_count, :billing_element,
+                 :era_commons_user_name, #:graduate_student_count, :billing_element,
                  :principal_id, :directory_department
         page.blanket_approve
       end

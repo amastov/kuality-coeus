@@ -136,6 +136,11 @@ end
 When /^(the (.*) |)submits the Proposal into routing$/ do |text, role_name|
   steps %{ * I log in with the #{role_name} user } unless text==''
   @proposal.submit
+
+
+  DEBUG.pause 500
+
+
 end
 
 When /^I? ?completes? the Proposal$/ do
@@ -165,11 +170,9 @@ end
 And /^the (.*) submits a new Proposal into routing$/ do |role_name|
   steps %{
     * the #{role_name} creates a Proposal
-    * completes the required supplemental info on the Proposal
     * adds a principal investigator to the Proposal
     * sets valid credit splits for the Proposal
-    * answers the Proposal's questionnaire
-    * the #{role_name} submits the Proposal into routing
+    * submits the Proposal into routing
 }
 end
 

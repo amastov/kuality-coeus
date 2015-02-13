@@ -26,7 +26,7 @@ class Kuality
 
     @browser = Watir::Browser.new web_browser
     @browser.window.resize_to(1500,1000)
-    @browser.goto $base_url
+    @browser.goto $base_url+$context
 
     $users       = Users.instance
     $file_folder = "#{File.dirname(__FILE__)}/resources/"

@@ -53,7 +53,7 @@ class CostSharingCollection < CollectionsFactory
   #TODO: Write code that will update indexes when items change their order in the list.
 
   def total_funds
-    self.collect{ |cs| cs.amount.to_f}.inject(0, :+)
+    self.collect{ |cs| cs.amount.to_f}.inject(0, :+).round(2)
   end
 
 end

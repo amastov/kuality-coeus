@@ -31,8 +31,8 @@ unassigneduser: # AKA: "Principal Name
     - :name: unassigned
       :qualifiers:
         - :unit: '000001'
-poolej: # AKA: "Principal Name
-  :user_name:        poolej
+spunky: # AKA: "Principal Name
+  :user_name:        spunky
   :description:      Basic Prop Dev Aggregator With Additional Helper Roles
   :affiliation_type: Staff
   :campus_code:      'UN - UNIVERSITY'
@@ -89,8 +89,8 @@ poolej: # AKA: "Principal Name
     - :name: Budget Creator
       :qualifiers:
         - :unit: '000001'
-cleganeg:  # AKA: "Principal Name"
-  :user_name:        cleganeg
+junky:  # AKA: "Principal Name"
+  :user_name:        junky
   :description:      OSP Approver User Who Can Only Approve A Proposal
   :affiliation_type: Faculty
   :campus_code:      'UN - UNIVERSITY'
@@ -137,8 +137,8 @@ cleganeg:  # AKA: "Principal Name"
     - :name: OSPApprover
       :qualifiers:
         - :unit:
-starka:  # AKA: "Principal Name"
-  :user_name:        starka
+flunky:  # AKA: "Principal Name"
+  :user_name:        flunky
   :description:      Proposal Creator User
   :affiliation_type: Other Academic Group
   :campus_code:      'UN - UNIVERSITY'
@@ -147,7 +147,7 @@ starka:  # AKA: "Principal Name"
   :primary_title:    Director RSmart College of Science
   :directory_title:  Principal Investigator
   :citizenship_type: US CITIZEN OR NONCITIZEN NATIONAL
-  :era_commons_user_name: pqowiuth
+  :era_commons_user_name: funkyjunky
   :graduate_student_count: '0'
   :billing_element:  bla bla bla
   :addresses:
@@ -183,8 +183,8 @@ starka:  # AKA: "Principal Name"
     - :name: Proposal Creator
       :qualifiers:
         - :unit: '000001'
-martelld:  # AKA: "Principal Name"
-  :user_name:        martelld
+clunky:  # AKA: "Principal Name"
+  :user_name:        clunky
   :description:      Proposal Aggregator User
   :affiliation_type: Other Academic Group
   :campus_code:      'UN - UNIVERSITY'
@@ -226,22 +226,22 @@ martelld:  # AKA: "Principal Name"
     - :name: Aggregator
       :qualifiers:
         - :unit: '000001'
-warrens:  # AKA: "Principal Name"
-  :user_name:        warrens
+munky:  # AKA: "Principal Name"
+  :user_name:        munky
   :description:      AOR User Capable Of Submitting To Grants.Gov
   :affiliation_type: Staff
   :campus_code:      'UN - UNIVERSITY'
-  :employee_id:      '00001'
+  :employee_id:      splatt
   :employee_status:  Active
   :employee_type:    Professional
   :base_salary:      123456.78
   :primary_department_code: '000001'
-  :first_name:       Sean
-  :last_name:        Warren
+  :first_name:       Sylvia
+  :last_name:        Platt
   :primary_title:    OSP Superuser
   :directory_title:  OSP Superuser
   :citizenship_type: US CITIZEN OR NONCITIZEN NATIONAL
-  :era_commons_user_name: swarren
+  :era_commons_user_name: splatt
   :directory_department:  Humanities
   :graduate_student_count: '0'
   :billing_element:  bla bla bla
@@ -281,8 +281,8 @@ warrens:  # AKA: "Principal Name"
     - :name: Aggregator
       :qualifiers:
         - :unit: '000001'
-lannister: #Note: Lannister is ONLY an OSP Admin. This means, he will not be in any proposal's workflow.
-  :user_name:        lannister
+spelunky: #Note: Lannister is ONLY an OSP Admin. This means, he will not be in any proposal's workflow.
+  :user_name:        spelunky
   :description:      OSP Administrator
   :affiliation_type: Staff
   :campus_code:      'UN - UNIVERSITY'

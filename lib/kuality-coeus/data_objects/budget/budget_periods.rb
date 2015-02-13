@@ -47,16 +47,10 @@ class BudgetPeriodObject < DataFactory
         edit.send("#{field}_of", @number).fit opts[field]
       end
       edit.save_period @number
-
       if opts.keys.include?(:start_date) || opts.keys.include?(:end_date)
-
-
-        DEBUG.message
         on(ChangePeriod).yes
-
-
       end
-
+      # TODO: This is probably not going to work any more. Fix it!
       return if edit.errors.size > 0
     end
     @datified = Utilities.datify @start_date

@@ -34,7 +34,7 @@ When /adds? a principal investigator to the Proposal$/ do
 end
 
 When /^various personnel are added to the Proposal$/ do
-  steps %|
+  steps %q|
     * add a principal investigator to the Proposal
     * add a co-investigator to the Proposal
     * add a key person to the Proposal

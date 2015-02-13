@@ -10,6 +10,7 @@ class BudgetVersionsObject < DataFactory
   attr_accessor :name
 
   def_delegator :@budget_periods, :period
+  def_delegator :@personnel, :person
 
   def initialize(browser, opts={})
     @browser = browser

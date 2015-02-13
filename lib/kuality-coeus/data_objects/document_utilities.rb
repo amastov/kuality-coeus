@@ -1,8 +1,6 @@
 module DocumentUtilities
 
-  CREDIT_SPLITS = { recognition: 'Recognition',
-                    responsibility: 'Responsibility',
-                    space: 'Space',
+  CREDIT_SPLITS = { responsibility: 'Responsibility',
                     financial: 'Financial' }
 
   # This method simply sets all the credit splits to

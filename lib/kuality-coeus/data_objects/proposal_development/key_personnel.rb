@@ -4,10 +4,9 @@
 
   attr_reader :first_name, :last_name, :type, :role, :document_id, :key_person_role,
               :full_name, :user_name, :home_unit, :organization, :units, :responsibility,
-              :financial, :recognition, :certified, :certify_info_true,
-              :potential_for_conflicts, :submitted_financial_disclosures, :lobbying_activities,
-              :excluded_from_transactions, :familiar_with_pla,
-              :space, :other_key_persons, :era_commons_name, :degrees
+              :financial, :certified, :certify_info_true,
+              :understand_coi_obligation, :agree_with_sponsor_terms,
+              :other_key_persons, :era_commons_name, :degrees
 
   # Note that you must pass in both first and last names (or neither).
   def initialize(browser, opts={})
@@ -19,12 +18,8 @@
       units:                           [],
       degrees:                         collection('Degrees'),
       certified:                       true, # Set this to false if you do not want any Proposal Person Certification Questions answered
-      certify_info_true:               'Y',
-      potential_for_conflict:          'Y',
-      submitted_financial_disclosures: 'Y',
-      lobbying_activities:             'Y',
-      excluded_from_transactions:      'Y',
-      familiar_with_pla:               'Y'
+      understand_coi_obligation:      'Y',
+      agree_with_sponsor_terms:       'Y'
     }
 
     set_options(defaults.merge(opts))
@@ -68,7 +63,7 @@
     unless @role=='Key Person' # Set credit splits
       view 'Credit Allocation'
       on CreditAllocation do |page|
-        fill_out_item @full_name, page, :recognition, :responsibility, :space, :financial
+        fill_out_item @full_name, page, :responsibility, :financial
         page.save
       end
     end
@@ -86,7 +81,7 @@
   def update_splits opts={}
     view 'Credit Allocation'
     on CreditAllocation do |page|
-      edit_item_fields opts, @full_name, page, :recognition, :responsibility, :space, :financial
+      edit_item_fields opts, @full_name, page, :responsibility, :financial
       page.save
     end
     update_options(opts)

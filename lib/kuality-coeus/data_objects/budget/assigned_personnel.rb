@@ -17,7 +17,8 @@ class AssignedPerson < DataFactory
       percent_charged:     (percent*0.8).round(2).to_s,
       period_type:         '::random::',
       monthly_base_salary: 0.0,
-      inflation_rate:      0.0
+      # TODO: Don't hard code this:
+      inflation_rate:      3.0
     }
     set_options(defaults.merge(opts))
     requires :person
@@ -62,29 +63,11 @@ class AssignedPerson < DataFactory
   end
 
   def requested_salary
-    sm = start_month_days == days_in_start_month || full_months_count<2 ? 0 : start_month_calculated_salary
-
-    DEBUG.message 'Start month:'
-    DEBUG.inspect sm
-
-    em = end_month_days == days_in_end_month ? monthly_calculated_salary : end_month_calculated_salary
-
-    DEBUG.message 'End month:'
-    DEBUG.inspect em
-
-    DEBUG.message 'Full months count:'
-    DEBUG.inspect full_months_count
-
-    DEBUG.message 'Monthly calculated salary:'
-    DEBUG.inspect monthly_calculated_salary
-
-    ((full_months_count*monthly_calculated_salary) + (monthly_inflation_cost*inflated_months_count) + sm + em + end_month_inflation_cost).round(2)
+    ((middle_months_count*monthly_calculated_salary) + (monthly_inflation_cost*inflated_months_count) + start_month_calculated_salary + end_month_calculated_salary + end_month_inflation_cost).round(2)
   end
 
   def cost_sharing
-    sm = start_month_days == days_in_start_month || full_months_count<2 ? 0 : start_month_calc_cost_share
-    em = end_month_days == days_in_end_month ? monthly_calc_cost_share : end_mnth_calc_cost_sharing
-    ((full_months_count*monthly_calc_cost_share) + sm + em ).round(2)
+    ((middle_months_count*monthly_calc_cost_share) + start_month_calc_cost_share + em ).round(2)
   end
 
   def rate_cost(rate)
@@ -110,8 +93,20 @@ class AssignedPerson < DataFactory
     days_in_month(start.year, start.month)
   end
 
+  def start_month_full?
+    start.day == 1
+  end
+
   def days_in_end_month
     days_in_month(end_d.year, end_d.month)
+  end
+
+  def end_month_full?
+    end_month_days == days_in_end_month
+  end
+
+  def start_and_end_month_same?
+    end_d.year == start.year && end_d.month == start.month
   end
 
   def monthly_calculated_salary
@@ -131,7 +126,7 @@ class AssignedPerson < DataFactory
   end
 
   def end_month_daily_salary
-    monthly_base_salary/days_in_end_month
+    start_and_end_month_same? ? 0 : monthly_base_salary/days_in_end_month
   end
 
   def start_month_calculated_salary
@@ -166,13 +161,9 @@ class AssignedPerson < DataFactory
     datify @rate_start_date
   end
 
-
-  def full_months_count
-    # Is the start month full?
-    s = start.day > 1 ? 0 : 1
-    # Is the end month full?
-    e = end_d.day == days_in_end_month ? 0 : 1
-    (end_d.year - start.year)*12 + end_d.month - start.month - s - e
+  def middle_months_count
+    x = (end_d.year - start.year)*12 + end_d.month - start.month - 1
+    x < 0 ? 0 : x
   end
 
   def inflated_months_count

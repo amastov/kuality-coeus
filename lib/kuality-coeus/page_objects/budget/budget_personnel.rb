@@ -9,9 +9,9 @@ class BudgetPersonnel < BasePage
     items= []
     b.personnel_rows.each { |row|
       items << {
-          person:           row.p.text[/.*(?= \()/],
-          role:             row.p.text[/(?<=\()\w+/],
-          job_code:         row.td(index: 1).span.text[/\w+/],
+          person:           row.td.text[/^.*(?=\s\()/],
+          role:             row.td.span.text[/\w+/],
+          job_code:         row.td(index: 1).span.text[/(?<=\()\w+/],
           appointment_type: row.td(index: 2).text.strip,
           base_salary:      row.td(index: 3).text.strip
       }
