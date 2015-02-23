@@ -180,10 +180,12 @@ class BudgetVersionsObject < DataFactory
                       cost_limit: page.cost_limit_of(number).value.groom,
                       direct_cost_limit: page.direct_cost_limit_of(number).value.groom
         @budget_periods << period
-        page.save_period number
       end
     end
     @budget_periods.number!
+
+    DEBUG.inspect @budget_periods
+
   end
 
 end # BudgetVersionsObject
