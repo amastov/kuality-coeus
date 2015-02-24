@@ -57,7 +57,7 @@ class AwardContacts < KCAwards
   # ===========
   private
   # ===========
-  
+
   p_element(:target_key_person_div) { |name, b| b.frm.div(id: "tab-#{nsp(name)}:UnitDetails-div") }
   p_element(:person_units) { |name, b| b.target_key_person_div(name).table(summary: 'Project Personnel Units') }
   p_element(:person_unit_row) { |name, unit, b| b.person_units(name).row(text: /#{unit}/) }

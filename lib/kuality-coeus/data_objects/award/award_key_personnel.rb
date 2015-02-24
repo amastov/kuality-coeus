@@ -4,8 +4,7 @@ class AwardKeyPersonObject < DataFactory
 
   attr_reader :employee_user_name, :non_employee_id, :project_role,
               :key_person_role, :units, :first_name, :last_name, :full_name,
-              :lead_unit, :type, :responsibility, :financial, :recognition,
-              :space
+              :lead_unit, :type, :responsibility, :financial
 
   def initialize(browser, opts={})
     @browser = browser

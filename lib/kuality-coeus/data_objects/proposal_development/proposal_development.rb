@@ -11,8 +11,7 @@ class ProposalDevelopmentObject < DataFactory
               :personnel_attachments, :mail_by, :mail_type, :institutional_proposal_number, :nsf_science_code,
               :original_ip_id, :award_id
   def_delegators :@key_personnel, :principal_investigator, :co_investigator
-
-
+  
   def initialize(browser, opts={})
     @browser = browser
 
@@ -168,8 +167,8 @@ class ProposalDevelopmentObject < DataFactory
                             first_name: person.first_name, last_name: person.last_name,
                             lead_unit: person.home_unit, role: person.role,
                             project_role: person.key_person_role, units: person.units,
-                            responsibility: person.responsibility, space: person.space,
-                            financial: person.financial, recognition: person.recognition,
+                            responsibility: person.responsibility,
+                            financial: person.financial,
                             document_id: doc_id, search_key: { institutional_proposal_number: doc_id },
                             lookup_class: InstitutionalProposalLookup, doc_header: 'KC Institutional Proposal'
       ip.project_personnel << project_person
@@ -178,7 +177,7 @@ class ProposalDevelopmentObject < DataFactory
   end
 
   def delete
-
+    #TODO
   end
 
   def recall(reason=random_alphanums)
@@ -319,7 +318,7 @@ class ProposalDevelopmentObject < DataFactory
 
   def set_new_doc_number(new_doc_number)
     @document_id = new_doc_number
-
+    #TODO: What else goes here?
   end
 
   # =======

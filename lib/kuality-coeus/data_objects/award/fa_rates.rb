@@ -38,7 +38,7 @@ class AwardFARatesObject < DataFactory
           page.new_rate_fiscal_year.fire_event 'onblur'
           sleep 1.5
           x+=1
-          raise 'The Date Fields are not auto-populating!' if x==5
+          raise 'The Date Fields are not auto-populating!' if x==10
         end
         @start_date=page.new_rate_start_date.value
         @end_date=page.new_rate_end_date.value

@@ -15,8 +15,9 @@ Feature: Proposal Key Personnel Validations
 
     Examples:
     | Type           | Value  |
-    | Financial      | 1000   |
+    | Responsibility | 100.01 |
     | Responsibility | -0.01  |
+    | Financial      | 1000   |
 
   Scenario: Data Validation of Credit Split not totalling 100%
     Given I add a Principal Investigator with a Financial credit split of 99.99

@@ -90,7 +90,7 @@ end
 
 When /^the AOR user submits the Proposal to S2S$/ do
   @aor.sign_in
-  steps '* I submit the Proposal to S2S'
+  @proposal.submit :to_s2s
 end
 
 And /^the Proposal Creator copies the Proposal to a new one, as a continuation$/ do

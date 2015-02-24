@@ -97,9 +97,14 @@ class S2SQuestionnaireObject < DataFactory
       end
       fill_out s2s, :explain_potential_effects, :explain_support, :pis_us_govt_agency,
                     :total_amount_requested, :former_pi, :former_institution,
-                    :explain_environmental_impact, :explain_exemption, :explain_historic_designation,
-                    :identify_countries, :explain_international_activities, :submitted_to_govt_agency,
-                    :application_date, :program
+                    # :explain_environmental_impact,
+                    # :explain_exemption, :explain_historic_designation,
+                    # :identify_countries,
+                    # :explain_international_activities,
+                    # :submitted_to_govt_agency,
+                    # :application_date,
+                    :program,
+                    :site_historic, :international_activities, :other_agencies, :subject_to_review
       s2s.save
     end
   end

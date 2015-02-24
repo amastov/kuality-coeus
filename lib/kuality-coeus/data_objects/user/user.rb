@@ -166,6 +166,7 @@ class UserObject < DataFactory
                             number:  '602-840-7300',
                             default: :set }],
         rolez:            [{name: 'unassigned', qualifiers: [{:unit=>'000001'}]}],
+        groups:           collection('UserGroups')
     }
     defaults.merge!(opts)
 
@@ -419,10 +420,6 @@ class UserObject < DataFactory
       look.edit_person @user_name
     end
     on(Person).expand_all
-  end
-
-  def login_class
-    $cas ? CASLogin : Login
   end
 
 end # UserObject

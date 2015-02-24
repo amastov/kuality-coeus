@@ -2,9 +2,7 @@ class IPContacts < KCInstitutionalProposal
 
   # Combined Credit Split
   {
-      'recognition'=>1,
       'responsibility'=>2,
-      'space'=>3,
       'financial'=>4
   }.each do |key, value|
     # Makes methods for the person's 3 credit splits (doesn't have to take the full name of the person to work)

@@ -5,12 +5,12 @@ Feature: Award Contacts
   so that I can...
 
   Background:
-    * a User exists with the role 'Award Modifier' in unit 'BL-BL'
+    * a User exists with the role 'Award Modifier' in unit 'CS'
 
   Scenario: Award Modifier adds a PI to an Award
-    Given the Award Modifier creates an Award with BL-BL as the Lead Unit
+    Given the Award Modifier creates an Award with CS as the Lead Unit
     When  the Award Modifier adds a PI to the Award
-    Then  The Award PI's Lead Unit is BL-BL
+    Then  The Award PI's Lead Unit is CS
 
   Scenario: Award has no Principal Investigator added
     Given the Award Modifier creates an Award

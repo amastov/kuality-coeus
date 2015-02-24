@@ -5,7 +5,7 @@ class ProjectPersonnelObject < DataFactory
   attr_reader :full_name, :first_name, :last_name, :role, :lead_unit,
               :units, :faculty, :total_effort, :academic_year_effort,
               :summer_effort, :calendar_year_effort, :responsibility,
-              :recognition, :financial, :space, :project_role, :principal_name
+              :financial, :project_role, :principal_name
 
   def initialize(browser, opts={})
     @browser = browser

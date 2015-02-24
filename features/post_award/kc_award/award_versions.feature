@@ -5,7 +5,7 @@ Feature: Award Versions
 
   Background:
     * a User exists with the role 'Time And Money Modifier' in unit '000001' (descends hierarchy)
-    * a User exists with the role 'Award Modifier' in unit 'BL-BL'
+    * a User exists with the role 'Award Modifier' in unit 'CS'
     * the Award Modifier creates an Award
     * adds a subaward to the Award
     * completes the Award requirements

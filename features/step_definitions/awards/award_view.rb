@@ -44,8 +44,8 @@ end
 
 Then /^the anticipated and obligated amounts are zero$/ do
   on Award do |page|
-    page.anticipated_amount.value.should=='0.00'
-    page.obligated_amount.value.should=='0.00'
+    page.anticipated_amount_ro.should=='$0.00'
+    page.obligated_amount_ro.should=='$0.00'
   end
 end
 

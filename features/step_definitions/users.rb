@@ -150,3 +150,8 @@ When /^a User exists with the roles: (.*) in the (.*) unit$/ do |roles, unit|
     $users[-1].create unless $users[-1].exists?
   end
 end
+
+When /^I log in with the Proposal's principal investigator$/ do
+  $users.logged_in_user.sign_out unless $users.current_user==nil
+  @proposal.key_personnel.principal_investigator.log_in
+end

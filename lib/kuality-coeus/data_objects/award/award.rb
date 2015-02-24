@@ -33,9 +33,9 @@ class AwardObject < DataFactory
       award_type:            '::random::',
       project_start_date:    right_now[:date_w_slashes],
       project_end_date:      in_a_year[:date_w_slashes],
-      sponsor_type_code:     '::random::',
+      sponsor_type_code:     'Federal',
       sponsor_id:            '::random::',
-      lead_unit_id:             '::random::',
+      lead_unit:             '::random::',
       obligation_start_date: right_now[:date_w_slashes],
       obligation_end_date:   in_a_year[:date_w_slashes],
       account_id:            random_alphanums(7),
@@ -245,7 +245,8 @@ class AwardObject < DataFactory
   end
 
   def add_report opts={}
-    opts[:report] ||= %w{Financial IntellectualProperty Procurement Property ProposalsDue TechnicalManagement}.sample
+    #IntellectualProperty and TechnicalManagement removed because of a validation bug in CX (https://github.com/rSmart/issues/issues/289).
+    opts[:report] ||= %w{Financial Procurement Property ProposalsDue}.sample
     defaults = {award_id: @id, number: (@reports.count_of(opts[:report])+1).to_s}
     view :payment_reports__terms
     @reports.add defaults.merge(opts)

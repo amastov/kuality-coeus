@@ -8,15 +8,15 @@ class AwardTermsObject < DataFactory
     @browser = browser
 
     defaults = {
-        equipment_approval:  [rand(1..28)],
-        invention:           [rand(1..22)],
+        equipment_approval:  [([1, 3, 4, 6, 7, 10] + (12..26).to_a + [28]).sample],
+        invention:           [([1, 3, 6] + (7..13).to_a + (15..20).to_a).sample],
         prior_approval:      [rand(1..58)],
-        property:            [rand(1..27)],
-        publication:         [rand(1..15)],
-        referenced_document: [rand(1..70)],
-        rights_in_data:      [rand(1..37)],
-        subaward_approval:   [rand(1..24)],
-        travel_restrictions: [rand(1..25)]
+        property:            [([1] + (3..11).to_a + (14..21).to_a + [23] + (25..27).to_a).sample],
+        publication:         [([1] + (3..15).to_a).sample],
+        referenced_document: [([1] + (3..5).to_a + (8..10).to_a + (14..18).to_a + (20..21).to_a + [29, 34, 40, 42, 43, 49, 64, 69, 70]).sample],
+        rights_in_data:      [([1] + (7..13).to_a + [15, 16] + (22..27).to_a + [29, 31, 32, 35, 36]).sample],
+        subaward_approval:   [([1] + (3..7).to_a + [9] + (11..17).to_a + (19..24).to_a).sample],
+        travel_restrictions: [([1] + (3..10).to_a + (13..25).to_a).sample]
     }
     set_options(defaults.merge(opts))
   end

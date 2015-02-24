@@ -25,23 +25,36 @@ class AwardReportsObject < DataFactory
   def create
     on PaymentReportsTerms do |page|
       page.expand_all
-      page.refresh_selection_lists
-      page.add_report_type(@report).pick! @type
-      page.add_report_type(@report).fire_event('onchange')
-      page.add_frequency(@report).pick! @frequency
-      page.add_frequency(@report).fire_event('onchange')
-      if @frequency=='None' && @frequency_base=='::random::'
-        # Then we need to handle Frequency Base differently...
-        @frequency_base=nil
-      else
-        page.add_frequency_base(@report).pick! @frequency_base
-        page.add_frequency_base(@report).fire_event('onchange')
-      end
+      set_report_type
+      set_frequency
+      page.add_frequency_base(@report).pick! @frequency_base
       page.add_osp_file_copy(@report).pick! @osp_file_copy
       page.add_due_date(@report).fit @due_date
       page.add_report(@report)
       page.save
     end
+  end
+
+  private
+
+  def set_frequency
+    if @frequency == '::random::'
+      @frequency = 'None'
+      while @frequency == 'None'
+        @frequency = on(PaymentReportsTerms).add_frequency(@report).options.map(&:text).sample
+      end
+    end
+    on(PaymentReportsTerms).add_frequency(@report).pick! @frequency
+  end
+
+  def set_report_type
+    if @type == '::random::'
+      @type = 'None'
+      while @type == 'None'
+        @type = on(PaymentReportsTerms).add_report_type(@report).options.map(&:text).sample
+      end
+    end
+    on(PaymentReportsTerms).add_report_type(@report).pick! @type
   end
 
 end # AwardReportsObject

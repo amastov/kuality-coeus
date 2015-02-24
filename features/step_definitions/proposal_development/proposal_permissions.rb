@@ -16,28 +16,28 @@ end
 Then /^the (.*) user can access the Proposal$/ do |role|
   get(role).sign_in
   @proposal.view
-
+  #TODO: Add a validation here
 end
 
 Then /^their proposal permissions do not allow them to edit budget details$/ do
-  raise 'This ain\t done!'
+  raise 'This ain\'t done!'
 end
 
 And /^their proposal permissions allow them to edit all parts of the Proposal$/ do
-  raise 'This ain\t done!'
+  raise 'This ain\'t done!'
 end
 
 And /^their proposal permissions allow them to update the Budget, not the narrative$/ do
-  raise 'This ain\t done!'
+  raise 'This ain\'t done!'
 
 end
 
 And /^their proposal permissions allow them to only read the Proposal$/ do
-  raise 'This ain\t done!'
+  raise 'This ain\'t done!'
 end
 
 And /^their proposal permissions allow them to delete the Proposal$/ do
-  raise 'This ain\t done!'
+  raise 'This ain\'t done!'
 end
 
 When /^I? ?add an additional proposal role to the (.*) user$/ do |system_role|
