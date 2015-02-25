@@ -140,13 +140,9 @@
   private
   # =======
 
-  def cert_questions
-    [:certify_info_true,
-     :potential_for_conflict,
-     :submitted_financial_disclosures,
-     :lobbying_activities,
-     :excluded_from_transactions,
-     :familiar_with_pla]
+  def open_page(page)
+    #TODO: Add case logic here for documents other than Proposal...
+    on(ProposalSidebar).send(damballa(page))
   end
 
   def on_page?(page)

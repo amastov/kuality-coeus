@@ -316,7 +316,7 @@ class UserObject < DataFactory
   def sign_in
     unless $current_user==self
       $current_user.sign_out if $current_user
-      visit login_class do |log_in|
+      visit Login do |log_in|
         log_in.username.set @user_name
         log_in.login
       end
