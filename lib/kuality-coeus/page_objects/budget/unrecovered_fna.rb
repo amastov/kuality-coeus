@@ -9,6 +9,9 @@ class UnrecoveredFandA < BasePage
   p_element(:fa_source_account) { |number, b| b.target_row(number).text_field(name: /sourceAccount$/) }
   p_element(:fa_amount) { |number, b| b.target_row(number).text_field(name: /amount$/) }
 
+  value(:total_allocated) { |b| b.div(data_label: 'Total Allocated').p(data_role:'totalValue').text }
+  value(:total_unallocated) { |b| b.div(data_label: 'Total Unallocated').p(data_role:'totalValue').text }
+
   private
 
   element(:fna_rows) { |b| b.section(id: 'PropBudget-UnrecoveredFandAPage-Group').table.tbody.rows }

@@ -33,9 +33,9 @@ class Rates < BasePage
                    description:     tr.td(index: 0).text,
                    on_campus:       tr.td(index: 1).text,
                    fiscal_year:     tr.td(index: 2).text,
-                   start_date:      tr.td(index: 3).text,
-                   institute_rate:  tr.td(index: 4).text,
-                   applicable_rate: tr.text_field(name: /applicableRate/).value }
+                   start_date:      Utilities.datify(tr.td(index: 3).text),
+                   institute_rate:  tr.td(index: 4).text.to_f,
+                   applicable_rate: tr.text_field(name: /applicableRate/).value.to_f }
       }
     end
     array

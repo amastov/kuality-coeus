@@ -6,7 +6,7 @@ class BudgetPeriodObject < DataFactory
               :direct_cost, :f_and_a_cost, :unrecovered_f_and_a,
               :cost_sharing, :cost_limit, :direct_cost_limit, :datified,
               :budget_name, :cost_sharing_distribution_list, :unrecovered_fa_dist_list,
-              :participant_support, :assigned_personnel, :non_personnel_costs
+              :participant_support, :assigned_personnel, :non_personnel_costs, :period_rates
               #TODO: Add support for this:
               :number_of_participants
   attr_accessor :number
@@ -19,13 +19,13 @@ class BudgetPeriodObject < DataFactory
       unrecovered_fa_dist_list:       collection('UnrecoveredFA'),
       participant_support:            collection('ParticipantSupport'),
       assigned_personnel:             collection('AssignedPersonnel'),
-      non_personnel_costs:            collection('NonPersonnelCosts')
+      non_personnel_costs:            collection('NonPersonnelCosts'),
+      period_rates:                   collection('BudgetRates')
     }
 
     set_options(defaults.merge(opts))
     requires :start_date, :open_budget
-    @datified = Utilities.datify @start_date
-    add_cost_sharing @cost_sharing
+    add_cost_sharing
   end
 
   def create
@@ -34,7 +34,7 @@ class BudgetPeriodObject < DataFactory
     on AddBudgetPeriod do |create|
       # TODO!
     end
-    initialize_unrecovered_fa @unrecovered_f_and_a
+    initialize_unrecovered_fa
   end
 
   def edit opts={}
@@ -52,10 +52,9 @@ class BudgetPeriodObject < DataFactory
       # TODO: This is probably not going to work any more. Fix it!
       return if edit.errors.size > 0
     end
-    @datified = Utilities.datify @start_date
-    add_cost_sharing opts[:cost_sharing]
-    initialize_unrecovered_fa opts[:unrecovered_f_and_a]
     set_options(opts)
+    add_cost_sharing
+    initialize_unrecovered_fa
   end
 
   def view(tab)
@@ -81,6 +80,7 @@ class BudgetPeriodObject < DataFactory
       page.assign_personnel @number
     end
     @assigned_personnel.add opts
+    #TODO add the getting of period rates
   end
 
   def assign_non_personnel_cost opts={}
@@ -89,7 +89,32 @@ class BudgetPeriodObject < DataFactory
     if @browser.header(id: 'PropBudget-ConfirmPeriodChangesDialog_headerWrapper').present?
       on(ConfirmPeriodChanges).yes
     end
-    @non_personnel_costs.add opts
+    defaults = { period_rates: @period_rates }
+    @non_personnel_costs.add defaults.merge(opts)
+  end
+
+  def copy_non_personnel_item(np_item)
+    s_d = (np_item.start_date_datified + 365).strftime("%m/%d/%Y")
+    e_d = (np_item.end_date_datified + 365).strftime("%m/%d/%Y")
+    old_tbc = np_item.total_base_cost.to_f
+
+
+
+    #TODO!!!
+    tbc = old_tbc + old_tbc
+
+
+
+    # TODO: Need to add calculations for cost sharing and other things...
+    c_s = np_item.cost_sharing
+    new_item = make NonPersonnelCost, category_type: np_item.category_type,
+                                      object_code_name: np_item.object_code_name,
+                                      start_date: s_d,
+                                      end_date: e_d,
+                                      total_base_cost: tbc,
+                                      cost_sharing: c_s
+    new_item.get_rates
+    @non_personnel_costs << new_item
   end
 
   def add_participant_support opts={}
@@ -117,20 +142,32 @@ class BudgetPeriodObject < DataFactory
                    :cost_sharing, :cost_limit, :direct_cost_limit]
   end
 
+  def start_date_datified
+    datify @start_date
+  end
+
+  def end_date_datified
+    datify @end_date
+  end
+
+  def get_rates(budget_rates)
+    @period_rates = budget_rates.in_range(start_date_datified, end_date_datified)
+  end
+
   # =======
   private
   # =======
 
-  def add_cost_sharing(cost_sharing)
-    if @cost_sharing_distribution_list.empty? && !cost_sharing.nil? && cost_sharing.to_f > 0
+  def add_cost_sharing
+    if @cost_sharing_distribution_list.empty? && !@cost_sharing.nil? && @cost_sharing.to_f > 0
       cs = make CostSharingObject, period: "#{@number}: #{@start_date} - #{@end_date}",
                 amount: cost_sharing, source_account: ''
       @cost_sharing_distribution_list << cs
     end
   end
 
-  def initialize_unrecovered_fa unrec_fa
-    if @unrecovered_fa_dist_list.empty? && !unrec_fa.nil? && unrec_fa.to_f > 0
+  def initialize_unrecovered_fa
+    if @unrecovered_fa_dist_list.empty? && !@unrecovered_f_and_a.nil? && @unrecovered_f_and_a.to_f > 0
       on(BudgetSidebar).unrecovered_fna
       on UnrecoveredFandA do |page|
         page.fna_rows.each do |row|
@@ -156,14 +193,12 @@ class BudgetPeriodsCollection < CollectionsFactory
   # This will update the number values of the budget periods,
   # based on their start date values.
   def number!
-    self.sort_by! { |period| period.datified }
+    self.sort_by! { |period| period.start_date_datified }
     self.each_with_index { |period, index| period.number=index+1 }
   end
 
   def total_sponsor_cost
     self.collect{ |period| period.total_sponsor_cost.to_f }.inject(0, :+)
   end
-
-
 
 end # BudgetPeriodsCollection

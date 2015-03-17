@@ -279,6 +279,8 @@ class BasePage < PageFactory
     # ========
 
     # Don't use this with links that are contained in the iframes...
+    # Also: Only use when there is no need to wait for the loading image...
+    # TODO: Reconsider whether or not this needs to just use #elementate
     def links(*links_text)
       links_text.each { |link| elementize(:link, link) }
     end

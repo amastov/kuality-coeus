@@ -18,4 +18,7 @@ class BudgetSidebar < BasePage
   action(:project_income) { |b| b.link(name: 'PropBudget-ProjectIncomePage').click; b.loading }
   action(:modular) { |b| b.link(name: 'PropBudget-ModularPage').click; b.loading }
 
+  # Not technically "sidebar" stuff, but added here for the #view method...
+  action(:budget_settings) { |b| b.link(text: 'Budget Settings').click; b.loading }
+
 end

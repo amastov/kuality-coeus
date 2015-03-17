@@ -6,7 +6,7 @@ class BudgetVersionsObject < DataFactory
               :project_start_date, :project_end_date, :total_direct_cost_limit,
               :budget_periods, :unrecovered_fa_rate_type, :f_and_a_rate_type,
               :submit_cost_sharing, :residual_funds, :total_cost_limit,
-              :subaward_budgets, :personnel, :institute_rates
+              :subaward_budgets, :personnel, :institute_rates, :on_off_campus
   attr_accessor :name
 
   def_delegator :@budget_periods, :period
@@ -20,7 +20,8 @@ class BudgetVersionsObject < DataFactory
       budget_periods:    collection('BudgetPeriods'),
       subaward_budgets:  collection('SubawardBudget'),
       personnel:         collection('BudgetPersonnel'),
-      summary:           'Y'
+      summary:           'Y',
+      institute_rates:   collection('BudgetRates')
     }
 
     set_options(defaults.merge(opts))
@@ -40,13 +41,27 @@ class BudgetVersionsObject < DataFactory
       add.modular(@modular) unless @modular.nil?
       add.create_budget
     end
+    view 'Budget Settings'
+    on BudgetSettings do |page|
+      @project_start_date = Utilities.datify(page.project_start_date)
+      @project_end_date = Utilities.datify(page.project_end_date)
+      fill_out page, :total_direct_cost_limit, :total_cost_limit, :residual_funds, :submit_cost_sharing
+      @total_direct_cost_limit |= page.total_direct_cost_limit.value
+      @residual_funds |= page.residual_funds.value
+      @total_cost_limit |= page.total_cost_limit.value
+      @submit_cost_sharing |= page.submit_cost_sharing
+      get_or_select! :@unrecovered_fa_rate_type, page.unrecovered_fa_rate_type
+      get_or_select! :@f_and_a_rate_type, page.f_and_a_rate_type
+      get_or_select! :@status, page.status
+      get_or_select! :@on_off_campus, page.on_off_campus
+    end
+    get_rates
     get_budget_periods
-    on(BudgetSidebar).rates
-    @institute_rates = on(Rates).rates
-  end
+  end #create
 
   def add_period opts={}
     @budget_periods.add(opts)
+    @budget_periods[-1].get_rates @institute_rates
     return if on(PeriodsAndTotals).errors.size > 0 # No need to continue the method if we have an error
     @budget_periods.number! # This updates the number value of all periods, as necessary
   end
@@ -166,6 +181,7 @@ class BudgetVersionsObject < DataFactory
   # Note: Assumes we're already on the Periods And Totals page...
   def get_budget_periods
     @budget_periods.clear
+    view 'Periods and Totals'
     on PeriodsAndTotals do |page|
       1.upto(page.period_count) do |number|
         period = make BudgetPeriodObject, open_budget: @open_budget,
@@ -178,10 +194,16 @@ class BudgetVersionsObject < DataFactory
                       cost_sharing: page.cost_sharing_of(number).value.groom,
                       cost_limit: page.cost_limit_of(number).value.groom,
                       direct_cost_limit: page.direct_cost_limit_of(number).value.groom
+        period.get_rates(@institute_rates)
         @budget_periods << period
       end
     end
     @budget_periods.number!
+  end
+
+  def get_rates
+    view 'Rates'
+    @institute_rates.build(on(Rates).rates, @project_start_date, @project_end_date, @on_off_campus, @unrecovered_fa_rate_type, @f_and_a_rate_type)
   end
 
 end # BudgetVersionsObject
