@@ -18,6 +18,19 @@ class EditAssignedNonPersonnel < BasePage
   element(:submit_cost_sharing) { |b| b.checkbox(name: 'addProjectBudgetLineItemHelper.budgetLineItem.submitCostSharingFlag') }
   element(:on_campus) { |b| b.checkbox(name: 'addProjectBudgetLineItemHelper.budgetLineItem.onOffCampusFlag') }
 
+  value(:inflation_rates) { |b|
+    array = []
+    b.div(data_parent: 'PropBudget-NonPersonnelCostsPage-EditNonPersonnel-Dialog').tbody.trs.each { |tr|
+      array << {
+          description: tr[0].text,
+          start_date: Utilities.datify(tr[1].text),
+          institution_rate: tr[2].text,
+          applicable_rate: tr[3].text
+      }
+    }
+    array
+  }
+
   # Cost Sharing
   element(:cost_sharing) { |b| b.text_field(name: 'addProjectBudgetLineItemHelper.budgetLineItem.costSharingAmount') }
 
@@ -41,7 +54,8 @@ class EditAssignedNonPersonnel < BasePage
 
   element(:modal_div) { |b| b.div(data_parent: 'PropBudget-NonPersonnelCostsPage-EditNonPersonnel-Dialog') }
   element(:tab_list) { |b| b.modal_div.ul }
-  value(:noko_rates_table) { |b| b.no_frame_noko.div(data_parent: 'PropBudget-NonPersonnelCostsPage-EditNonPersonnel-Dialog').tbody }
-  element(:rates_table) { |b| b.modal_div.tbody }
+  value(:noko_rates_table) { |b| b.no_frame_noko.div(data_parent: 'PropBudget-NonPersonnelCostsPage-EditNonPersonnel-Dialog').section(class: 'uif-tableCollectionSection').tbody }
+  # FIXME!!!
+  element(:rates_table) { |b| b.table(id: 'uwcuma2') }
 
 end

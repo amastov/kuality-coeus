@@ -4,7 +4,7 @@ class NonPersonnelCost < DataFactory
 
   attr_reader :category_type, :category_code, :object_code_name, :total_base_cost,
               :cost_sharing, :start_date, :end_date, :rates, :apply_inflation, :submit_cost_sharing,
-              :on_campus,
+              :on_campus, :ird,
               #TODO someday:
               :quantity, :description # These don't seem to do anything, really
   attr_accessor :participants
@@ -16,6 +16,7 @@ class NonPersonnelCost < DataFactory
       category_type:    '::random::',
       object_code_name: '::random::',
       total_base_cost:  random_dollar_value(1000000),
+      ird:              []
     }
 
     set_options(defaults.merge(opts))
@@ -43,6 +44,7 @@ class NonPersonnelCost < DataFactory
     on EditAssignedNonPersonnel do |page|
       @start_date ||= page.start_date.value
       @end_date ||= page.end_date.value
+
       edit_fields opts, page, :apply_inflation, :submit_cost_sharing,
                   :start_date, :end_date, :on_campus
       opts[:on_campus] |= page.on_campus.set?
@@ -50,16 +52,15 @@ class NonPersonnelCost < DataFactory
       opts[:submit_cost_sharing] |= page.submit_cost_sharing.set?
       page.cost_sharing_tab
       edit_fields opts, page, :cost_sharing
+      # Note: code order is a little unusual, here, but necessary in order
+      # to get the right collection of rates for the item...
+      page.details_tab
+      # Grab the inflation rate descriptions for reference (they're used in #get_rates)...
+      @ird = page.inflation_rates.map { |r| r[:description] }.uniq
+      update_options opts
+      get_rates
       page.save_changes
     end
-    update_options opts
-    get_rates
-
-    DEBUG.inspect @category_type
-    DEBUG.inspect @object_code_name
-    DEBUG.inspect inflation_rates
-    exit
-
   end
 
   # Used when the category type is 'Participant Support'
@@ -92,20 +93,54 @@ class NonPersonnelCost < DataFactory
     (end_date_datified-start_date_datified).to_i+1
   end
 
+  def rate_days(rate)
+    # We know the rate applies, at least partially, because it hasn't been eliminated, so no need to
+    # check date range again...
+    # Determine which start date is later...
+    strt = rate.start_date > start_date_datified ? rate.start_date : start_date_datified
+    # Determine which end date is earlier...
+    end_d = rate.end_date > end_date_datified ? end_date_datified : rate.end_date
+    # Now count the days between them...
+    (end_d - strt).to_i+1
+  end
+
+  def inflation_amount
+     if Transforms::TRUE_FALSE[@apply_inflation]
+       subtotals = [0.0]
+       @rates.inflation.each do |inflation_rate|
+         subtotals << daily_total_base_cost*(inflation_rate.applicable_rate/100)*rate_days(inflation_rate)
+       end
+       subtotals.inject(:+)
+     else
+       0.0
+     end
+  end
+
   def get_rates
     @rates = @period_rates.non_personnel.in_range(start_date_datified, end_date_datified)
     if @on_campus != nil
       @rates.delete_if { |r| r.on_campus != Transforms::YES_NO[@on_campus] }
     end
+    @rates.delete_if { |r| r.rate_class_type=='Inflation' && !@ird.include?(r.description)
+    } unless @rates.inflation.nil? || @ird.empty?
   end
 
-  def inflation_rates
-    inf = @rates.inflation
-    rat = []
-    unless inf.empty?
-      rat = inf.find_all { |r| r.description =~ /#{@category_type}/i }
+  def copy_mutatis_mutandis opts={}
+    self.instance_variables.each do |var|
+      key = var.to_s.gsub('@','').to_sym
+      if opts[key].nil?
+        orig_val = instance_variable_get var
+        opts[key] = case
+                    when orig_val.instance_of?(BudgetRatesCollection)
+                      nil
+                    when orig_val.instance_of?(Array) || orig_val.instance_of?(Hash)
+                      Marshal::load(Marshal.dump(orig_val))
+                    else
+                      orig_val
+                    end
+      end
     end
-    rat.empty? ? inf : rat
+    self.class.new(@browser, opts)
   end
 
 end

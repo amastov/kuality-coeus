@@ -1,9 +1,9 @@
-@Proposal @failing #https://jira.kuali.org/browse/KRAFDBCK-12063
+@Proposal @failing
 Feature: Permissions in a Proposal
 
   As a Proposal Aggregator, I want to be able to assign others permissions to a proposal,
   to allow them to work on the proposal with me, and to control what actions
-  they are capable of performing with it.
+  they are capable of performing with it. #https://jira.kuali.org/browse/KRAFDBCK-12063
 
   Background: A proposal creator user creates a proposal
     * Users exist with the following roles: Proposal Creator, unassigned

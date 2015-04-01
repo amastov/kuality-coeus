@@ -31,201 +31,156 @@ unassigneduser: # AKA: "Principal Name"
     - :name: unassigned
       :qualifiers:
         - :unit: '000001'
-poolej: # AKA: "Principal Name"
-  :user_name:        poolej
-  :description:      Basic Prop Dev Aggregator With Additional Helper Roles
-  :affiliation_type: Staff
-  :campus_code:      'UN - UNIVERSITY'
-  :employee_id:      poolej
-  :employee_status:  Active
-  :employee_type:    Professional
-  :primary_department_code: '000001'
-  :base_salary:      '180'
-  :first_name:       Jeyne
-  :last_name:        Poole
-  :primary_title:    Director RSmart College of Science
-  :directory_title:  Principal Investigator
-  :citizenship_type: US CITIZEN OR NONCITIZEN NATIONAL
-  :era_commons_user_name: grantsgov
-  :directory_department:  Biology
-  :graduate_student_count: '0'
-  :billing_element:  bla bla bla
-  :addresses:
-    - :type:    Home
-      :line_1:  475 n scottsdale rd
-      :city:    scottsdale
-      :state:   ARIZONA
-      :country: United States
-      :zip:     85257
-      :default: :set
-    - :type:    Work
-      :line_1:  475 n scottsdale rd
-      :city:    scottsdale
-      :state:   ARIZONA
-      :country: United States
-      :zip:     85257
-      :default: :clear
-  :phones:
-    - :type:    Work
-      :number:  602-228-3876
-      :default: :set
-    - :type:    Facsimile
-      :number:  602-597-5350
-      :default: :clear
-  :emails:
-    - :email:   kc-qa-notify@rsmart.com
-      :type:    Work
-      :default: :set
-  :rolez:
-    - :name: Viewer
-      :qualifiers:
-        - :unit: '000001'
-    - :name: Aggregator
-      :qualifiers:
-        - :unit: '000001'
-    - :name: Narrative Writer
-      :qualifiers:
-        - :unit: '000001'
-    - :name: Budget Creator
-      :qualifiers:
-        - :unit: '000001'
-cleganeg:
-  :user_name:        cleganeg
-  :description:      OSP Approver User Who Can Only Approve A Proposal
+aft_dean: # AKA: "Principal Name"
+  :user_name:        aft_dean
+  :description:      no roles
   :affiliation_type: Faculty
   :campus_code:      'UN - UNIVERSITY'
-  :employee_id:      ospapprover
+  :employee_id:      AFT0001
   :employee_status:  Active
-  :employee_type:    Other
-  :base_salary:      '180'
-  :first_name:       Gregor
-  :last_name:        Clegane
-  :primary_title:    Director RSmart College of Science
-  :directory_title:  Principal Investigator
-  :citizenship_type: US CITIZEN OR NONCITIZEN NATIONAL
-  :era_commons_user_name: qwperoiu
-  :directory_department:  Chemistry
-  :graduate_student_count: '0'
-  :billing_element:  bla bla bla
+  :employee_type:    Professional
+  :primary_department_code: AFT1
+  :base_salary:      '123456'
+  :first_name:       Dean
+  :last_name:        Aft-Pui
+  :primary_title:
+  :directory_title:
+  :citizenship_type:
+  :era_commons_user_name:
+  :directory_department:
+  :graduate_student_count:
+  :billing_element:
   :addresses:
-    - :type:    Home
-      :line_1:  475 n scottsdale rd
-      :city:    scottsdale
-      :state:   ARIZONA
-      :country: United States
-      :zip:     85257
-      :default: :set
     - :type:    Work
-      :line_1:  475 n scottsdale rd
-      :city:    scottsdale
-      :state:   ARIZONA
+      :line_1:  77 Massachusetts Ave
+      :city:    Cambridge
+      :state:   MASSACHUSETTS
       :country: United States
-      :zip:     85257
-      :default: :clear
+      :zip:     02139-4307
+      :default: :set
   :phones:
     - :type:    Work
-      :number:  602-228-3876
+      :number:  617-253-1000
       :default: :set
-    - :type:    Facsimile
-      :number:  602-597-5350
-      :default: :clear
   :emails:
-    - :email:   kc-qa-notify@rsmart.com
+    - :email:   aftdean@kuali.org
       :type:    Work
       :default: :set
   :rolez:
-    - :name: OSPApprover
+    - :name:
+      :id:
       :qualifiers:
         - :unit:
-starka:
-  :user_name:        starka
-  :description:      Proposal Creator User
-  :affiliation_type: Other Academic Group
+auto_chair:
+  :user_name:        auto_chair
+  :description:
+  :affiliation_type: Faculty
   :campus_code:      'UN - UNIVERSITY'
-  :first_name:       Arya
-  :last_name:        Stark
-  :primary_title:    Director RSmart College of Science
-  :directory_title:  Principal Investigator
-  :citizenship_type: US CITIZEN OR NONCITIZEN NATIONAL
-  :era_commons_user_name: funkyjunky
-  :graduate_student_count: '0'
-  :billing_element:  bla bla bla
+  :employee_id:      AFT0002
+  :employee_status:  Active
+  :employee_type:    Professional
+  :base_salary:      '123456'
+  :first_name:       Auto
+  :last_name:        Chair
+  :primary_department_code: AFT2
+  :primary_title:
+  :directory_title:
+  :citizenship_type:
+  :era_commons_user_name:
+  :directory_department:
+  :graduate_student_count:
+  :billing_element:
   :addresses:
-    - :type:    Home
-      :line_1:  475 n scottsdale rd
-      :city:    scottsdale
-      :state:   ARIZONA
-      :country: United States
-      :zip:     85257
-      :default: :set
     - :type:    Work
-      :line_1:  475 n scottsdale rd
-      :city:    scottsdale
-      :state:   ARIZONA
+      :line_1:  77 Massachusetts Ave
+      :city:    Cambridge
+      :state:   MASSACHUSETTS
       :country: United States
-      :zip:     85257
-      :default: :clear
+      :zip:     02139-4307
+      :default: :set
   :phones:
     - :type:    Work
-      :number:  602-228-3876
+      :number:  617-253-1000
       :default: :set
-    - :type:    Facsimile
-      :number:  602-597-5350
-      :default: :clear
   :emails:
-    - :email:   kc-qa-notify@rsmart.com
+    - :email:   autochair@kuali.org
       :type:    Work
       :default: :set
   :rolez:
-    - :name: Aggregator
+    - :name:
       :qualifiers:
-        - :unit: '000001'
-    - :name: Proposal Creator
+        - :unit:
+auto_a-officer:
+  :user_name:        auto_a-officer
+  :description:      AO Officer
+  :affiliation_type: Staff
+  :campus_code:      'UN - UNIVERSITY'
+  :employee_id:      AFT0003
+  :employee_status:  Active
+  :employee_type:    Professional
+  :base_salary:      '123456'
+  :first_name:       AutoAO
+  :last_name:        Officer
+  :primary_department_code: AFT2
+  :primary_title:
+  :directory_title:
+  :citizenship_type:
+  :era_commons_user_name:
+  :graduate_student_count:
+  :billing_element:
+  :addresses:
+    - :type:    Work
+      :line_1:  77 Massachusetts Ave
+      :city:    Cambridge
+      :state:   MASSACHUSETTS
+      :country: United States
+      :zip:     02139-4307
+      :default: :set
+  :phones:
+    - :type:    Work
+      :number:  617-253-1000
+      :default: :set
+  :emails:
+    - :email:   autoao@kuali.org
+      :type:    Work
+      :default: :set
+  :rolez:
+    - :name:
       :qualifiers:
-        - :unit: '000001'
-dmartell:
-  :user_name:        dmartell
+        - :unit:
+auto_finance:
+  :user_name:        auto_finance
   :description:      Proposal Aggregator User
-  :affiliation_type: Other Academic Group
+  :affiliation_type: Staff
   :campus_code:      'UN - UNIVERSITY'
-  :first_name:       Doran
-  :last_name:        Martell
-  :primary_title:    Director RSmart College of Science
-  :directory_title:  Principal Investigator
-  :citizenship_type: US CITIZEN OR NONCITIZEN NATIONAL
-  :era_commons_user_name: 98ygwrgw
-  :graduate_student_count: '0'
-  :billing_element:  bla bla bla
+  :first_name:       Financial
+  :last_name:        Auto-Officer
+  :primary_title:
+  :directory_title:
+  :citizenship_type:
+  :era_commons_user_name:
+  :graduate_student_count:
+  :billing_element:
   :addresses:
-    - :type:    Home
-      :line_1:  475 n scottsdale rd
-      :city:    scottsdale
-      :state:   ARIZONA
-      :country: United States
-      :zip:     85257
-      :default: :set
     - :type:    Work
-      :line_1:  475 n scottsdale rd
-      :city:    scottsdale
-      :state:   ARIZONA
+      :line_1:  77 Massachusetts Ave
+      :city:    Cambridge
+      :state:   MASSACHUSETTS
       :country: United States
-      :zip:     85257
-      :default: :clear
+      :zip:     02139-4307
+      :default: :set
   :phones:
     - :type:    Work
-      :number:  602-228-3876
+      :number:  617-253-1000
       :default: :set
-    - :type:    Facsimile
-      :number:  602-597-5350
-      :default: :clear
   :emails:
-    - :email:   kc-qa-notify@rsmart.com
+    - :email:   financial-auto@kuali.org
       :type:    Work
       :default: :set
   :rolez:
-    - :name: Aggregator
+    - :name:
       :qualifiers:
-        - :unit: '000001'
+        - :unit:
 swarren:
   :user_name:        swarren
   :description:      AOR User Capable Of Submitting To Grants.Gov

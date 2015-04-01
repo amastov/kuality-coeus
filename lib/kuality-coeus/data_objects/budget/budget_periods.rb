@@ -94,25 +94,12 @@ class BudgetPeriodObject < DataFactory
   end
 
   def copy_non_personnel_item(np_item)
-    s_d = (np_item.start_date_datified + 365).strftime("%m/%d/%Y")
-    e_d = (np_item.end_date_datified + 365).strftime("%m/%d/%Y")
-    old_tbc = np_item.total_base_cost.to_f
-
-
-
-    #TODO!!!
-    tbc = old_tbc + old_tbc
-
-
-
-    # TODO: Need to add calculations for cost sharing and other things...
-    c_s = np_item.cost_sharing
-    new_item = make NonPersonnelCost, category_type: np_item.category_type,
-                                      object_code_name: np_item.object_code_name,
-                                      start_date: s_d,
-                                      end_date: e_d,
-                                      total_base_cost: tbc,
-                                      cost_sharing: c_s
+    opts = { start_date: (np_item.start_date_datified + 365).strftime("%m/%d/%Y"),
+             end_date: (np_item.end_date_datified + 365).strftime("%m/%d/%Y"),
+             total_base_cost:  np_item.total_base_cost.to_f + np_item.inflation_amount,
+             period_rates:  @period_rates
+    }
+    new_item = np_item.copy_mutatis_mutandis opts
     new_item.get_rates
     @non_personnel_costs << new_item
   end

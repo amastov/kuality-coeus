@@ -8,6 +8,7 @@ And /adds a non\-personnel cost with an? '(.*)' category type to the first Budge
     puts @proposal.proposal_number
     DEBUG.inspect $current_user.user_name
     @budget_version.period(1).non_personnel_costs[0].edit start_date: in_a_year[:date_w_slashes], end_date: in_a_year[:date_w_slashes]
+    exit
   }
 end
 
@@ -75,13 +76,16 @@ And /^the MTDC rate for the non-personnel item is unapplied for all periods$/ do
     page.apply('MTDC', 'MTDC').clear
     page.save_and_apply_to_other_periods
   end
+  on(NonPersonnelCosts).save_and_continue
 
   @budget_version.budget_periods[1..-1].each_with_index do |period, index|
     period.copy_non_personnel_item @budget_version.period(index+1).non_personnel_costs[0]
 
-    DEBUG.inspect period.non_personnel_costs
+    DEBUG.inspect period.non_personnel_costs[0].total_base_cost
 
   end
+
+  DEBUG.pause 1000
 
   exit
 

@@ -8,6 +8,14 @@ module Transforms
              'No' => 'No'
   }
 
+  TRUE_FALSE = { set: true,
+                 clear: false,
+                 true => true,
+                 false => true,
+                 'Yes' => true,
+                 'No' => false
+  }
+
   ON_OFF = { set: 'on', clear: 'off' }
 
   CAN = { 'can ' => :should, 'can\'t ' => :should_not }

@@ -1,5 +1,8 @@
 class NonPersonnelCosts < BasePage
 
+  budget_header_elements
+  buttons 'Save and Continue', 'Complete Budget'
+
   p_element(:period_title) { |number, b| b.h3(id: "PropBudget-NonPersonnelCosts-LineItemDetails_#{number}_header").span }
 
   p_action(:view_period) { |number, b| b.link(text: "Period #{number}").click unless b.period_title(number).visible? }
