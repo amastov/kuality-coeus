@@ -1,4 +1,3 @@
-# this is from /var/lib/jenkins/.rvm/gems/ruby-1.9.3-p448/gems/kuality-coeus-0.0.4/features/support/env.rb
 require 'yaml'
 require 'watir-webdriver'
 
@@ -45,7 +44,6 @@ After do |scenario|
   if scenario.failed?
     @browser.screenshot.save 'screenshot.png'
     embed 'screenshot.png', 'image/png'
-    DEBUG.message "Failed on page: #{@browser.url}"
   end
   @browser.cookies.clear
 end

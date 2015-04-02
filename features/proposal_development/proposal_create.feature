@@ -10,12 +10,11 @@ Feature: Creating a proposal development document
   Scenario: Successful initiation of proposal with federal sponsor type
     When  the Proposal Creator creates a Proposal with a 'Federal' sponsor type
     Then  The S2S opportunity search should become available
-
+  @froof
   Scenario: Activating data validation on good Proposal
     Given the Proposal Creator creates a Proposal
     And   adds a principal investigator to the Proposal
     And   sets valid credit splits for the Proposal
-    And   answers the Proposal's questionnaire
     And   completes the required supplemental info on the Proposal
     When  data validation is activated
     Then  there are no data validation errors or warnings for the Proposal

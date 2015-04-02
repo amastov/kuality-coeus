@@ -17,6 +17,7 @@ class QuestionnaireObject < DataFactory
   end
 
   def create
+    raise 'This will need to be modified to fit the new QA environment'
     view
     on Questions do |cq|
       cq.generic_demo_questionnaire unless cq.generic_demo_questionnaire_li.class_name=='active'
