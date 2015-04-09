@@ -25,7 +25,7 @@ Then /^an error should appear that says (.*)$/ do |error|
             'the approved equipment can\'t have duplicates' => 'Approved Equipment Vendor, Model and Item must be unique',
             'the invoiced exceeds the obligated amount' => 'Cumulative Invoiced Amount would exceed the Obligated Subaward Amount.',
             'the start date must be before the end' => 'Project Start Date: The Project Start Date (Start Dt) must be before the Project End Date (End Dt).',
-            'the project title can\'t contain special characters' => 'Project Title: Can be any character',
+            'the project title can\'t contain special characters' => 'Project Title: Must be an alphanumeric character or punctuation.',
             'the IP ID can only have alphanumeric characters' => 'Original Institutional Proposal ID: Can only be alphanumeric characters ',
             'the Award ID is invalid' => 'Award ID: Award ID is invalid.',
             'the deadline time is not valid' => 'Sponsor Deadline Time: DeadlineTime is invalid.',
@@ -40,15 +40,15 @@ Then /^an error should appear that says (.*)$/ do |error|
 end
 
 Then /^an error requiring at least one unit for the co-investigator is shown$/ do
-  $current_page.errors.should include %|At least one Unit is required for #{@proposal.key_personnel.co_investigator.full_name}.|
+  expect($current_page.errors).to include %|At least one Unit is required for #{@proposal.key_personnel.co_investigator.full_name}.|
 end
 
 Then /^an error about un-certified personnel is shown$/ do
-  on(DataValidation).validation_errors_and_warnings.should include %|The Investigators are not all certified. Please certify #{@proposal.key_personnel[0].first_name} #{@proposal.key_personnel[0].last_name}.|
+  expect(on(DataValidation).validation_errors_and_warnings).to include %|The Investigators are not all certified. Please certify #{@proposal.key_personnel[0].first_name} #{@proposal.key_personnel[0].last_name}.|
 end
 
 Then /^an error should say the credit split does not equal 100%$/ do
-  on(DataValidation).validation_errors_and_warnings.should include "The Investigators #{@split_type} Credit Split does not equal 100%."
+  expect(on(DataValidation).validation_errors_and_warnings).to include "The Investigators #{@split_type} Credit Split does not equal 100%."
 end
 
 Then /^an? (error|warning) is shown that says (.*)$/ do |x, error|
@@ -61,7 +61,7 @@ Then /^an? (error|warning) is shown that says (.*)$/ do |x, error|
              'the subaward\'s amount can\'t be zero' => 'Approved Subaward amount must be greater than zero.'
   }
 
-  on(DataValidation).validation_errors_and_warnings.should include errors[error]
+  expect(on(DataValidation).validation_errors_and_warnings).to include errors[error]
 end
 
 Then /^errors about the missing Award terms are shown$/ do
@@ -101,8 +101,8 @@ Then /^errors appear on the Contacts page, saying the credit splits for the PI a
   @award.view :contacts
   on AwardContacts do |page|
     DocumentUtilities::CREDIT_SPLITS.values.each do |type|
-      page.errors.should include "The Project Personnel #{type} Credit Split does not equal 100%"
-      page.errors.should include "The Unit #{type} Credit Split for #{@award.key_personnel.principal_investigator.full_name} does not equal 100%"
+      expect(page.errors).to include "The Project Personnel #{type} Credit Split does not equal 100%"
+      expect(page.errors).to include "The Unit #{type} Credit Split for #{@award.key_personnel.principal_investigator.full_name} does not equal 100%"
     end
   end
 end
@@ -112,7 +112,7 @@ end
 #-----------------------#
 
 Then /^the Award should show an error saying the project start date can't be later than the obligation date$/ do
-  $current_page.errors.should include "Award #{@award.id} Project Start Date must be before or equal to Obligation Start Date."
+  expect($current_page.errors).to include "Award #{@award.id} Project Start Date must be before or equal to Obligation Start Date."
 end
 
 Then /^the Award should throw an error saying (.*)/ do |error|
@@ -120,14 +120,14 @@ Then /^the Award should throw an error saying (.*)/ do |error|
     'they are already in the Award Personnel' => "#{@award.key_personnel.principal_investigator.full_name} is already added to the Award Project Personnel",
     'the Award\'s PI requires at least one unit' => "At least one Unit is required for #{@award.key_personnel.principal_investigator.full_name}"
   }
-  $current_page.errors.should include errors[error]
+  expect($current_page.errors).to include errors[error]
 end
 
 #-----------------------#
 # Subaward              #
 #-----------------------#
 Then /^an error should appear on the Subaward saying the person is already added to the contacts$/ do
-  on(Subaward).errors.should include "#{@subaward.contacts[0][:name]} is already added to the Subaward Contacts"
+  expect(on(Subaward).errors).to include "#{@subaward.contacts[0][:name]} is already added to the Subaward Contacts"
 end
 
 #------------------------#
@@ -184,14 +184,14 @@ end
 # Miscellaneous          #
 #------------------------#
 Then /^a confirmation screen asks if you want to edit the existing pending version$/ do
-  on(Confirmation).message.should == 'A Pending version already exists. Do you want to edit the Pending version?'
+  expect(on(Confirmation).message).to be 'A Pending version already exists. Do you want to edit the Pending version?'
 end
 
 Then /^there are no errors on the page$/ do
-  $current_page.errors.size.should==0
+  expect($current_page.errors.size).to equal(0)
 end
 
 And /^there are no data validation errors or warnings for the Proposal$/ do
-  on(DataValidation).errors_list.should_not be_present
+  expect(on(DataValidation).errors_list).not_to be_present
   expect($current_page.errors.size).to equal(0)
 end

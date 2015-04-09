@@ -30,7 +30,7 @@ class DetailsAndRates < BasePage
 
   element(:tab_list) { |b| b.ul(id: 'PropBudget-AssignPersonnelToPeriodsPage-DetailsAndRates-TabSection_tabList') }
 
-  element(:rates_table) { |b| b.div(id: 'PropBudget-AssignPersonnelToPeriodsPage-DetailsAndRates-TabSection').tbody }
-  value(:noko_rates_table) { |b| b.no_frame_noko.div(id: 'PropBudget-AssignPersonnelToPeriodsPage-DetailsAndRates-TabSection').tbody }
+  element(:rates_table) { |b| b.div(id: 'PropBudget-AssignPersonnelToPeriodsPage-DetailsAndRates-TabSection').table(class: /dataTable/).tbody }
+  value(:noko_rates_table) { |b| b.no_frame_noko.div(id: 'PropBudget-AssignPersonnelToPeriodsPage-DetailsAndRates-TabSection').table(class: /dataTable/).tbody }
 
 end

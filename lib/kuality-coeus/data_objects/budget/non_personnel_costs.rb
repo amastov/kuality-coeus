@@ -121,8 +121,7 @@ class NonPersonnelCost < DataFactory
     if @on_campus != nil
       @rates.delete_if { |r| r.on_campus != Transforms::YES_NO[@on_campus] }
     end
-    @rates.delete_if { |r| r.rate_class_type=='Inflation' && !@ird.include?(r.description)
-    } unless @rates.inflation.nil? || @ird.empty?
+    @rates.delete_if { |r| r.rate_class_type=='Inflation' && !@ird.include?(r.description) }
   end
 
   def copy_mutatis_mutandis opts={}

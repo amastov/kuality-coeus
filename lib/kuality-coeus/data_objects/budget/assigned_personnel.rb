@@ -67,7 +67,7 @@ class AssignedPerson < DataFactory
   end
 
   def cost_sharing
-    ((middle_months_count*monthly_calc_cost_share) + start_month_calc_cost_share + em ).round(2)
+    ((middle_months_count*monthly_calc_cost_share) + start_month_calc_cost_share + end_mnth_calc_cost_sharing ).round(2)
   end
 
   def rate_cost(rate)
@@ -134,11 +134,11 @@ class AssignedPerson < DataFactory
   end
 
   def end_month_calculated_salary
-    end_month_daily_salary*end_month_days*perc_chrgd
+    end_month_daily_salary*end_d.day*perc_chrgd
   end
 
   def end_mnth_calc_cost_sharing
-    end_month_daily_salary*end_month_days*cost_sharing_percentage
+    end_month_daily_salary*end_d.day*cost_sharing_percentage
   end
 
   def end_month_inflation_cost
@@ -163,8 +163,8 @@ class AssignedPerson < DataFactory
   end
 
   def inflated_months_count
-    x = end_d.month - rate_start.month
-    x < 0 ? end_d.month + (12 - rate_start.month) : x
+    x = (end_d.year - rate_start.year)*12 + end_d.month - rate_start.month
+    x < 0 ? 0 : x
   end
 
   def perc_chrgd

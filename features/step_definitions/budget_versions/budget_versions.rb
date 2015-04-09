@@ -20,7 +20,7 @@ end
 
 When /^correcting the Budget Version date will remove the warning$/ do
   @budget_version.default_periods
-  on(Parameters).warnings.size.should be 0
+  expect(on(Parameters).warnings.size).to be 0
 end
 
 Given /^(the (.*) user |)creates a final and complete Budget Version for the Proposal$/ do |text, role_name|
@@ -45,16 +45,15 @@ Then /^the copied budget's values are all as expected$/ do
   @copied_budget_version.budget_periods.each do |period|
     n = period.number
     on PeriodsAndTotals do |page|
-      page.edit_period(n)
-      page.start_date_of(n).value.should==period.start_date
-      page.end_date_of(n).value.should==period.end_date
-      page.total_sponsor_cost_of(n).value.to_f.round(2).should==(period.direct_cost.to_f+period.f_and_a_cost.to_f).round(2)
-      page.direct_cost_of(n).value.should==period.direct_cost
-      page.f_and_a_cost_of(n).value.should==period.f_and_a_cost
-      page.unrecovered_f_and_a_of(n).value.should==period.unrecovered_f_and_a
-      page.cost_sharing_of(n).value.should==period.cost_sharing
-      page.cost_limit_of(n).value.should==period.cost_limit
-      page.direct_cost_limit_of(n).value.should==period.direct_cost_limit
+      expect(page.start_date_of(n).value).to eq period.start_date
+      expect(page.end_date_of(n).value).to eq period.end_date
+      expect(page.total_sponsor_cost_of(n).value.to_f.round(2)).to eq (period.direct_cost.to_f+period.f_and_a_cost.to_f).round(2)
+      expect(page.direct_cost_of(n).value).to eq period.direct_cost
+      expect(page.f_and_a_cost_of(n).value).to eq period.f_and_a_cost
+      expect(page.unrecovered_f_and_a_of(n).value).to eq period.unrecovered_f_and_a
+      expect(page.cost_sharing_of(n).value).to eq period.cost_sharing
+      expect(page.cost_limit_of(n).value).to eq period.cost_limit
+      expect(page.direct_cost_limit_of(n).value).to eq period.direct_cost_limit
     end
   end
 end
@@ -83,23 +82,17 @@ Then /^all budget periods get recreated, zeroed, and given default date ranges$/
     default_end_dates.store(@years-i, "12/31/#{@proposal.project_end_date[/\d+$/].to_i-i}")
   end
   on PeriodsAndTotals do |page|
-    page.period_count.should==@years
+    expect(page.period_count).to eq @years
     1.upto(@years) do |x|
-      # Note: This 'edit' and subsequent 'save', below, are an artifact
-      # of the page design. They are here
-      # simply because we need to expose the text fields to view. No
-      # actual editing or saving is taking place.
-      page.edit_period(x)
-      page.start_date_of(x).value.should==default_start_dates[x]
-      page.end_date_of(x).value.should==default_end_dates[x]
-      page.total_sponsor_cost_of(x).value.should=='0.00'
-      page.direct_cost_of(x).value.should=='0.00'
-      page.f_and_a_cost_of(x).value.should=='0.00'
-      page.unrecovered_f_and_a_of(x).value.should=='0.00'
-      page.cost_sharing_of(x).value.should=='0.00'
-      page.cost_limit_of(x).value.should=='0.00'
-      page.direct_cost_limit_of(x).value.should=='0.00'
-      page.save_period(x)
+      expect(page.start_date_of(x).value).to eq default_start_dates[x]
+      expect(page.end_date_of(x).value).to eq default_end_dates[x]
+      expect(page.total_sponsor_cost_of(x).value).to eq '0.00'
+      expect(page.direct_cost_of(x).value).to eq '0.00'
+      expect(page.f_and_a_cost_of(x).value).to eq '0.00'
+      expect(page.unrecovered_f_and_a_of(x).value).to eq '0.00'
+      expect(page.cost_sharing_of(x).value).to eq '0.00'
+      expect(page.cost_limit_of(x).value).to eq '0.00'
+      expect(page.direct_cost_limit_of(x).value).to eq '0.00'
     end
   end
 end
@@ -158,18 +151,18 @@ Then /^the Budget Version is no longer editable$/ do
   on(ResearcherMenu).search_proposals
   @budget_version.view 'Periods And Totals'
   on PeriodsAndTotals do |page|
-    page.add_budget_period_element.should_not be_present
+    expect(page.add_budget_period_element).not_to be_present
   end
   # TODO: Add more validations here
 end
 
 Then /the Budget Version should have two more budget periods/ do
-  @budget_version.budget_periods.count.should==@original_period_count+2
+  expect(@budget_version.budget_periods.count).to eq @original_period_count+2
 end
 
 Then /^the copied budget is not marked 'for submission'$/ do
   on(PeriodsAndTotals).budget_versions
-  on(BudgetsDialog).submission_message(@copied_budget_version.name).should_not be_visible
+  expect(on(BudgetsDialog).submission_message(@copied_budget_version.name)).not_to be_visible
 end
 
 And /^notes the Budget Period's summary totals$/ do

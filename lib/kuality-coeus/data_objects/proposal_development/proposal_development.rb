@@ -69,6 +69,9 @@ class ProposalDevelopmentObject < DataFactory
     end
     on(ProposalSidebar).sponsor_and_program_info
     on SponsorAndProgram do |page|
+      if @nsf_science_code=='::random::'
+        @nsf_science_code = page.science_codes.sample
+      end
       fill_out page, :sponsor_deadline_date, :nsf_science_code, :opportunity_id, :sponsor_deadline_time
       page.save_and_continue
     end

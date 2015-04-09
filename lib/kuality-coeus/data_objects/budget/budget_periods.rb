@@ -5,7 +5,7 @@ class BudgetPeriodObject < DataFactory
   attr_reader :start_date, :end_date, :total_sponsor_cost,
               :direct_cost, :f_and_a_cost, :unrecovered_f_and_a,
               :cost_sharing, :cost_limit, :direct_cost_limit, :datified,
-              :budget_name, :cost_sharing_distribution_list, :unrecovered_fa_dist_list,
+              :budget_name, :cost_sharing_distribution_list,
               :participant_support, :assigned_personnel, :non_personnel_costs, :period_rates
               #TODO: Add support for this:
               :number_of_participants
@@ -46,15 +46,11 @@ class BudgetPeriodObject < DataFactory
       dollar_fields.each do |field|
         edit.send("#{field}_of", @number).fit opts[field]
       end
-      if opts.keys.include?(:start_date) || opts.keys.include?(:end_date)
-        on(ChangePeriod).yes
-      end
       # TODO: This is probably not going to work any more. Fix it!
       return if edit.errors.size > 0
     end
     set_options(opts)
     add_cost_sharing
-    initialize_unrecovered_fa
   end
 
   def view(tab)
@@ -79,8 +75,10 @@ class BudgetPeriodObject < DataFactory
       page.view_period @number
       page.assign_personnel @number
     end
-    @assigned_personnel.add opts
-    #TODO add the getting of period rates
+    defaults = {
+        period_rates: @period_rates
+    }
+    @assigned_personnel.add defaults.merge(opts)
   end
 
   def assign_non_personnel_cost opts={}
@@ -117,7 +115,6 @@ class BudgetPeriodObject < DataFactory
   def get_dollar_field_values
     view 'Periods And Totals'
     on PeriodsAndTotals do |page|
-      page.edit_period @number
       dollar_fields.each do |field|
         set(field, page.send("#{field}_of", @number).value)
       end
@@ -150,20 +147,6 @@ class BudgetPeriodObject < DataFactory
       cs = make CostSharingObject, period: "#{@number}: #{@start_date} - #{@end_date}",
                 amount: cost_sharing, source_account: ''
       @cost_sharing_distribution_list << cs
-    end
-  end
-
-  def initialize_unrecovered_fa
-    if @unrecovered_fa_dist_list.empty? && !@unrecovered_f_and_a.nil? && @unrecovered_f_and_a.to_f > 0
-      on(BudgetSidebar).unrecovered_fna
-      on UnrecoveredFandA do |page|
-        page.fna_rows.each do |row|
-          fna_item = make UnrecoveredFAObject, number: row[0].text, fiscal_year: row[1].text_field.value,
-                          applicable_rate: row[2].text_field.value, campus: row[3].select.selected_options[0].text,
-                          source_account: row[4].text_field.value, amount: row[5].text_field.value
-          @unrecovered_fa_dist_list << fna_item
-        end
-      end
     end
   end
 

@@ -4,7 +4,7 @@ class BudgetRateObject < DataFactory
   attr_reader :rate_class_type, :rate_class_code, :description, :on_campus,
               :fiscal_year, :start_date, :institute_rate, :applicable_rate
 
-  def initialize(opts={})
+  def initialize(browser, opts={})
     set_options(opts)
   end
 
@@ -23,7 +23,7 @@ class BudgetRatesCollection < CollectionFactory
     rates.each { |r_c_t, rs|
       next if rs.empty?
       rs.each { |rate|
-      item = BudgetRateObject.new rate_class_type: r_c_t,
+      item = BudgetRateObject.new nil, rate_class_type: r_c_t,
           rate_class_code: rate[:rate_class_code],
           description: rate[:description],
           on_campus: rate[:on_campus],

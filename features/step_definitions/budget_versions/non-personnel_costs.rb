@@ -8,7 +8,6 @@ And /adds a non\-personnel cost with an? '(.*)' category type to the first Budge
     puts @proposal.proposal_number
     DEBUG.inspect $current_user.user_name
     @budget_version.period(1).non_personnel_costs[0].edit start_date: in_a_year[:date_w_slashes], end_date: in_a_year[:date_w_slashes]
-    exit
   }
 end
 
@@ -85,6 +84,7 @@ And /^the MTDC rate for the non-personnel item is unapplied for all periods$/ do
 
   end
 
+  DEBUG.message
   DEBUG.pause 1000
 
   exit

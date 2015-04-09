@@ -111,7 +111,10 @@ class BudgetVersionsObject < DataFactory
 
   def reset_to_period_defaults
     view 'Periods And Totals'
-    on(PeriodsAndTotals).reset_to_period_defaults
+    on PeriodsAndTotals do |page|
+      page.reset_to_period_defaults
+      page.save
+    end
     get_budget_periods
   end
 
@@ -153,6 +156,23 @@ class BudgetVersionsObject < DataFactory
   def complete
     view 'Periods And Totals'
     on(PeriodsAndTotals).complete_budget
+    on CompleteBudget do |page|
+      page.ready.set
+      page.ok
+    end
+
+
+
+
+
+    raise 'There is currently a refresh issue, here. The Budget may not actually be "complete", yet.'
+
+
+
+
+
+
+
   end
 
   def update_from_parent(navigate_method)

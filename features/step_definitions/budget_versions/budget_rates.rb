@@ -12,16 +12,16 @@ end
 Then /^the Person's Rates show correct costs and cost sharing amounts$/ do
   @budget_version.view :assign_personnel
   @project_person.monthly_base_salary = @budget_version.personnel.person(@project_person.person).monthly_base_salary
-  applicable_rates = @budget_version.institute_rates.values.flatten
   on(AssignPersonnelToPeriods).details_and_rates_of @project_person.object_code
+  # TODO: Fix this stuff to use the budget and period rates more intelligently...
   on DetailsAndRates do |page|
     page.rate_amounts.each do |rate_line|
       # The "on LA" items are unusual rates that we can skip for this test.
       # The MTDC calculation is not yet understood, so it's left off, for now.
       next if rate_line[:type]=~/(MTDC|on LA)$/
-      ar = applicable_rates.find{ |r| r[:on_campus]=='Yes' && r[:rate_class_code]==rate_line[:class] && r[:description]==rate_line[:type] }[:applicable_rate]
-      rate_line[:rate_cost].groom.should be_within(0.02).of @project_person.rate_cost(ar)
-      rate_line[:rate_cost_sharing].groom.should be_within(0.02).of @project_person.rate_cost_sharing(ar)
+      ar = @budget_version.institute_rates.find{ |r| r.on_campus=='Yes' && r.rate_class_code==rate_line[:class] && r.description==rate_line[:type] }.applicable_rate
+      expect(rate_line[:rate_cost].groom).to be_within(0.02).of @project_person.rate_cost(ar)
+      expect(rate_line[:rate_cost_sharing].groom).to be_within(0.02).of @project_person.rate_cost_sharing(ar)
     end
   end
 end
@@ -53,14 +53,14 @@ end
 And /^the Period's Direct Cost is lowered by the expected amount$/ do
   @budget_version.view 'Periods And Totals'
   on PeriodsAndTotals do |page|
-    page.direct_cost_of(1).to_f.should==(@budget_version.period(1).direct_cost.to_f-@rate_cost.to_f).round(2)
+    expect(page.direct_cost_of(1).to_f).to eq (@budget_version.period(1).direct_cost.to_f-@rate_cost.to_f).round(2)
   end
 end
 
 And /^the Period's Direct Cost is lower than before$/ do
   @budget_version.view 'Periods And Totals'
   on PeriodsAndTotals do |page|
-    page.direct_cost_of(1).to_f.should < @budget_version.period(1).direct_cost.to_f
+    expect(page.direct_cost_of(1).to_f).to be < @budget_version.period(1).direct_cost.to_f
   end
 end
 
@@ -70,5 +70,12 @@ end
 
 And /^the Budget's rates are updated$/ do
   @budget_version.view 'Rates'
-  expect{@budget_version.institute_rates}.not_to eq(on(Rates).rates)
+  original_rates = @budget_version.institute_rates.map { |r| r.description }
+  new_rates = []
+  on(Rates).rates.each { |class_type, rate|
+    descriptions = rate.map{ |r| r[:description] }
+    new_rates << descriptions
+  }
+  new_rates.flatten!
+  expect(new_rates.sort).not_to eq original_rates.sort
 end

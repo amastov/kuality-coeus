@@ -17,6 +17,7 @@ class SupplementalInfoObject < DataFactory
   end
 
   def create
+    raise 'This needs to be rewritten because of the change of the data on the QA environment'
     view
     on SupplementalInfo do |create|
       create.asdf if create.asdf_link.present?
