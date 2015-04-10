@@ -179,3 +179,12 @@ And /adds a direct cost limit to all of the Budget's periods$/ do
     period.edit direct_cost_limit: random_dollar_value(50000)
   end
 end
+
+Then /^the direct cost is equal to the direct cost limit in all periods$/ do
+  @budget_version.view 'Periods And Totals'
+  @budget_version.budget_periods.each do |period|
+    on PeriodsAndTotals do |page|
+      expect(page.direct_cost_of(period.number).to_f).to eq period.direct_cost_limit.to_f
+    end
+  end
+end

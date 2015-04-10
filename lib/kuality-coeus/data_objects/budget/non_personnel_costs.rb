@@ -73,6 +73,16 @@ class NonPersonnelCost < DataFactory
     end
   end
 
+  def sync_to_period_dc_limit
+    # Method assumes we're already in the right place
+    on(NonPersonnelCosts).details_of @object_code_name
+    on EditAssignedNonPersonnel do |page|
+      page.sync_to_period_direct_cost_limit
+      on(SyncDirectCostLimit).yes
+      page.save_changes
+    end
+  end
+
   def daily_total_base_cost
     @total_base_cost.to_f/total_days
   end
@@ -91,6 +101,14 @@ class NonPersonnelCost < DataFactory
 
   def total_days
     (end_date_datified-start_date_datified).to_i+1
+  end
+
+  def rate_cost_sharing
+    rate_cost_shares = []
+    @rates.find_all { |r| r.rate_class_type=='F & A'}.each { |rate|
+      rate_cost_shares << rate_days(rate)*daily_cost_share*(rate.applicable_rate/100)
+    }
+    rate_cost_shares.inject(:+)
   end
 
   def rate_days(rate)

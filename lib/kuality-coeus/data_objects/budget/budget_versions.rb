@@ -171,8 +171,6 @@ class BudgetVersionsObject < DataFactory
 
 
 
-
-
   end
 
   def update_from_parent(navigate_method)

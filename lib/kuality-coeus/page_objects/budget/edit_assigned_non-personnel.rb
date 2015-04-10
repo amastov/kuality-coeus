@@ -1,7 +1,7 @@
 class EditAssignedNonPersonnel < BasePage
 
   buttons 'Save Changes', 'Save And Apply To Other Periods',
-          'Sync to Period Direct Cost Limit', 'Sync To Period Cost Limit'
+          'Sync To Period Direct Cost Limit', 'Sync To Period Cost Limit'
 
   action(:details_tab) { |b| b.tab_list.li(text: 'Details').link.click }
   action(:cost_sharing_tab) { |b| b.tab_list.li(text: 'Cost Sharing').link.click }

@@ -99,6 +99,12 @@ class SyncBudgetRates < Dialogs
 
 end
 
+class SyncDirectCostLimit < Dialogs
+
+  element(:dialog_header) { |b| b.header(id: 'PropBudget-NonPersonnelCosts-SyncToDirectCostLimit_headerWrapper') }
+
+end
+
 class Participants < Dialogs
 
   buttons 'Save Changes'

@@ -9,9 +9,8 @@ Feature: Adding Budget Non-Personnel Costs
   @test
   Scenario: Add a non-personnel line item with cost share to period 1
     Given the Proposal Creator adds a non-personnel cost with a 'Travel' category type and some cost sharing to the first Budget period
-    When  the applicable rate is the on-campus 'F & A' 'MTDC' 'MTDC' for the period's fiscal year(s)
     Then  the Budget's institutional commitments shows the expected cost sharing value for Period 1
 
   Scenario: Adding participant support to a Budget
-    When the Proposal Creator adds a non-personnel cost with a 'Participant Support' category type to the first Budget period
+    When the Proposal Creator adds a non-personnel cost with a narrow date range and a 'Participant Support' category type to the first Budget period
     Then the number of participants for the category in period 1 can be specified

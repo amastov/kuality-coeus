@@ -2,17 +2,13 @@ And /adds a non\-personnel cost to the first Budget period$/ do
   @budget_version.period(1).assign_non_personnel_cost
 end
 
-And /adds a non\-personnel cost with an? '(.*)' category type to the first Budget period$/ do |type|
+And /adds a non\-personnel cost with a narrow date range and an? '(.*)' category type to the first Budget period$/ do |type|
   @budget_version.period(1).assign_non_personnel_cost category_type: type
-  DEBUG.do {
-    puts @proposal.proposal_number
-    DEBUG.inspect $current_user.user_name
-    @budget_version.period(1).non_personnel_costs[0].edit start_date: in_a_year[:date_w_slashes], end_date: in_a_year[:date_w_slashes]
-  }
+  @budget_version.period(1).non_personnel_costs[0].edit start_date: in_a_year[:date_w_slashes], end_date: date_factory(Time.now + (3600*24*371))[:date_w_slashes]
 end
 
 And /adds a non\-personnel cost with an? '(.*)' category type and some cost sharing to the first Budget period$/ do |type|
-  @budget_version.period(1).assign_non_personnel_cost category_type: type
+  @budget_version.period(1).assign_non_personnel_cost
   @budget_version.period(1).non_personnel_costs[0].edit cost_sharing: random_dollar_value(500000)
 end
 
@@ -22,39 +18,18 @@ And /adds a non\-personnel cost to the first Budget period with these settings:$
   @field_opts = { 'Category Type'=> :add_opts, 'Total Base Cost' => :add_opts,
                      'Apply Inflation'=>:edit_opts, 'Submit Cost Sharing'=>:edit_opts, 'Cost Sharing'=>:edit_opts }
   table.raw.each{ |item|
-    get(@field_opts[item[0]]).store(damballa(item[0]), item[1]) }
+    get(@field_opts[item[0]]).store(damballa(item[0]), item[1])
+  }
   @budget_version.period(1).assign_non_personnel_cost @add_opts
   @budget_version.period(1).non_personnel_costs[0].edit @edit_opts
 end
 
 Then /^the Budget's institutional commitments shows the expected cost sharing value for Period (\d+)$/ do |period|
-  # FIXME: This step only works when there are two (or less) applicable rates in the period.
-  cost_sharing = @budget_version.period(1).non_personnel_costs[0].cost_sharing.to_f
-  dcs = @budget_version.period(1).non_personnel_costs[0].daily_cost_share
-  first_range = (@end_fiscal_year_rate[:start_date]-@budget_version.period(1).non_personnel_costs[0].start_date_datified).to_i
-  second_range = (@budget_version.period(1).non_personnel_costs[0].end_date_datified-@end_fiscal_year_rate[:start_date]).to_i+1
-  start_fy_rate = @start_fiscal_year_rate[:applicable_rate]/100
-  end_fy_rate = @end_fiscal_year_rate[:applicable_rate]/100
-  cost_share = cost_sharing + start_fy_rate*dcs*first_range + end_fy_rate*dcs*second_range
+  cost_share = @budget_version.period(1).non_personnel_costs[0].cost_sharing.to_f + @budget_version.period(1).non_personnel_costs[0].rate_cost_sharing.round(2)
   @budget_version.view 'Cost Sharing'
   on CostSharing do |page|
-    page.row_amount(period).to_f.should be_within(0.03).of cost_share
+    expect(page.row_amount(period).to_f).to be_within(0.03).of cost_share
   end
-end
-
-And /^the applicable rate is the (.*)\-campus '(.*)' '(.*)' '(.*)' for the period's fiscal year\(s\)$/ do |campus, rate, rate_class_code, description|
-  on_off = { 'on'=>'Yes', 'off'=>'No' }
-  # Get rates...
-  rates = @budget_version.institute_rates[rate].find_all { |rate|
-    rate[:rate_class_code]==rate_class_code && rate[:description]==description && rate[:on_campus]==on_off[campus]
-  }
-  # Now gotta figure out what fiscal years are applicable and get those rates...
-  @start_fiscal_year_rate = rates.find_all{ |rate|
-    rate[:start_date] <= @budget_version.period(1).non_personnel_costs[0].start_date_datified
-  }[-1]
-  @end_fiscal_year_rate = rates.find_all { |rate|
-    rate[:start_date] <= @budget_version.period(1).non_personnel_costs[0].end_date_datified
-  }[-1]
 end
 
 And /the number of participants for the category in period 1 can be specified$/ do
@@ -109,4 +84,11 @@ And /^the Budget's unrecovered F&A amounts are as expected for all periods$/ do
   period.non_personnel_costs[0].get_fna_rates(rates)
   DEBUG.inspect period.non_personnel_costs[0].fna_rates
   DEBUG.inspect period.non_personnel_costs[0].daily_total_base_cost
+end
+
+And /^(syncs )?the non\-personnel cost( is synced)? with the direct cost limit for each period$/ do |x, y|
+  @budget_version.budget_periods.each do |period|
+    on(NonPersonnelCosts).view_period period.number
+    period.non_personnel_costs[0].sync_to_period_dc_limit
+  end
 end
