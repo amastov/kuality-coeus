@@ -1,18 +1,14 @@
 require 'yaml'
 require 'watir-webdriver'
 
-config = YAML.load_file("#{File.dirname(__FILE__)}/config.yml")
-basic = config[:basic]
-
-$base_url = basic[:url]
-$context = basic[:context]
-$port = basic[:port].to_s
+$base_url = ENV['URL']
+$context = ENV['CONTEXT']
+$port = ENV['PORT'].to_s
 $file_folder = "#{File.dirname(__FILE__)}/../../lib/resources/"
+$cas = ENV['CAS']
+$cas_context = $cas? ENV['CAS_CONTEXT'] : ''
 
-$cas = config[:cas]
-$cas_context = config[:cas_context]
-
-if config[:headless]
+if ENV['HEADLESS']
   require 'headless'
   headless = Headless.new
   headless.start
@@ -26,7 +22,7 @@ World StringFactory
 World DateFactory
 World Utilities
 
-kuality = Kuality.new basic[:browser]
+kuality = Kuality.new ENV['BROWSER'].to_sym
 
 Before do
   @browser = kuality.browser
