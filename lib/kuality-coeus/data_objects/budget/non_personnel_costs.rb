@@ -166,4 +166,10 @@ class NonPersonnelCostsCollection < CollectionFactory
 
   contains NonPersonnelCost
 
+  # NOTE: This method is written assuming that there's only one item
+  # with this category type in the collection...
+  def category_type(category_type)
+    self.find { |np_item| np_item.category_type==category_type }
+  end
+
 end

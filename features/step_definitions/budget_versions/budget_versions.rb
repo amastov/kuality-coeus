@@ -174,9 +174,9 @@ And /^the Budget Version is opened$/ do
   on(Budgets).open @budget_version.name
 end
 
-And /adds a direct cost limit to all of the Budget's periods$/ do
+And /adds a (direct|total) cost limit to all of the Budget's periods$/ do |type|
   @budget_version.budget_periods.each do |period|
-    period.edit direct_cost_limit: random_dollar_value(50000)
+    period.edit "#{type}_cost_limit".to_sym => random_dollar_value(50000)
   end
 end
 

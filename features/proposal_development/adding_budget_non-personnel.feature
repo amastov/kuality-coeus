@@ -6,7 +6,7 @@ Feature: Adding Budget Non-Personnel Costs
     * Users exist with the following roles: Proposal Creator
     * the Proposal Creator creates a 2-year, 'Research' Proposal
     * creates a Budget Version for the Proposal
-  @test
+
   Scenario: Add a non-personnel line item with cost share to period 1
     Given the Proposal Creator adds a non-personnel cost with a 'Travel' category type and some cost sharing to the first Budget period
     Then  the Budget's institutional commitments shows the expected cost sharing value for Period 1

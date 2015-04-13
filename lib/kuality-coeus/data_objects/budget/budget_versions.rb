@@ -153,6 +153,10 @@ class BudgetVersionsObject < DataFactory
     on(Budgets).include_for_submission @name
   end
 
+  def save_and_apply_to_other(period, line_item)
+
+  end
+
   def complete
     view 'Periods And Totals'
     on(PeriodsAndTotals).complete_budget

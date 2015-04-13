@@ -36,7 +36,7 @@ And /the number of participants for the category in period 1 can be specified$/ 
   @budget_version.period(1).non_personnel_costs[0].add_participants
 end
 
-And /^adds a non\-personnel cost with an '(.*)' category type to all Budget Periods$/ do |type|
+And /^adds a non\-personnel cost with an? '(.*)' category type to all Budget Periods$/ do |type|
   @budget_version.budget_periods.each do |period|
     period.assign_non_personnel_cost category_type: type
   end
@@ -86,9 +86,25 @@ And /^the Budget's unrecovered F&A amounts are as expected for all periods$/ do
   DEBUG.inspect period.non_personnel_costs[0].daily_total_base_cost
 end
 
-And /^(syncs )?the non\-personnel cost( is synced)? with the direct cost limit for each period$/ do |x, y|
+And /^(syncs )?the (.*) cost( is synced)? with the (direct|total) cost limit for each period$/ do |x, npc, y, cost|
+  cost_limit = { 'direct' => :sync_to_period_dc_limit, 'total' => :sync_to_period_tc_limit }
   @budget_version.budget_periods.each do |period|
     on(NonPersonnelCosts).view_period period.number
-    period.non_personnel_costs[0].sync_to_period_dc_limit
+    period.non_personnel_costs[0].send(cost_limit[cost])
   end
+end
+
+And /^edits the total cost and cost sharing amounts for the Equipment item in period (\d+)$/ do |x|
+  pending
+end
+
+And /^deletes the equipment items in periods (\d+) through (\d+)$/ do |arg, arg1|
+  pending
+end
+
+And /^adds an? '(.*)' item to the first period and copies it to the later ones$/ do |category_type|
+  @budget_version.period(5).assign_non_personnel_cost category_type: category_type
+
+  DEBUG.pause 1000
+
 end
