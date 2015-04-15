@@ -103,8 +103,7 @@ And /^deletes the equipment items in periods (\d+) through (\d+)$/ do |arg, arg1
 end
 
 And /^adds an? '(.*)' item to the first period and copies it to the later ones$/ do |category_type|
-  @budget_version.period(5).assign_non_personnel_cost category_type: category_type
-
-  DEBUG.pause 1000
-
+  @budget_version.period(1).assign_non_personnel_cost category_type: category_type
+  @budget_version.period(1).non_personnel_costs.category_type(category_type).edit
+  @budget_version.save_and_apply_to_later(@budget_version.period(1), @budget_version.period(1).non_personnel_costs.category_type(category_type))
 end

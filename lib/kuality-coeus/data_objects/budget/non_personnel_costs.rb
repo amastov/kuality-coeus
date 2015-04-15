@@ -15,7 +15,7 @@ class NonPersonnelCost < DataFactory
     defaults = {
       category_type:    '::random::',
       object_code_name: '::random::',
-      total_base_cost:  random_dollar_value(1000000),
+      total_base_cost:  random_dollar_value(1000000).to_f,
       ird:              []
     }
 
@@ -83,8 +83,11 @@ class NonPersonnelCost < DataFactory
     end
   end
 
-  def daily_total_base_cost
-    @total_base_cost.to_f/total_days
+  def save_and_apply_to_later
+    on(NonPersonnelCosts).details_of @object_code_name
+    on EditAssignedNonPersonnel do |page|
+      page.save_and_apply_to_other_periods
+    end
   end
 
   def daily_cost_share
@@ -99,10 +102,6 @@ class NonPersonnelCost < DataFactory
     Utilities.datify @end_date
   end
 
-  def total_days
-    (end_date_datified-start_date_datified).to_i+1
-  end
-
   def rate_cost_sharing
     rate_cost_shares = []
     @rates.find_all { |r| r.rate_class_type=='F & A'}.each { |rate|
@@ -111,31 +110,24 @@ class NonPersonnelCost < DataFactory
     rate_cost_shares.inject(:+)
   end
 
-  def rate_days(rate)
-    # We know the rate applies, at least partially, because it hasn't been eliminated, so no need to
-    # check date range again...
-    # Determine which start date is later...
-    strt = rate.start_date > start_date_datified ? rate.start_date : start_date_datified
-    # Determine which end date is earlier...
-    end_d = rate.end_date > end_date_datified ? end_date_datified : rate.end_date
-    # Now count the days between them...
-    (end_d - strt).to_i+1
-  end
-
   def inflation_amount
      if Transforms::TRUE_FALSE[@apply_inflation]
-       subtotals = [0.0]
-       @rates.inflation.each do |inflation_rate|
-         subtotals << daily_total_base_cost*(inflation_rate.applicable_rate/100)*rate_days(inflation_rate)
-       end
-       subtotals.inject(:+)
+       @total_base_cost.to_f*inflation_rate
      else
        0.0
      end
   end
 
+  def inflation_rate
+    @rates.inflation.empty? ? 0.0 : @rates.inflation[0].applicable_rate/100
+  end
+
+  def calc_tbc
+    @total_base_cost+=inflation_amount
+  end
+
   def get_rates
-    @rates = @period_rates.non_personnel.in_range(start_date_datified, end_date_datified)
+    @rates = @period_rates.non_personnel(start_date_datified)
     if @on_campus != nil
       @rates.delete_if { |r| r.on_campus != Transforms::YES_NO[@on_campus] }
     end
@@ -157,7 +149,10 @@ class NonPersonnelCost < DataFactory
                     end
       end
     end
-    self.class.new(@browser, opts)
+    npc = self.class.new(@browser, opts)
+    npc.get_rates
+    npc.calc_tbc
+    npc
   end
 
 end

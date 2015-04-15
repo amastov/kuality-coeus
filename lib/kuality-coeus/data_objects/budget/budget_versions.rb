@@ -153,7 +153,17 @@ class BudgetVersionsObject < DataFactory
     on(Budgets).include_for_submission @name
   end
 
-  def save_and_apply_to_other(period, line_item)
+  def save_and_apply_to_later(per, line_item)
+    per.view :non_personnel_costs
+    on(NonPersonnelCosts).view_period(per.number)
+    line_item.save_and_apply_to_later
+    @budget_periods[per.number..-1].each_with_index do |p, i|
+      p.copy_non_personnel_item period(i+per.number).non_personnel_costs.category_type(line_item.category_type)
+
+      DEBUG.inspect p.non_personnel_costs[0].total_base_cost
+
+    end
+    DEBUG.pause 999
 
   end
 

@@ -64,8 +64,8 @@ class BudgetRatesCollection < CollectionFactory
     br << keep
     ed = self.find_all { |rate| rate.start_date <= end_date } - st
     br << ed
-    br.flatten!
-    br.delete_bad_inflations! start_date
+    x = br.flatten
+    x.delete_bad_inflations! start_date
   end
 
   def campus!(type)
@@ -73,7 +73,9 @@ class BudgetRatesCollection < CollectionFactory
     self.delete_if { |rate| rate.on_campus != camp[type] }
   end
 
-  def non_personnel
+  # Takes the start date of the NP Item because the system calculates the rate ONLY
+  # based on the start date of the line item.
+  def non_personnel(start_date)
     br = noob
     np = self.find_all { |r|
       r.rate_class_type != 'Fringe Benefits' &&
@@ -81,25 +83,26 @@ class BudgetRatesCollection < CollectionFactory
           r.description !~ /salar/i
     }
     br << np
-    br.flatten!
+    x = br.flatten
+    x.keep_if { |r| r.start_date <= start_date && r.end_date >= start_date }
   end
 
   def inflation
     br = noob
     br << self.find_all { |r| r.rate_class_type=='Inflation' }
-    br.flatten!
+    br.flatten
   end
 
   def non_fa_rates
     nfa = noob
     nfa << self.find_all { |r| r.rate_class_type != 'F & A' }
-    nfa.flatten!
+    nfa.flatten
   end
 
   def fa_rates(rate_class_code)
     br = noob
     br << self.find_all { |r| r.rate_class_code == rate_class_code && r.rate_class_type == 'F & A' }
-    br.flatten!
+    br.flatten
   end
 
   def delete_bad_inflations!(start_date)

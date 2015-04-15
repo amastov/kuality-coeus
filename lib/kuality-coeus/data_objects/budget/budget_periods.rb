@@ -94,11 +94,9 @@ class BudgetPeriodObject < DataFactory
   def copy_non_personnel_item(np_item)
     opts = { start_date: (np_item.start_date_datified + 365).strftime("%m/%d/%Y"),
              end_date: (np_item.end_date_datified + 365).strftime("%m/%d/%Y"),
-             total_base_cost:  np_item.total_base_cost.to_f + np_item.inflation_amount,
-             period_rates:  @period_rates
+             period_rates: @period_rates
     }
     new_item = np_item.copy_mutatis_mutandis opts
-    new_item.get_rates
     @non_personnel_costs << new_item
   end
 
@@ -136,6 +134,9 @@ class BudgetPeriodObject < DataFactory
 
   def get_rates(budget_rates)
     @period_rates = budget_rates.in_range(start_date_datified, end_date_datified)
+
+    DEBUG.inspect @period_rates
+
   end
 
   # =======
