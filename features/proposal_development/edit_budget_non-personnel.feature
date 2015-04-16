@@ -27,6 +27,7 @@ Feature: Editing a Budget's Non-Personnel Costs
     And   the Budget's unrecovered F&A amounts are as expected for all periods
   @test
   Scenario: Deleting line items from later periods
-    *  adds a 'Travel' item to the first period and copies it to the later ones
+    *  adds an 'Equipment' item to the first period and copies it to the later ones
     *  edits the total cost and cost sharing amounts for the Equipment item in period 2
-    *  deletes the equipment items in periods 3 through 5
+    *  deletes the 'Equipment' item in periods 3 through 5
+    *  the Budget's Periods & Totals should be as expected

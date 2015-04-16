@@ -60,7 +60,7 @@ And /^the MTDC rate for the non-personnel item is unapplied for all periods$/ do
   end
 
   DEBUG.message
-  DEBUG.pause 1000
+  DEBUG.pause 987
 
   exit
 
@@ -94,12 +94,18 @@ And /^(syncs )?the (.*) cost( is synced)? with the (direct|total) cost limit for
   end
 end
 
-And /^edits the total cost and cost sharing amounts for the Equipment item in period (\d+)$/ do |x|
-  pending
+And /^edits the total cost and cost sharing amounts for the Equipment item in period (\d+)$/ do |period_number|
+  @budget_version.period(period_number).view :non_personnel_costs
+  on(NonPersonnelCosts).view_period period_number
+  tbc = random_dollar_value(30000)
+  @budget_version.period(period_number).non_personnel_costs.category_type('Equipment').edit total_base_cost: tbc, cost_sharing: random_dollar_value(15000)
 end
 
-And /^deletes the equipment items in periods (\d+) through (\d+)$/ do |arg, arg1|
-  pending
+And /^deletes the '(.*)' item in periods (\d+) through (\d+)$/ do |category_type, n, x|
+  @budget_version.budget_periods[n.to_i-1, x.to_i-1].each do |period|
+    on(NonPersonnelCosts).view_period period.number
+    period.non_personnel_costs.delete(category_type)
+  end
 end
 
 And /^adds an? '(.*)' item to the first period and copies it to the later ones$/ do |category_type|

@@ -9,24 +9,24 @@ This project consists of Cucumber-based test scripts for validating Kuali Coeus 
 Requirements
 ------------
 
-* Ruby 1.9.3 or newer
-* TestFactory 0.4.7 or newer
-* Watir-webdriver 0.6.4 or newer
+See the Gemfile for gem dependencies.
 
-In order for the scripts to actually run successfully, you will need to add a `config.yml` file in your /features/support directory.
+In order for the scripts to actually run successfully, you will need to add the following environment variables to your command line:
 
-The contents of that file should be as follows:
+_URL_ - The server address, including the https: and the trailing backslash
 
-```yaml
-:basic:
-  :url: https://<your.kuali.test.server.address.goes.here>/
-  :context: <any.context.value.that.appears.prior.to.query.string.in.the.URL>/
-  :port: 80 # Use only if the URL includes a port number after the domain. Leave blank, otherwise
-  :browser: :ff # ... or :chrome, :safari, etc.
-:headless: no # or yes, if you're running in headless mode
-:cas: no # or yes, if there is a CAS login page
-:cas_context: <the.context.string.for.the CAS.login.page.URL>/
-```
+_CONTEXT_ - Any context value that appears prior to the query string in the URL. Includes a trailing backslash
+
+ _PORT_ - Typically 80 ... But include only if the URL includes a port number after the domain.
+
+_BROWSER_ - The test browser you're going to want to use. Options are ff, chrome, safari... See the watir-webdriver documentation for further details.
+
+_HEADLESS_ - Include only if you're running in headless mode. It can be set to any value.
+
+_CAS_ - Include if there is a CAS login page. Can be set to any value.
+
+_CAS_CONTEXT_ - Include only if CAS is defined. It's the context string for the CAS Login URL, and should include a trailing backslash.
+
 
 Contribute to the Project
 -------------------------
@@ -38,7 +38,7 @@ Contribute to the Project
 5. Squash your commits
 6. Send a pull request, with a concise description of your changes
 
-Copyright 2014 The Kuali Foundation
+Copyright 2015 The Kuali Foundation
 -----------------------------------
 
 	Licensed under the Educational Community License, Version 2.0 (the "License");

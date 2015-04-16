@@ -159,12 +159,7 @@ class BudgetVersionsObject < DataFactory
     line_item.save_and_apply_to_later
     @budget_periods[per.number..-1].each_with_index do |p, i|
       p.copy_non_personnel_item period(i+per.number).non_personnel_costs.category_type(line_item.category_type)
-
-      DEBUG.inspect p.non_personnel_costs[0].total_base_cost
-
     end
-    DEBUG.pause 999
-
   end
 
   def complete
@@ -218,14 +213,7 @@ class BudgetVersionsObject < DataFactory
       1.upto(page.period_count) do |number|
         period = make BudgetPeriodObject, open_budget: @open_budget,
                       start_date: page.start_date_of(number).value,
-                      end_date: page.end_date_of(number).value,
-                      total_sponsor_cost: page.total_sponsor_cost_of(number).value.groom,
-                      direct_cost: page.direct_cost_of(number).value.groom,
-                      f_and_a_cost: page.f_and_a_cost_of(number).value.groom,
-                      unrecovered_f_and_a: page.unrecovered_f_and_a_of(number).value.groom,
-                      cost_sharing: page.cost_sharing_of(number).value.groom,
-                      cost_limit: page.cost_limit_of(number).value.groom,
-                      direct_cost_limit: page.direct_cost_limit_of(number).value.groom
+                      end_date: page.end_date_of(number).value
         period.get_rates(@institute_rates)
         @budget_periods << period
       end
