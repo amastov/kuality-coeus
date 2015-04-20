@@ -12,7 +12,8 @@ class PeriodsAndTotals < BasePage
 
   value(:period_count) { |b| b.period_rows.count }
 
-  element(:period_rows) { |b| b.div(class: 'dataTables_wrapper').tbody.rows }
+  element(:pttable) { |b| b.table(id: 'u1h1mzbd') }
+  element(:period_rows) { |b| b.pttable.tbody.rows }
 
   # The following elements will become text fields when editing the period, so add or edit, then use these...
   p_element(:start_date_of) { |number, b| b.text_field(name:"budget.budgetPeriods\[#{number.to_i-1}\].startDate") }

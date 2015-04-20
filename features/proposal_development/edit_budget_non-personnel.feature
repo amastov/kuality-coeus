@@ -19,7 +19,7 @@ Feature: Editing a Budget's Non-Personnel Costs
     And   adds a non-personnel cost with an 'Equipment' category type to all Budget Periods
     And   adds a non-personnel cost with a 'Travel' category type to all Budget Periods
     When  the Equipment cost is synced with the total cost limit for each period
-  @failing
+
   Scenario: Removing F&A charges, applying to all Budget periods
     Given the Proposal Creator adds a non-personnel cost with a narrow date range and a 'Travel' category type to the first Budget period
     When  the MTDC rate for the non-personnel item is unapplied for all periods
@@ -27,7 +27,8 @@ Feature: Editing a Budget's Non-Personnel Costs
     And   the Budget's unrecovered F&A amounts are as expected for all periods
   @test
   Scenario: Deleting line items from later periods
-    *  adds an 'Equipment' item to the first period and copies it to the later ones
-    *  edits the total cost and cost sharing amounts for the Equipment item in period 2
-    *  deletes the 'Equipment' item in periods 3 through 5
+    *  adds some Non-Personnel Costs to the first period
+    *  auto-calculates the budget periods
+    #*  edits the total cost and cost sharing amounts for the Non-Personnel Cost in period 2
+    #*  deletes the Non-Personnel Cost item in periods 3 through 5
     *  the Budget's Periods & Totals should be as expected

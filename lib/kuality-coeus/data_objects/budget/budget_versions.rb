@@ -93,6 +93,8 @@ class BudgetVersionsObject < DataFactory
   def view(tab)
     @open_budget.call
     on(BudgetSidebar).send(damballa(tab.to_s))
+    #FIXME... Need this because of race conditions on some pages...
+    sleep 2
   end
 
   def copy_all_periods new_name
@@ -153,12 +155,23 @@ class BudgetVersionsObject < DataFactory
     on(Budgets).include_for_submission @name
   end
 
-  def save_and_apply_to_later(per, line_item)
+  def save_npc_and_apply_to_later(per, line_item)
     per.view :non_personnel_costs
     on(NonPersonnelCosts).view_period(per.number)
     line_item.save_and_apply_to_later
     @budget_periods[per.number..-1].each_with_index do |p, i|
-      p.copy_non_personnel_item period(i+per.number).non_personnel_costs.category_type(line_item.category_type)
+      p.copy_non_personnel_item period(i+per.number).non_personnel_costs.object_code_name(line_item.object_code_name)
+    end
+  end
+
+  def autocalculate_periods
+    view :periods_and_totals
+    on(PeriodsAndTotals).autocalculate_periods
+    @budget_periods[1..-1].each_with_index do |period, i|
+      @budget_periods[i].non_personnel_costs.each do |npc|
+        period.copy_non_personnel_item(npc)
+        warn 'Must add the copying of personnel items to the autocalculate periods method!'
+      end
     end
   end
 

@@ -9,7 +9,7 @@ class NonPersonnelCosts < BasePage
 
   action(:assign_non_personnel) { |b| b.active_tab.button(text: 'Assign Non-Personnel...').click; b.loading }
 
-  p_action(:details_of) { |description, b| b.items_rows.find{ |item| item[0].text==description }.button().click; b.loading }
+  p_action(:details_of) { |description, b| b.items_rows.find{ |item| item[0].text==description }.button.click; b.loading }
 
   action(:edit_participant_count) { |b| b.td(text: /Participant Support/).link(text: 'edit').click; b.loading }
 

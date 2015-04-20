@@ -60,6 +60,7 @@ class NonPersonnelCost < DataFactory
       page.details_tab
       # Grab the inflation rate descriptions for reference (they're used in #get_rates)...
       @ird = page.inflation_rates.map { |r| r[:description] }.uniq
+      @overhead = page.rates_table.exist?
       update_options opts
       get_rates
       page.save_changes
@@ -163,6 +164,7 @@ class NonPersonnelCost < DataFactory
     end
     @rates.delete_if { |r| r.rate_class_type=='Inflation' && !@ird.include?(r.description) }
     @rates.delete_if { |r| r.rate_class_type=='Inflation' && start_date_datified < r.start_date }
+    @rates.delete_if { |r| r.rate_class_type == 'F & A' && @overhead==false }
   end
 
   def copy_mutatis_mutandis opts={}
@@ -190,9 +192,14 @@ class NonPersonnelCost < DataFactory
 
   def calc_cost(cost_type)
     amounts = []
-    @rates.find_all { |r| r.rate_class_type=='F & A'}.each { |rate|
-      amounts << rate_days(rate)*cost_type*(rate.applicable_rate/100)
-    }
+    fna = @rates.f_and_a
+    if fna.count==1
+      amounts << @total_base_cost*(fna[0].applicable_rate/100)
+    else
+      fna.each { |rate|
+        amounts << rate_days(rate)*cost_type*(rate.applicable_rate/100)
+      } unless fna.empty?
+    end
     amounts.inject(0, :+)
   end
 
@@ -216,9 +223,15 @@ class NonPersonnelCostsCollection < CollectionFactory
     self.find { |np_item| np_item.category_type==category_type }
   end
 
-  def delete(category_type)
-    category_type(category_type).delete
-    self.delete_if { |np_item| np_item.category_type==category_type }
+  # NOTE: This method is written assuming that there's only one item
+  # with this object code in the collection...
+  def object_code_name(obcdnm)
+    self.find { |np_item| np_item.object_code_name==obcdnm }
+  end
+
+  def delete(obcdnm)
+    object_code_name(obcdnm).delete
+    self.delete_if { |np_item| np_item.object_code_name==obcdnm }
   end
 
   # this method is basically for debugging purposes, as it gets rid of things

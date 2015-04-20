@@ -102,6 +102,11 @@ class BudgetRatesCollection < CollectionFactory
     br.flatten
   end
 
+  # Use this method for an already-filtered collection of rates...
+  def f_and_a
+    self.find_all { |r| r.rate_class_type=='F & A'}
+  end
+
   def delete_bad_inflations!(start_date)
     self.delete_if { |r|
       r.rate_class_type == 'Inflation' &&

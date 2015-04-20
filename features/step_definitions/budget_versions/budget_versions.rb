@@ -174,6 +174,10 @@ And /^the Budget Version is opened$/ do
   on(Budgets).open @budget_version.name
 end
 
+And /^auto-calculates the budget periods$/ do
+  @budget_version.autocalculate_periods
+end
+
 And /adds a (direct|total) cost limit to all of the Budget's periods$/ do |type|
   @budget_version.budget_periods.each do |period|
     period.edit "#{type}_cost_limit".to_sym => random_dollar_value(50000)
@@ -190,18 +194,12 @@ Then /^the direct cost is equal to the direct cost limit in all periods$/ do
 end
 
 Then /^the Budget's Periods & Totals should be as expected$/ do
-
-  DEBUG.inspect $current_user.user_name
-  DEBUG.inspect @proposal.proposal_number
-
   @budget_version.view 'Periods And Totals'
-  on PeriodsAndTotals do |page|
-    @budget_version.budget_periods.each { |period|
-
-      DEBUG.inspect period.non_personnel_costs.details
-
-      expect(page.direct_cost_of(period.number).to_f).to eq period.direct_cost
-      expect(page.f_and_a_cost_of(period.number).to_f).to eq period.f_and_a_cost
-    }
-  end
+  @budget_version.budget_periods.each { |period|
+    on PeriodsAndTotals do |page|
+      # TODO: Add more checks of values here...
+      expect(page.direct_cost_of(period.number).to_f).to be_within(0.05).of period.direct_cost
+      expect(page.f_and_a_cost_of(period.number).to_f).to be_within(0.05).of period.f_and_a_cost
+    end
+  }
 end
