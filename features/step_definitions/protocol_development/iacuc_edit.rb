@@ -63,7 +63,7 @@ end
 
 When /reopens the IACUC Protocol without saving the changes$/ do
   on(IACUCProtocolOverview).close
-  on(Confirmation).no
+  on(Confirmation).no if on(Confirmation).no_button.exists?
   @iacuc_protocol.view_document
 end
 

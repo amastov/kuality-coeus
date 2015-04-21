@@ -1,10 +1,10 @@
 class SponsorTermLookup < Lookups
 
+  results_multi_select
+
   expected_element :sponsor_term_id
 
   old_ui
-  #needed in  Sponsor Template Term lookup
-  results_multi_select
 
   element(:last_button) { |b| b.frm.link(text: 'Last') }
   action(:last) { |b| b.last_button.click }

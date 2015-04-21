@@ -1,5 +1,6 @@
 Then /^The Award PI's Lead Unit is (.*)$/ do |unit|
-  @award.principal_investigator.lead_unit.should==unit
+  on(Award).award
+  expect(on(Award).lead_unit_ro).to include unit
 end
 
 Then /^the Award's Lead Unit is changed to (.*)$/ do |unit|
@@ -21,14 +22,16 @@ Then /^the new Award should not have any subawards or T&M document$/ do
     test.approved_subaward_table.rows.size.should==3
     test.time_and_money
     # If there is no T&M, then an error should be thrown...
-    test.errors.should include 'Project Start Date is required when creating a Time And Money Document.'
+    test.errors.should include 'Project End Date (Project End Date) is a required field.'
   end
 end
 
 Then /^the new Award's transaction type is 'New'$/ do
-  @award_2.view :award
-  on(Award).transaction_type.selected?('New').should be_true
-  #DEBUG expect(on(Award).transaction_type.selected_options[0].text).to include('New')
+  @award.view :award
+  on Award do |page|
+    page.expand_all
+    page.transaction_type.selected?('New').should be_true
+  end
 end
 
 Then /^the child Award's project end date should be the same as the parent, and read-only$/ do
@@ -37,15 +40,16 @@ end
 
 Then /^the anticipated and obligated amounts are read-only and (.*)$/ do |amount|
   on Award do |page|
-    page.anticipated_amount_ro.should==amount
-    page.obligated_amount_ro.should==amount
+    page.anticipated_direct_ro.should==amount
+    page.obligated_direct_ro.should==amount
   end
 end
 
 Then /^the anticipated and obligated amounts are zero$/ do
   on Award do |page|
-    page.anticipated_amount_ro.should=='$0.00'
-    page.obligated_amount_ro.should=='$0.00'
+    page.expand_all
+    expect(page.anticipated_direct_ro).to eq ''
+    expect(page.obligated_direct_ro).to eq ''
   end
 end
 
@@ -207,8 +211,8 @@ end
 Then /^the default start and end dates are based on the F&A rate's fiscal year$/ do
   fna = @award.fa_rates[0]
   f_y = fna.fiscal_year.to_i
-  fna.start_date.should=="07/01/#{f_y-1}"
-  fna.end_date.should=="06/30/#{f_y}"
+  expect(fna.start_date).to eq "07/01/#{f_y-1}"
+  expect(fna.end_date).to eq "06/30/#{f_y}"
 end
 
 And /^returning to the Award goes to the new, pending version$/ do
@@ -221,4 +225,27 @@ end
 
 And /opens the Award$/ do
   @award.view :award
+end
+
+When /^the Award Modifier searches for the Award from the award lookup page$/ do
+    on(Header).central_admin
+    on(CentralAdmin).search_award
+    on AwardLookup do |lookup|
+      lookup.award_id.set @award.id
+      lookup.search
+    end
+end
+
+Then /^no results should be returned$/ do
+  expect(on(AwardLookup).results_text).to include 'No values match this search'
+end
+
+When /^the unassigned user visits the Award$/  do
+  steps '* I log in with the unassigned user'
+  @award.view_award
+end
+
+Then /^an error notification will indicate that the user cannot access the Award$/ do
+  expect(on(Award).exception_errors).to include "user 'unassigneduser' is not authorized to open document '#{@award.document_id}'"
+  expect(@browser.html).to include "user 'unassigneduser' is not authorized to open document '#{@award.document_id}'"
 end

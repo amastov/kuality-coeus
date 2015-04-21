@@ -2,8 +2,6 @@ class CommitteeScheduleLookup < Lookups
 
   expected_element :protocol_number
 
-  url_info 'Schedule%20Lookup','kra.committee.bo.CommitteeSchedule'
-
   old_ui
 
   element(:protocol_number) { |b| b.frm.text_field(name: 'protocolSubmissions.protocolNumber') }

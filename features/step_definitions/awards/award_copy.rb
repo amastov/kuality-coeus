@@ -1,4 +1,5 @@
 When /I? ?copy the Award to a new parent Award$/ do
+  @award_2 = make AwardObject
   @award_2 = @award.copy
 end
 

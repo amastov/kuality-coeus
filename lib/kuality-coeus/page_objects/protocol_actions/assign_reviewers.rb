@@ -1,4 +1,5 @@
 class AssignReviewers < KCProtocol
+  undefine :submit_button
 
   # Returns an array containing the names of the listed reviewers
   value(:reviewers) { |b| b.assign_reviewers_div.selects(title: 'Reviewer Type').map{|s| s.parent.parent.td.text} }

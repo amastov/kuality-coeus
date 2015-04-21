@@ -9,6 +9,9 @@ class ActionList < BasePage
 
   action(:edit_first_item) { |b| b.frm.link(text: 'edit').click; b.use_new_tab; b.close_parents }
 
+  action(:open_first_document_id) { |p| p.results_table.tbody.link(href: /command=displayActionListView$/).click; p.use_new_tab; p.close_parents }
+
+
   action(:item_row) { |match, b| b.results_table.row(text: /#{Regexp.escape(match)}/m) }
   # Note: Use this when you need to click the "open" link on the target row
   action(:open) { |match, p| p.results_table.row(text: /#{Regexp.escape(match)}/m).link(text: 'open').click; p.use_new_tab; p.close_parents }

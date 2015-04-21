@@ -57,7 +57,9 @@ class InstitutionalProposalObject < DataFactory
   # This method is appropriate only in the context of creating an
   # Institutional Proposal from a Proposal Log.
   def create
-    visit(CentralAdmin).create_institutional_proposal
+    on(Header).central_admin
+    on(CentralAdmin).create_institutional_proposal
+
     on ProposalLogLookup do |look|
       look.proposal_number.set @proposal_number
       look.search
@@ -154,7 +156,7 @@ class InstitutionalProposalObject < DataFactory
   def set_sponsor_code
     if @sponsor_id=='::random::'
       on(InstitutionalProposal).find_sponsor_code
-      on SponsorLookup do |look|
+      on OLDSponsorLookup do |look|
         look.sponsor_type_code.pick! 'Federal'
         look.search
         look.page_links[rand(look.page_links.length)].click if look.page_links.size > 0

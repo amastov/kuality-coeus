@@ -17,6 +17,7 @@ class AwardContacts < KCAwards
   p_element(:project_role) { |name, b| b.key_personnel_table.row(text: /#{Regexp.escape(name)}/).select(name: /contactRoleCode/) }
   value(:key_personnel) { |b| b.key_personnel_table.hiddens(name: /award_person.identifier_\d+/).map { |hid| hid.parent.text.strip } }
 
+  value(:get_full_name) {|b| b.frm.div(id: 'per.fullName.div').text.strip }
   # Person Details
 
   # Unit Details
@@ -34,9 +35,10 @@ class AwardContacts < KCAwards
   element(:lead_unit_radio_button) { |b| b.frm.radio(name: 'selectedLeadUnit') }
   p_element(:lead_unit_radio) { |name, unit, b| b.person_unit_row(name, unit).radio(name: 'selectedLeadUnit') }
   p_action(:delete_unit) { |name, unit, b| b.person_unit_row(name, unit).button(name: /methodToCall.deleteProjectPersonUnit/).click }
-
+  p_element(:delete_unit_element) { |name, unit, b| b.person_unit_row(name, unit).button(name: /methodToCall.deleteProjectPersonUnit/) }
   action(:unit_name) { |name, unit, b| b.person_unit_row(name, unit)[2].text.strip }
 
+  action(:delete_unit_row) { |b| b.frm.button(name: /methodToCall.deleteProjectPersonUnit/).click }
   # This button is only present in the context of a Key Person...
   action(:add_unit_details) { |name, p| p.person_units(name).button(title: 'Add Unit Details').click }
 
@@ -49,19 +51,28 @@ class AwardContacts < KCAwards
   element(:sponsor_non_employee_id) { |b| b.frm.text_field(name: 'sponsorContactsBean.newAwardContact.rolodex.fullName') }
   value(:org_name) { |b| b.frm.div(id: 'org.fullName.div').text }
   element(:sponsor_project_role) { |b| b.frm.select(name: 'sponsorContactsBean.contactRoleCode') }
+  action(:search_sponsor_contact) { |b| b.sponsor_non_employee_id.parent.button(title: 'Search ').click; b.loading }
   action(:add_sponsor_contact) { |b| b.frm.button(name: 'methodToCall.addSponsorContact').click; b.loading }
 
   # Close button element (used to force waiting for page load)
   element(:close_button) { |b| b.frm.button(title: 'close') }
 
+  # Combined Credit Split
+  element(:cs_recognition) {|b| b.frm.text_field(id: "document.awardList[0].projectPersons[0].creditSplits[0].credit") }
+  element(:cs_responsibility) {|b| b.frm.text_field(id: "document.awardList[0].projectPersons[0].creditSplits[1].credit") }
+  element(:cs_space) {|b| b.frm.text_field(id: "document.awardList[0].projectPersons[0].creditSplits[2].credit") }
+  element(:cs_financial) {|b| b.frm.text_field(id: "document.awardList[0].projectPersons[0].creditSplits[3].credit") }
+
+
   # ===========
   private
   # ===========
 
+  element(:key_personnel_table) { |b| b.frm.table(id: 'contacts-table') }
+
   p_element(:target_key_person_div) { |name, b| b.frm.div(id: "tab-#{nsp(name)}:UnitDetails-div") }
   p_element(:person_units) { |name, b| b.target_key_person_div(name).table(summary: 'Project Personnel Units') }
   p_element(:person_unit_row) { |name, unit, b| b.person_units(name).row(text: /#{unit}/) }
-  element(:key_personnel_table) { |b| b.frm.table(id: 'contacts-table') }
 
   element(:credit_split_div_table) { |b| b.frm.div(id: 'tab-ProjectPersonnel:CombinedCreditSplit-div').table }
 

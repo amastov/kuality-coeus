@@ -1,5 +1,6 @@
 class Header < BasePage
 
+  element(:header_div) { |b| b.div(class: 'collapse navbar-collapse navbar-ex1-collapse uif-listGroup') }
   # Header links
   action(:researcher) { |b|
     5.times {
@@ -37,15 +38,30 @@ class Header < BasePage
   action(:action_list) { |b| b.link(text: 'Action List').click }
 
   # Has same visible problems as researcher
+  # action(:central_admin) { |b|
+  #   5.times {
+  #     b.central_admin_link.click
+  #     sleep 1 unless b.central_admin_link.parent.div.visible?
+  #     break if b.central_admin_link.parent.div.visible?
+  #     b.refresh
+  #     sleep 1
+  #   }
+  # }
+  # element(:central_admin_link) { |b| b.link(text: 'CENTRAL ADMIN') }
+
+  #Central Admin not working on kc6 using UNIT for temp fix.
   action(:central_admin) { |b|
     5.times {
-      b.central_admin_link.click
-      sleep 1 unless b.central_admin_link.parent.div.visible?
-      break if b.central_admin_link.parent.div.visible?
+      b.unit_link.click
+      sleep 1 unless b.unit_link.parent.div.visible?
+      break if b.unit_link.parent.div.visible?
       b.refresh
       sleep 1
     }
   }
-  element(:central_admin_link) { |b| b.link(text: 'CENTRAL ADMIN') }
+  element(:unit_link) { |b| b.link(text: 'UNIT') }
 
+
+  action(:krad_portal) { |b| b.krad_portal_element.click }
+  element(:krad_portal_element) { |b| b.link(title: 'KRAD Portal') }
 end

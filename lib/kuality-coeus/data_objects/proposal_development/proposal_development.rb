@@ -226,16 +226,40 @@ class ProposalDevelopmentObject < DataFactory
 
     case(type)
       when :to_sponsor
-
-
-        # FIXME! This needs to be removed when bug is fixed... https://jira.kuali.org/browse/KRAFDBCK-12041
-        on(Header).researcher
-        on(ResearcherMenu).search_proposals
+        on(Header).doc_search
+        on DocumentSearch do |lookup|
+          lookup.document_id.fit @document_id
+          lookup.search
+          lookup.open_result @document_id
+        end
         view 'Summary/Submit'
-
-
+        DEBUG.message 'Submit to sponsor not displayed submitting for review'
+        unless on(ProposalSummary).submit_to_sponsor_element.exists?
+          on(ProposalSummary).submit_for_review
+          view 'Summary/Submit'
+          DEBUG.message 'submit second time'
+        end
+        unless on(ProposalSummary).submit_to_sponsor_element.exists?
+          on(ProposalSummary).submit_for_review
+          view 'Summary/Submit'
+          DEBUG.message 'submit third time'
+        end
+        unless on(ProposalSummary).submit_to_sponsor_element.exists?
+          on(ProposalSummary).submit_for_review
+          view 'Summary/Submit'
+          DEBUG.message 'submit 4th time'
+        end
+        unless on(ProposalSummary).submit_to_sponsor_element.exists?
+          on(ProposalSummary).submit_for_review
+          view 'Summary/Submit'
+          DEBUG.message 'submit 5th time'
+        end
         on(ProposalSummary).submit_to_sponsor
         on SendNotifications do |page|
+          page.employee_set
+          page.search_for_recipients
+
+          select_random_result
           @institutional_proposal_number=page.institutional_proposal_number
           page.send_notifications
         end
@@ -248,10 +272,18 @@ class ProposalDevelopmentObject < DataFactory
       else
         view 'Summary/Submit'
         on(ProposalSummary).submit_for_review
+        DEBUG.message "Submit for review"
         @status=on(NewDocumentHeader).document_status
     end
   end
 
+  def select_random_result
+    on SendNotifications do |page|
+      results_array = page.get_search_results.to_a
+      DEBUG.message "results #{results_array.class} and arry is ..#{results_array}"
+      page.select_random_checkbox(results_array.sample)
+    end
+  end
   # Note: This method currently assumes you've entered
   # an original institutional proposal ID and you want to
   # generate a new version of that same IP. If that's not
@@ -286,6 +318,8 @@ class ProposalDevelopmentObject < DataFactory
     on(ActionList).filter
     on ActionListFilter do |page|
       page.document_title.set @project_title[0..18]
+      DEBUG.message "#{@project_title[0..18]}"
+      # DEBUG.pause(123)
       page.filter
     end
     on(ActionList).open_item(@document_id)
@@ -343,17 +377,11 @@ class ProposalDevelopmentObject < DataFactory
         # TODO: Need this to be more robust. What if you're in the 5.2 UI? This can't
         # navigate from there...
         visit Landing
-        on(Header).researcher
-        on(ResearcherMenu).search_proposals
-        on DevelopmentProposalLookup do |search|
-          search.proposal_number.set @proposal_number
-          search.search
-          # FIXME...
-          begin
-            search.edit_proposal @proposal_number
-          rescue
-            search.view_proposal @proposal_number
-          end
+        on(Header).doc_search
+        on DocumentSearch do |lookup|
+          lookup.document_id.fit @document_id
+          lookup.search
+          lookup.open_result(@document_id)
         end
       end
     }
@@ -393,8 +421,8 @@ class ProposalDevelopmentObject < DataFactory
         #fill_out look, :sponsor_type_code
         look.search
         look.results_table.wait_until_present
-        look.page_links.to_a.sample.click if look.page_links.size > 1
         look.select_random
+        look.loading
       end
       @sponsor_id=on(CreateProposal).sponsor_code.value
     else

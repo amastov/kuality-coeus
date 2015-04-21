@@ -13,8 +13,7 @@ class InstitutionalProposal < KCInstitutionalProposal
   element(:activity_type) { |b| b.frm.select(name: 'document.institutionalProposalList[0].activityTypeCode') }
   element(:project_title) { |b| b.frm.textarea(name: 'document.institutionalProposalList[0].title') }
   element(:sponsor_id) { |b| b.frm.text_field(name: 'document.institutionalProposalList[0].sponsorCode') }
-  action(:find_sponsor_code) { |b| b.frm.button(name: 'methodToCall.performLookup.(!!org.kuali.kra.bo.Sponsor!!).(((sponsorCode:document.institutionalProposalList[0].sponsorCode,sponsorName:document.institutionalProposalList[0].sponsor.sponsorName))).((``)).((<>)).(([])).((**)).((^^)).((&&)).((//)).((~~)).(::::;;::::).anchorSponsorProgramInformation').click }
-
+  action(:find_sponsor_code) { |b| b.sponsor_id.parent.button(title: 'Search ').click; b.loading }
   # ===========
   private
   # ===========

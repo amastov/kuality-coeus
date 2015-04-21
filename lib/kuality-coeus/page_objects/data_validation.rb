@@ -1,16 +1,17 @@
 class DataValidation < BasePage
 
-  expected_element :close_button
+  expected_element :data_validation_div
 
   element(:turn_on) { |b| b.button(text: 'Turn On').when_present.click; b.button(text: 'Turn On').wait_while_present }
 
   new_error_messages
 
-  element(:data_section) { |b| b.section(id: /DataValidationSection/) }
-  element(:errors_list) { |b| b.data_section.table }
+  element(:data_validation_div) { |b| b.frm.div(id: 'tab-DataValidation-div') }
+  element(:errors_list) { |b| b.data_validation_div.table }
+  element(:close_button) { |b| b.data_validation_div.button(text: 'Close') }
 
-  value(:validation_errors_and_warnings) { |b| errs = []; b.errors_list.rows.each{ |row| errs << row[2].text }; errs }
-
-  element(:close_button) { |b| b.data_section.button(text: 'Close') }
+  #Error section
+  action(:expand_all_error_sections) { |b| b.data_validation_div.buttons(title: 'show').each {|btn| btn.click }  }
+  value(:validation_errors_and_warnings) { |b| errs=[]; b.expand_all_error_sections; b.data_validation_div.tds.collect {|txt| errs << txt.text }; errs }
 
 end

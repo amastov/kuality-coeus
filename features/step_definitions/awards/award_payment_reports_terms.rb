@@ -7,7 +7,7 @@ When /adds (\d+) reports to the Award$/ do |x|
 end
 
 When /I? ?adds? Terms to the Award$/ do
-  @award.add_terms if @award.terms.nil?
+  @award.add_terms
 end
 
 Given /I? ?add a Payment & Invoice item to the Award$/ do
@@ -31,6 +31,7 @@ end
 
 And /adds an item of approved equipment to the Award$/ do
   @award.add_approved_equipment
+  on(PaymentReportsTerms).save
 end
 
 And /adds a duplicate item of approved equipment to the Award$/ do

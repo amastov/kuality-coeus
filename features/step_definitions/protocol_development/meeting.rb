@@ -7,7 +7,9 @@ And /(Protocol Creator|IRB Administrator) edits the meeting details to make it a
       steps '* log in with the IRB Administrator user'
   end
 
-  visit CommitteeScheduleLookup do |page|
+  on(Header).central_admin
+  on(CentralAdmin).irb_schedules
+  on CommitteeScheduleLookup do |page|
     page.protocol_number.set @irb_protocol.protocol_number
     page.search
     page.edit_meeting
@@ -20,11 +22,15 @@ end
 
 And /^(the IRB Admin |)records the voting members' attendance at the Committee meeting$/ do |usr|
   steps '* I log in with the IRB Administrator user' if usr=='the IRB Admin '
-  visit CommitteeScheduleLookup do |page|
+
+  on(Header).central_admin
+  on(CentralAdmin).irb_schedules
+  on CommitteeScheduleLookup do |page|
     page.protocol_number.set @irb_protocol.protocol_number
     page.search
     page.edit_meeting
   end
+
   on Meeting do |page|
     page.expand_all
     @committee.voting_members.each do |member|
@@ -45,11 +51,15 @@ Then /the (.*) (can |can't )see the primary reviewer's comment in the meeting mi
   }
   member = people[person] ? @committee.members.member(people[person]) : @irb_protocol.principal_investigator
   member.sign_in
-  visit CommitteeScheduleLookup do |page|
+
+  on(Header).central_admin
+  on(CentralAdmin).irb_schedules
+  on CommitteeScheduleLookup do |page|
     page.protocol_number.set @irb_protocol.protocol_number
     page.search
     page.view_meeting
   end
+
   on Meeting do |page|
     page.expand_all
     expect(page.minute_entries.find{ |m_e| m_e[:description]==comment }).send(translate[bool], be_nil)

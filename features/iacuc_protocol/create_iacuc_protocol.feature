@@ -9,6 +9,7 @@ Feature: Creating IACUC Protocols
   Background: Establish a Protocol Creator
     * Users exist with the following roles: IACUC Protocol Creator, IACUC Administrator
 
+
   Scenario: Create a IACUC proposal
     When the IACUC Protocol Creator creates an IACUC Protocol
     Then there are no errors on the page

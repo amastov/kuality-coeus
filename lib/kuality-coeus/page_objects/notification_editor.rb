@@ -7,7 +7,8 @@ class NotificationEditor < BasePage
 
   undefine :send_notification
 
-  action(:send_notification) { |b| b.frm.button(name: 'methodToCall.sendNotification').click }
+  action(:send_notification) { |b| b.send_notification_button.click }
+  action(:send_notification_button) { |b| b.frm.button(name: 'methodToCall.sendNotification') }
 
   action(:employee_search) { |b| b.frm.button(name: 'methodToCall.performLookup.(!!org.kuali.kra.bo.KcPerson!!).(((personId:notificationHelper.newPersonId))).((``)).((<>)).(([])).((**)).((^^)).((&&)).((//)).((~~)).(::::;;::::).anchor').click }
   

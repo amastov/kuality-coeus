@@ -15,4 +15,5 @@ class AwardLookup < Lookups
     ids
   }
 
+  value(:results_text) { |b| b.frm.div(id: 'lookup').parent.text }
 end

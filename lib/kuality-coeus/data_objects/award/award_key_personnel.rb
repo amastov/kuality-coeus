@@ -4,15 +4,18 @@ class AwardKeyPersonObject < DataFactory
 
   attr_reader :employee_user_name, :non_employee_id, :project_role,
               :key_person_role, :units, :first_name, :last_name, :full_name,
-              :lead_unit, :type, :responsibility, :financial
+              :lead_unit, :type, :responsibility, :financial, :recognition,
+              :space, :key_person_role, :get_units
 
   def initialize(browser, opts={})
     @browser = browser
 
     defaults = {
-        type:         'employee',
-        project_role: 'Principal Investigator',
-        units:        [] # Contains Hashes with Keys... :number, :name, :recognition, :responsibility, :space, :financial
+        type:            'employee',
+        project_role:    'Principal Investigator',
+        units:           [], # Contains Hashes with Keys... :number, :name, :recognition, :responsibility, :space, :financial
+        key_person_role: random_alphanums,
+        get_units: 'yes'
     }
 
     set_options(defaults.merge(opts))
@@ -23,32 +26,66 @@ class AwardKeyPersonObject < DataFactory
   # Navigation done by parent object...
   def create
     on(AwardContacts).expand_all
-    if @employee_user_name.nil? && @non_employee_id.nil?
-      get_person
-      # TODO: Need to add code that sets the user name or id
-    else
-      # TODO: Need to add conditional code for
-      # when you have a user id but not a name
-    end
-    on AwardContacts do |create|
-      # This conditional exists to deal with the fact that
-      # a Principal Investigator can also be called a "PI/Contact",
-      # in cases where it's an NIH proposal.
-      if create.kp_project_role.include? @project_role
-        create.kp_project_role.select @project_role
-      else
-        create.kp_project_role.select_value role_value[@project_role]
-        @project_role = create.kp_project_role.selected_options[0].text
+    if @type == 'employee'
+      on AwardContacts do |page|
+        page.employee_search
       end
-      fill_out create, :key_person_role
-      create.add_key_person
-      # Note: This break is here for testing for an
-      # error when attempting to add 2 PIs to the Award...
-      break if create.errors.size > 0
-      set_up_units
-      create.save
+
+      if @last_name == nil && @first_name == nil
+
+        on KcPersonLookup do |lookup|
+          lookup.last_name.fit @last_name
+          lookup.first_name.fit @first_name
+          lookup.search
+          #capture full_name last_name first_name
+          lookup.select_random_with_name
+        end
+        #need to view person to get the first and last name because full name is given and
+        on KCPerson do |gather|
+          @last_name = gather.last_name
+          @first_name = gather.first_name
+          @full_name = gather.full_name
+          gather.close_window
+        end
+      end
+      on KcPersonLookup do |lookup|
+        lookup.last_name.fit @last_name
+        lookup.first_name.fit @first_name
+        lookup.search
+        lookup.return_random
+      end
+
+    else #Non-employee
+      on AwardContacts do |page|
+        page.non_employee_search
+        #Non-Organizational Address Book Lookup
+      end
+      on NonOrgAddressBookLookup do |lookup|
+        lookup.search
+        lookup.return_random
+      end
+      #set up name
+      on AwardContacts do |page|
+        @full_name = page.kp_non_employee_id.value.strip
+        @first_name = @full_name.partition(',').first.strip
+        @last_name =  @full_name.partition(',').last.strip
+      end
+
+    end #to employee or non-employee
+
+    on AwardContacts do |page|
+      page.kp_project_role.select @project_role
+      page.key_person_role.fit @key_person_role if @project_role == 'Key Person'
+
+      page.add_key_person
+      page.expand_all
+      #need to remove spaces and commas because of the way the div is constructed
+      @full_name_no_spaces = @full_name.gsub(' ', '').gsub(',', '')
+      if @get_units == 'yes' && @role != 'Key Person'
+        @units = page.units(@full_name_no_spaces)
+      end
     end
-  end
+  end  #create
 
   def edit opts={}
     # TODO: Add navigation
@@ -97,7 +134,7 @@ class AwardKeyPersonObject < DataFactory
   def delete_unit(unit_number)
     # TODO: Add conditional navigation
     on AwardContacts do |delete_unit|
-      delete_unit.delete_unit(@full_name, unit_number)
+      delete_unit.delete_unit(@full_name, unit_number)   if delete_unit.delete_unit_element(@full_name, unit_number).exists?
       delete_unit.save
     end
     @units.delete(unit_number)
@@ -105,6 +142,34 @@ class AwardKeyPersonObject < DataFactory
 
   def update_from_parent(id)
     @document_id=id
+  end
+
+  def update_splits opts={}
+    view 'Contacts'
+    on AwardContacts do |page|
+      page.expand_all
+      edit_item_fields opts, @full_name, page, :recognition, :responsibility, :space, :financial
+      page.save
+    end
+    update_options(opts)
+  end
+
+  def view(tab)
+    open_document
+    unless on(Award).send(StringFactory.damballa("#{tab}_element")).parent.class_name=~/tabcurrent$/
+      on(Award).send(StringFactory.damballa(tab.to_s))
+    end
+  end
+
+
+  def update_unit_splits(unit_number, opts)
+    on CombinedCreditSplit do |page|
+      opts.each do |type, value|
+        page.send("unit_#{type}", @full_name, unit_number).fit value
+      end
+      page.save
+    end
+    # @units.find{ |u| u[:number]==unit_number}.merge!(opts)
   end
 
   # ===========

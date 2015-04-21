@@ -21,7 +21,8 @@ class ProposalLogObject < DataFactory
   end
 
   def create
-    visit(CentralAdmin).create_proposal_log
+    on(Header).central_admin
+    on(CentralAdmin).create_proposal_log
     set_principal_investigator
     on ProposalLog do |create|
       create.expand_all
@@ -37,7 +38,7 @@ class ProposalLogObject < DataFactory
 
 
 
-    DEBUG.pause 300
+    # DEBUG.pause 300
 
 
 
@@ -67,7 +68,7 @@ class ProposalLogObject < DataFactory
     else
       on(ProposalLog).principal_investigator_employee.set @principal_investigator
     end
-    @pi_full_name=on(ProposalLog).pi_full_name
+    @principle_investigator=on(ProposalLog).pi_full_name
   end
 
   def set_sponsor_code

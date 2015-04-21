@@ -15,7 +15,8 @@ class Lookups < BasePage
       action(:edit_item) { |match, p| p.results_table.row(text: /#{Regexp.escape(match)}/m).link(text: 'edit').click; p.use_new_tab; p.close_parents }
       alias_method :edit_person, :edit_item
 
-      action(:edit_first_item) { |b| b.frm.link(text: 'edit').click; b.use_new_tab; b.close_parents }
+      action(:edit_first_item) { |b| b.frm.link(text: 'edit').when_present.click; b.use_new_tab; b.close_parents }
+      action(:view_first_item) { |b| b.frm.link(text: 'view').when_present.click; b.use_new_tab; b.close_parents }
 
       action(:item_row) { |match, b| b.results_table.row(text: /#{Regexp.escape(match)}/m) }
       # Note: Use this when you need to click the "open" link on the target row
@@ -28,8 +29,13 @@ class Lookups < BasePage
       p_action(:select_item) { |match, p| p.item_row(match).link(text: 'select').click }
       action(:return_random) { |b| b.return_value_links.to_a.sample.click }
       element(:return_value_links) { |b| b.results_table.links(text: 'return value') }
+      #used by Award for adding a key person wher user name is important
+      action(:select_random_with_name) { |b| b.results_table.tbody.trs.to_a.sample.link(title: /^with KC Person KcPerson/).click; b.use_new_tab }
 
       p_value(:docs_w_status) { |status, b| array = []; (b.results_table.rows.find_all{|row| row[3].text==status}).each { |row| array << row[0].text }; array }
+
+      action(:return_random_term) {|b| b.random_term_results.set; b.return_selected }
+      value(:random_term_results) { |b| b.results_table.checkboxes.to_a.sample }
 
       # Used as the catch-all "document opening" method for conditional navigation,
       # when we can't know whether the current user will have edit permissions.
@@ -42,7 +48,7 @@ class Lookups < BasePage
       element(:full_name) { |b| b.frm.text_field(id: 'fullName') }
       element(:user_name) { |b| b.frm.text_field(id: 'userName') }
       element(:state) { |b| b.frm.select(id: 'state') }
-      action(:search) { |b| b.frm.button(title: 'search', value: 'search').click; b.loading }
+      action(:search) { |b| b.frm.button(title: 'search', value: 'search').when_present.click; b.loading }
       element(:create_button) { |b| b.frm.link(title: 'Create a new record') }
       action(:create_new) { |b| b.create_button.click; b.loading }
       alias_method :create, :create_new
@@ -51,7 +57,7 @@ class Lookups < BasePage
     def dialog_ui
       action(:search) { |b| b.frm.button(id: 'ufuknop').click; b.results_table.wait_until_present }
       element(:results_table) { |b| b.frm.table(id: 'uLookupResults_layout') }
-      action(:select_random) { |b| b.select_links.to_a.sample.click; b.loading; b.header.wait_while_present }
+      action(:select_random) { |b| b.select_links.to_a.sample.click; b.loading }
       element(:select_links) { |b| b.results_table.links(text: 'select') }
     end
 

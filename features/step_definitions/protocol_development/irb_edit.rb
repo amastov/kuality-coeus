@@ -41,7 +41,7 @@ And /assigns? a committee member the the Protocol's personnel/ do
   name = names.sample
   first = name[/^\w+/]
   last = name[/\w+$/]
-  role = ['Co-Investigator', 'Correspondent - CRC', 'Correspondent Administrator', 'Study Personnel'].sample
+  role = ['Co-Investigator', 'IRB Administrator', 'Principal Investigator', 'Study Personnel'].sample
   @irb_protocol.view 'Personnel'
   @irb_protocol.personnel.add full_name: name,
                               role: role, first_name: first,

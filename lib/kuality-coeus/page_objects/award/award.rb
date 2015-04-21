@@ -38,9 +38,6 @@ class Award < KCAwards
   element(:obligated_direct) { |b| b.frm.text_field(name: /obligatedTotalDirect/) }
   value(:obligated_direct_ro) { |b| b.tm_table[3][3].text }
   element(:obligated_fna) { |b| b.frm.text_field(name: /obligatedTotalIndirect/) }
-  # Probably removing?
-  element(:anticipated_amount) { |b| b.frm.text_field(name: /anticipatedTotalAmount/) }
-  element(:obligated_amount) { |b| b.frm.text_field(name: /amountObligatedToDate/) }
 
   element(:add_organization_name) { |b| b.frm.text_field(name: 'approvedSubawardFormHelper.newAwardApprovedSubaward.organizationName') }
   action(:search_organization) { |b| b.frm.button(name: 'methodToCall.performLookup.(!!org.kuali.coeus.common.framework.org.Organization!!).(((organizationName:approvedSubawardFormHelper.newAwardApprovedSubaward.organizationName,organizationId:approvedSubawardFormHelper.newAwardApprovedSubaward.organizationId))).((``)).((<>)).(([])).((**)).((^^)).((&&)).((//)).((~~)).(::::;;::::).anchorSubawards').click }
@@ -55,6 +52,7 @@ class Award < KCAwards
 
   element(:error_summary) { |b| b.frm.div(class: 'error') }
 
+  value(:exception_errors)  { |b| arry=[]; b.divs(align: 'left').each {|d| arry << d.text}; arry }
   private
 
   p_action(:target_funding_row) { |match, b| b.current_funding_proposals_table.row(text: /#{Regexp.escape(match)}/) }

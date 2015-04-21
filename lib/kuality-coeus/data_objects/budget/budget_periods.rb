@@ -5,8 +5,9 @@ class BudgetPeriodObject < DataFactory
   attr_reader :start_date, :end_date, :total_sponsor_cost,
               :direct_cost, :f_and_a_cost, :unrecovered_f_and_a,
               :cost_sharing, :cost_limit, :direct_cost_limit, :datified,
-              :budget_name, :cost_sharing_distribution_list,
-              :participant_support, :assigned_personnel, :non_personnel_costs, :period_rates
+              :budget_name, :cost_sharing_distribution_list, :unrecovered_fa_dist_list,
+              :participant_support, :assigned_personnel, :non_personnel_costs, :period_rates,
+              :submit_budget_to_sponsor,
               #TODO: Add support for this:
               :number_of_participants
   attr_accessor :number
@@ -20,7 +21,8 @@ class BudgetPeriodObject < DataFactory
       participant_support:            collection('ParticipantSupport'),
       assigned_personnel:             collection('AssignedPersonnel'),
       non_personnel_costs:            collection('NonPersonnelCosts'),
-      period_rates:                   collection('BudgetRates')
+      period_rates:                   collection('BudgetRates'),
+      submit_budget_to_sponsor: 'yes'
     }
 
     set_options(defaults.merge(opts))

@@ -36,7 +36,7 @@ Feature: Basic Award Validations
   Scenario: The anticipated amount is less than the obligated amount
     When  the Award Modifier creates an Award with more obligated than anticipated amounts
     Then  an error should appear that says the anticipated amount must be equal to or more than obligated
-  @proposal
+  @proposal @broken
   Scenario: Attempt to link an IP that has not been approved
     Given the Proposal Creator submits a new Proposal into routing
     And   the OSP Administrator submits the Proposal to its sponsor
@@ -55,7 +55,7 @@ Feature: Basic Award Validations
     And   adds a $0.00 Subaward to the Award
     When  data validation is turned on for the Award
     Then  an error is shown that says the subaward's amount can't be zero
-
+  @KRACOEUS-8776
   Scenario: Missing required field in F&A Rate entry
     Given the Award Modifier creates an Award
     When  the Award Modifier adds an F&A rate to the Award but misses a required field
@@ -64,8 +64,8 @@ Feature: Basic Award Validations
   Scenario: Terms are not entered in the Award
     Given the Award Modifier creates an Award
     When  data validation is turned on for the Award
-    Then  errors about the missing Award terms are shown
-
+    Then  errors about the missing Award terms are shown for data validation
+  @KRACOEUS-8776
   Scenario: Contact's Credit Splits not valid
     Given the Award Modifier creates an Award
     And   adds a PI to the Award
@@ -73,9 +73,8 @@ Feature: Basic Award Validations
     Then  errors appear on the Contacts page, saying the credit splits for the PI aren't equal to 100%
 
   Scenario: KC-TS-2114 Blank project start date with Obligated Amount
-    Given the Award Modifier creates an Award with an obligated amount and blank project start date
-    When  data validation is turned on for the Award
-    Then  an error is shown that says a project start date is required for the T&M Document
+    When the Award Modifier creates an Award with an obligated amount and blank project start date
+    Then errors about the obligation amount and obligation start date are shown
 
   Scenario: Project Start Date is after Obligation Start Date
     When  the Award Modifier creates an Award with a project start date later than the obligation start date

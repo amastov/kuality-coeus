@@ -19,7 +19,7 @@ class BasePage < PageFactory
 
   action(:form_tab) { |name, b| b.frm.h2(text: /#{name}/) }
   action(:form_status) { |name, b| b.form_tab(name).text[/(?<=\()\w+/] }
-  element(:save_button) { |b| b.frm.button(class: 'globalbuttons', name: 'methodToCall.save') }
+  element(:save_button) { |b| b.frm.button(name: 'methodToCall.save') }
   value(:notification) { |b| b.frm.div(class: 'left-errmsg').div.text }
 
   element(:workarea_div) { |b| b.frm.div(id: 'workarea') }
@@ -62,6 +62,8 @@ class BasePage < PageFactory
       alias_method :pi, :committee_name
       alias_method :expiration_date, :committee_name
       element(:headerarea) { |b| b.frm.div(id: 'headerarea') }
+      value(:headerinfo_table_no_frame) { |b| b.div(id: 'headerarea').table(class: 'headerinfo') }
+
     end
 
     def new_doc_header
@@ -88,7 +90,8 @@ class BasePage < PageFactory
            'Generate All Periods', 'Calculate All Periods', 'Default Periods',
            'Calculate Current Period', 'Send Notification'
       action(:save) { |b| b.save_button.when_present.click; b.loading }
-      action(:submit){ |b| b.frm.button(title: 'submit').click; b.loading; b.awaiting_doc }
+      action(:submit){ |b| b.frm.button(title: 'submit').when_present.click; b.loading; b.awaiting_doc }
+      action(:submit_button){ |b| b.frm.button(title: 'submit') }
       element(:approve_button) { |b| b.frm.button(name: 'methodToCall.approve') }
       action(:approve) { |b| b.approve_button.click; b.loading; b.awaiting_doc }
       # Explicitly defining the "recall" button to keep the method name at "recall" instead of "recall_current_document"...
@@ -103,8 +106,9 @@ class BasePage < PageFactory
     end
 
     def tab_buttons
-      action(:expand_all) { |b| b.frm.button(name: 'methodToCall.showAllTabs').when_present.click; b.loading }
+      action(:expand_all) { |b| b.frm.button(name: 'methodToCall.showAllTabs').when_present(60).click; b.loading; b.loading_old }
       element(:expand_all_button) { |b| b.frm.button(name: 'methodToCall.showAllTabs') }
+      element(:show_button) { |b| b.button(src: '/kc-dev/kr/static/images/tinybutton-show.gif') }
     end
 
     def tiny_buttons
@@ -255,7 +259,11 @@ class BasePage < PageFactory
     def validation_elements
       element(:validation_button) { |b| b.frm.button(name: 'methodToCall.activate') }
       action(:show_data_validation) { |b| b.frm.button(id: 'tab-DataValidation-imageToggle').click; b.validation_button.wait_until_present }
-      action(:turn_on_validation) { |b| b.validation_button.click; b.special_review_button.wait_until_present }
+      action(:turn_on_validation) { |b| b.validation_button.click; b.loading; b.loading_old; b.turn_off_validation_button.wait_until_present }
+
+      element(:turn_off_validation_button) { |b| b.frm.button(name: 'methodToCall.deactivate') }
+      action(:turn_off_validation) { |b| b.turn_off_validation_button.click; b.turn_off_validation_button.wait_while_present; b.loading }
+
       element(:validation_errors_and_warnings) { |b| errs = []; b.validation_err_war_fields.each { |field| errs << onespace(field.html[/(?<=>).*(?=<)/]) }; errs }
       element(:validation_err_war_fields) { |b| b.frm.tds(width: '94%') }
     end
@@ -306,6 +314,17 @@ class BasePage < PageFactory
     def green_buttons(links={})
       links.each_pair do |name, title|
         action(name) { |b| b.frm.link(title: title).click; b.loading }
+      end
+    end
+
+    def black_buttons(links={})
+      links.each_pair do |name, title|
+        name_create = 'create_'+name.to_s
+        name_search = 'search_'+name.to_s
+        #create button (+) , example: :proposal_log
+        action(name_create.to_sym) { |b| b.p(text: title).parent.link(class: 'uif-actionLink uif-boxLayoutHorizontalItem icon-plus icon-plus').click; b.loading }
+        #search button, example: :search_proposal_log
+        action(name_search.to_sym) { |b| b.p(text: title).parent.link(class: 'uif-actionLink uif-boxLayoutHorizontalItem icon-search icon-search').click; b.loading }
       end
     end
 

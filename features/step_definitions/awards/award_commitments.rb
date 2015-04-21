@@ -4,7 +4,7 @@ And /^a cost share item is added to the Award$/ do
 end
 
 And /^a cost share item is added to the Award with a typo in the project period$/ do
-  @award.add_cost_share project_period: random_alphanums(3, 'x')
+  @award.add_cost_share project_period: random_alphanums(3, 'x'), press: nil
 end
 
 When /^a cost share item is added to the Award without a required field$/ do
@@ -21,13 +21,14 @@ When /^a cost share item is added to the Award without a required field$/ do
 end
 
 And /^duplicate cost share items are added to the Award$/ do
-  @award.add_cost_share
+  @award.add_cost_share press: 'save'
   cs = @award.cost_sharing[0]
   @award.add_cost_share percentage: cs.percentage,
                         type: cs.type,
                         project_period: cs.project_period,
                         source: cs.source,
-                        commitment_amount: cs.commitment_amount
+                        commitment_amount: cs.commitment_amount,
+                        press: 'save'
 end
 
 And /adds an F&A rate to the Award$/ do

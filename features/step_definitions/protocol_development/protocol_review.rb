@@ -9,8 +9,11 @@ Then /^the assigned reviewers get a Protocol Review$/ do
       page.document_title.set @irb_protocol.protocol_number
       page.filter
     end
-    title_string = "KC Protocol Review - #{@irb_protocol.principal_investigator.last_name}/Protocol# #{@irb_protocol.protocol_number}"
-    on(ActionList).open_review(title_string)
+
+    on(ActionList).open_first_document_id
+
+    on(OnlineReview).expand_all
+    DEBUG.pause(3)
     expect(on(OnlineReview).new_review_comment(rev_name)).to be_present
     reviewer.sign_out
   end
@@ -26,7 +29,7 @@ And /the primary reviewer submits review comments/ do
     page.document_title.set @irb_protocol.protocol_number
     page.filter
   end
-  on(ActionList).open_review(@irb_protocol.protocol_number)
+  on(ActionList).open_first_document_id
   @irb_protocol.add_comment_for pr_name
   primary_reviewer.sign_out
 end

@@ -1,11 +1,12 @@
 Given /adds? a PI to the Award$/ do
   # Note: the logic is here because of the nesting of this
   # step in "I complete the Award requirements"
-  @award.add_pi if @award.key_personnel.principal_investigator.nil?
+  # @award.add_pi # if @award.key_personnel.principal_investigator.nil?
+  @award.add_key_person project_role: 'Principal Investigator'
 end
 
 And /^another Principal Investigator is added to the Award$/ do
-  @award.add_pi
+  @award.add_key_person project_role: 'Principal Investigator', press: nil
 end
 
 When /^I? ?give the Award valid credit splits$/ do
@@ -22,11 +23,12 @@ Given /I? ?adds? a key person to the Award$/ do
 end
 
 And /adds a non-employee as a Principal Investigator to the Award$/ do
-  @award.add_pi type: 'non_employee'
+  @award.add_key_person type: 'non_employee'
+
 end
 
 When /^a Co-Investigator is added to the Award$/ do
-  @award.add_key_person project_role: 'Co-Investigator', key_person_role: nil
+  @award.add_key_person project_role: 'Co-Investigator', key_person_role: nil, press: 'save'
 end
 
 When /^I? ?add the (.*) unit to the Award's PI$/ do |unit|
@@ -46,12 +48,17 @@ When /^I? ?set (.*) as the lead unit for the Award's PI$/ do |unit|
 end
 
 When /^the Award\'s PI is added again with a different role$/ do
-  pi = @award.principal_investigator
-  @award.add_key_person first_name: pi.first_name, last_name: pi.last_name
+  on(Award).save
+  name_array = @award.key_personnel[:principal_investigator].split
+  last_name = name_array[name_array.length-1]
+  first_name = @award.key_personnel[:principal_investigator].chomp(last_name).strip
+  @award.add_key_person principal_investigator: "#{first_name} #{last_name}", last_name: last_name, first_name: first_name, project_role: ['Co-Investigator', 'Key Person'].sample, press: nil
 end
 
 When /^the Award's Principal Investigator has no units$/ do
-  @award.principal_investigator.units.each do |unit|
-    @award.principal_investigator.delete_unit(unit[:number])
+  on AwardContacts do |page|
+    page.expand_all
+    page.delete_unit_row
+    page.save
   end
 end

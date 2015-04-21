@@ -16,28 +16,31 @@ When /^the Award's title is made more than (\d+) characters long$/ do |arg|
 end
 
 When /I? ?adds? the required Custom Data to the Award$/ do
-  @award.add_custom_data if @award.custom_data.nil?
+  @award.add_custom_data
 end
 #TODO
 #Confirm that custom data is not required in KC Award.
 When /completes? the Award requirements$/ do
-  steps %q{
-    * add a Report to the Award
-    * add Terms to the Award
-    * add the required Custom Data to the Award
-    * add a Payment & Invoice item to the Award
-    * add a Sponsor Contact to the Award
-    * add a PI to the Award
-    * give the Award valid credit splits
-  }
+   # steps '* add a report to the Award'
+   steps '* add Terms to the Award'
+   # steps '* add the required Custom Data to the Award'
+   steps '* add a Payment & Invoice item to the Award'
+   steps '* add a Sponsor Contact to the Award'
+   steps '* add a PI to the Award'
+   steps '* give the Award valid credit splits'
 end
 
 When /^data validation is turned on for the Award$/ do
-  @award.view :award_actions
+  @award.view_tab :award_actions
   on AwardActions do |page|
     page.expand_all
+    page.validation_button.wait_until_present
     page.turn_on_validation
   end
+end
+
+When /edits? the obligated amount and blank project start date on the award?/ do
+  @award.edit  project_start_date: '', obligated_direct: '1000.00'
 end
 
 #----------------------#
@@ -57,14 +60,7 @@ end
 
 And /the Award Modifier edits the finalized Award$/ do
   steps '* log in with the Award Modifier user'
-  @award.edit transaction_type: '::random::', anticipated_amount: '5', obligated_amount: '5'
-
-
-
-  DEBUG.message @award.prior_versions.inspect
-
-
-
+  @award.edit transaction_type: '::random::', anticipated_direct: '5', obligated_direct: '5'
 end
 
 When /^the original Award is edited again$/ do
@@ -95,4 +91,8 @@ end
 When /^the Award Modifier cancels the Award$/ do
   steps '* log in with the Award Modifier user'
   @award.cancel
+end
+
+And /^adds the unassigned user as a Principal Investigator for the Award$/ do
+       @award.add_key_person first_name: 'PleaseDoNot', last_name: 'AddOrEditRoles'
 end

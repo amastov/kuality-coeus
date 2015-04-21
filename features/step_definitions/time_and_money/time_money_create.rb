@@ -4,6 +4,6 @@ Given /^the Time And Money Modifier initializes the Award's Time And Money docum
 end
 
 Then /^a new T&M Document is created$/ do
-  @award.time_and_money.versions.should_not be_empty
-  @award.time_and_money.versions[-1].should_not == on(TimeAndMoney).header_document_id
+  expect(@award.time_and_money.versions).to_not be_empty
+  expect(@award.time_and_money.versions[-1]).to_not eq(on(TimeAndMoney).header_document_id)
 end

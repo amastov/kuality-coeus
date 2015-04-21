@@ -14,7 +14,8 @@ class AwardCostSharingObject < DataFactory
         type:              '::random::',
         project_period:    '1',
         source:            random_alphanums_plus,
-        commitment_amount: random_dollar_value(100000)
+        commitment_amount: random_dollar_value(100000),
+        press: nil
     }
     set_options(defaults.merge(opts))
   end
@@ -31,6 +32,7 @@ class AwardCostSharingObject < DataFactory
       page.new_cost_sharing_destination.fit @destination
       page.new_cost_sharing_commitment_amount.fit @commitment_amount
       page.add_cost_sharing
+      page.send(@press) unless @press.nil?
     end
   end
 

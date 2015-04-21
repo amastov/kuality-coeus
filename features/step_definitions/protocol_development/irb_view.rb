@@ -3,7 +3,10 @@ Then /^the (.*) Checklist can be filled out$/ do |checklist|
 end
 
 Then /the system warns that the number of protocols exceeds the allowed maximum/ do
-  on(Confirmation).message.should=='The number of Protocols has reached or exceeded the maximum. Do you still want to submit the Protocol?'
+  on Confirmation do |page|
+    page.yes_button.wait_until_present
+    page.message.should=='The number of Protocols has reached or exceeded the maximum. Do you still want to submit the Protocol?'
+  end
 end
 
 Then /the (.*) (can |can't )see the primary reviewer's comment in Submission Details/ do |person, bool|
@@ -15,7 +18,8 @@ Then /the (.*) (can |can't )see the primary reviewer's comment in Submission Det
   }
   member = people[person] ? @committee.members.member(people[person]) : @irb_protocol.principal_investigator
   member.sign_in
-  @irb_protocol.view 'Protocol Actions'
+  #view_by_view is selecting the View link from the search results
+  @irb_protocol.view_by_view 'Protocol Actions'
   on ProtocolActions do |page|
     page.expand_all
     page.review_comments.send(Transforms::CAN[bool], include, @irb_protocol.comments_of(@irb_protocol.primary_reviewers[0])[0][:comment])
@@ -24,7 +28,10 @@ Then /the (.*) (can |can't )see the primary reviewer's comment in Submission Det
 end
 
 Then /^the summary approval date on the Protocol should be last year$/ do
-  on(ExpeditedApproval).approval_date_ro.should == last_year[:date_w_slashes]
+  on ExpeditedApproval do |page|
+    page.expand_all
+    page.approval_date_ro.should == last_year[:date_w_slashes]
+  end
 end
 
 And /^the expedited date on the Protocol should be yesterday$/ do

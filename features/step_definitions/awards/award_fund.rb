@@ -1,14 +1,14 @@
 Given /^(\d+) Approved Institutional Proposals? exists?$/ do |count|
   @ips = []
   count.to_i.times {
-    steps %q{
-      * Users exist with the following roles: OSPApprover, Proposal Creator
-      * a User exists with the roles: OSP Administrator, Proposal Submission, Institutional Proposal Maintainer in the 000001 unit
-      * the Proposal Creator submits a new Proposal into routing
-      * the OSPApprover approves the Proposal without future approval requests
-      * the principal investigator approves the Proposal
-      * the Proposal Submission submits the Proposal to its sponsor
-    }
+      #Split steps to make debugging easier
+      steps %q{* Users exist with the following roles: OSPApprover, Proposal Creator }
+      steps %q{* a User exists with the roles: OSP Administrator, Proposal Submission, Institutional Proposal Maintainer in the 000001 unit }
+      steps %q{* the Proposal Creator submits a new Proposal into routing }
+      steps %q{* the OSPApprover approves the Proposal without future approval requests }
+      steps %q{* the principal investigator approves the Proposal }
+      steps %q{* the Proposal Submission submits the Proposal to its sponsor }
+
     @ips << @institutional_proposal
   }
 end
