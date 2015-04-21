@@ -1,5 +1,7 @@
 class Rates < BasePage
 
+  expected_element :refresh_all_rates_element
+
   buttons 'Sync All Rates', 'Refresh All Rates'
   links 'Research F & A', 'Fringe Benefits', 'Inflation', 'Vacation', 'Lab Allocation - Salaries', 'Lab Allocation - Other', 'Other'
 

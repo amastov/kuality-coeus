@@ -92,9 +92,10 @@ class BudgetVersionsObject < DataFactory
 
   def view(tab)
     @open_budget.call
-    on(BudgetSidebar).send(damballa(tab.to_s))
-    #FIXME... Need this because of race conditions on some pages...
-    sleep 2
+    on BudgetSidebar do |page|
+      page.send(damballa(tab.to_s))
+      page.loading
+    end
   end
 
   def copy_all_periods new_name

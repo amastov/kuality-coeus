@@ -29,6 +29,6 @@ Feature: Editing a Budget's Non-Personnel Costs
   Scenario: Deleting line items from later periods
     *  adds some Non-Personnel Costs to the first period
     *  auto-calculates the budget periods
-    #*  edits the total cost and cost sharing amounts for the Non-Personnel Cost in period 2
-    #*  deletes the Non-Personnel Cost item in periods 3 through 5
+    *  edits the total cost and cost sharing amounts for the Non-Personnel Cost in period 2
+    *  deletes the Non-Personnel Cost item in periods 3 through 5
     *  the Budget's Periods & Totals should be as expected

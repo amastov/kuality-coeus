@@ -1,5 +1,7 @@
 class AssignPersonnelToPeriods < BasePage
 
+  expected_element :title
+
   document_buttons
 
   p_element(:period_title) { |number, b| b.h3(id: "PropBudget-AssignPersonnelToPeriodsPage-PersonnelDetails_#{number}_header").span }
@@ -21,5 +23,7 @@ class AssignPersonnelToPeriods < BasePage
   element(:visible_tab) { |b| x=1; x+=1 until b.testdiv(x).visible?; b.testdiv(x) }
 
   p_element(:testdiv) { |x, b| b.div(id: "PropBudget-AssignPersonnelToPeriodsPage-PersonnelDetails_#{x}_tabPanel") }
+
+  element(:title) { |b| b.span(text: 'Assign Personnel to Periods') }
 
 end

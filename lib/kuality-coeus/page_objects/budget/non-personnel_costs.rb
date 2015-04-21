@@ -1,5 +1,7 @@
 class NonPersonnelCosts < BasePage
 
+  expected_element :title
+
   budget_header_elements
   buttons 'Save and Continue', 'Complete Budget', 'Save'
 
@@ -19,5 +21,7 @@ class NonPersonnelCosts < BasePage
 
   element(:items_rows) { |b| b.active_tab.tbody.trs.find_all{ |tr| tr.id==''} }
   element(:active_tab) { |b| b.div(class: 'tab-pane active') }
+
+  element(:title) { |b| b.h3(id: 'PropBudget-NonPersonnelCosts-TabGroup_header') }
 
 end

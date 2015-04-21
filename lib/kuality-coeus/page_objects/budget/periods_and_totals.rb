@@ -1,5 +1,7 @@
 class PeriodsAndTotals < BasePage
 
+  expected_element :pttable
+
   document_buttons
   budget_header_elements
   new_error_messages
