@@ -1,5 +1,7 @@
 class BudgetPersonnel < BasePage
 
+  expected_element :sync_from_proposal_element
+
   document_buttons
   buttons 'Add Personnel', 'Sync from Proposal'
 

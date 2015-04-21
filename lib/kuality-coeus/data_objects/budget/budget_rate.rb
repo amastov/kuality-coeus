@@ -64,8 +64,8 @@ class BudgetRatesCollection < CollectionFactory
     br << keep
     ed = self.find_all { |rate| rate.start_date <= end_date } - st
     br << ed
-    br.flatten!
-    br.delete_bad_inflations! start_date
+    x = br.flatten
+    x.delete_bad_inflations! start_date
   end
 
   def campus!(type)
@@ -81,25 +81,30 @@ class BudgetRatesCollection < CollectionFactory
           r.description !~ /salar/i
     }
     br << np
-    br.flatten!
+    br.flatten
   end
 
   def inflation
     br = noob
     br << self.find_all { |r| r.rate_class_type=='Inflation' }
-    br.flatten!
+    br.flatten
   end
 
   def non_fa_rates
     nfa = noob
     nfa << self.find_all { |r| r.rate_class_type != 'F & A' }
-    nfa.flatten!
+    nfa.flatten
   end
 
   def fa_rates(rate_class_code)
     br = noob
     br << self.find_all { |r| r.rate_class_code == rate_class_code && r.rate_class_type == 'F & A' }
-    br.flatten!
+    br.flatten
+  end
+
+  # Use this method for an already-filtered collection of rates...
+  def f_and_a
+    self.find_all { |r| r.rate_class_type=='F & A'}
   end
 
   def delete_bad_inflations!(start_date)

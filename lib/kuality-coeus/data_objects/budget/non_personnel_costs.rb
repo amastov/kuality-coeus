@@ -15,7 +15,8 @@ class NonPersonnelCost < DataFactory
     defaults = {
       category_type:    '::random::',
       object_code_name: '::random::',
-      total_base_cost:  random_dollar_value(1000000),
+      total_base_cost:  random_dollar_value(1000000).to_f,
+      cost_sharing:     0.0,
       ird:              []
     }
 
@@ -32,6 +33,8 @@ class NonPersonnelCost < DataFactory
     on AddAssignedNonPersonnel do |page|
       page.category.pick! @category_type
       page.loading
+      #FIXME!
+      sleep 1
       fill_out page, :object_code_name, :total_base_cost
       page.add_non_personnel_item
     end
@@ -46,7 +49,7 @@ class NonPersonnelCost < DataFactory
       @end_date ||= page.end_date.value
 
       edit_fields opts, page, :apply_inflation, :submit_cost_sharing,
-                  :start_date, :end_date, :on_campus
+                  :start_date, :end_date, :on_campus, :total_base_cost
       opts[:on_campus] |= page.on_campus.set?
       opts[:apply_inflation] |= page.apply_inflation.set?
       opts[:submit_cost_sharing] |= page.submit_cost_sharing.set?
@@ -57,9 +60,18 @@ class NonPersonnelCost < DataFactory
       page.details_tab
       # Grab the inflation rate descriptions for reference (they're used in #get_rates)...
       @ird = page.inflation_rates.map { |r| r[:description] }.uniq
+      @overhead = page.rates_table.exist?
       update_options opts
       get_rates
       page.save_changes
+    end
+  end
+
+  def delete
+    # Method assumes we're already in the right place
+    on(NonPersonnelCosts) do |page|
+      page.trash @object_code_name
+      page.save
     end
   end
 
@@ -83,6 +95,13 @@ class NonPersonnelCost < DataFactory
     end
   end
 
+  def save_and_apply_to_later
+    on(NonPersonnelCosts).details_of @object_code_name
+    on EditAssignedNonPersonnel do |page|
+      page.save_and_apply_to_other_periods
+    end
+  end
+
   def daily_total_base_cost
     @total_base_cost.to_f/total_days
   end
@@ -103,14 +122,6 @@ class NonPersonnelCost < DataFactory
     (end_date_datified-start_date_datified).to_i+1
   end
 
-  def rate_cost_sharing
-    rate_cost_shares = []
-    @rates.find_all { |r| r.rate_class_type=='F & A'}.each { |rate|
-      rate_cost_shares << rate_days(rate)*daily_cost_share*(rate.applicable_rate/100)
-    }
-    rate_cost_shares.inject(:+)
-  end
-
   def rate_days(rate)
     # We know the rate applies, at least partially, because it hasn't been eliminated, so no need to
     # check date range again...
@@ -122,16 +133,28 @@ class NonPersonnelCost < DataFactory
     (end_d - strt).to_i+1
   end
 
+  def f_and_a
+    calc_cost(daily_total_base_cost)
+  end
+
+  def f_and_a_cost_sharing
+    calc_cost(daily_cost_share)
+  end
+
   def inflation_amount
      if Transforms::TRUE_FALSE[@apply_inflation]
-       subtotals = [0.0]
-       @rates.inflation.each do |inflation_rate|
-         subtotals << daily_total_base_cost*(inflation_rate.applicable_rate/100)*rate_days(inflation_rate)
-       end
-       subtotals.inject(:+)
+       @total_base_cost.to_f*inflation_rate
      else
        0.0
      end
+  end
+
+  def inflation_rate
+    @rates.inflation.empty? ? 0.0 : @rates.inflation[0].applicable_rate/100
+  end
+
+  def calc_tbc
+    @total_base_cost+=inflation_amount
   end
 
   def get_rates
@@ -140,6 +163,8 @@ class NonPersonnelCost < DataFactory
       @rates.delete_if { |r| r.on_campus != Transforms::YES_NO[@on_campus] }
     end
     @rates.delete_if { |r| r.rate_class_type=='Inflation' && !@ird.include?(r.description) }
+    @rates.delete_if { |r| r.rate_class_type=='Inflation' && start_date_datified < r.start_date }
+    @rates.delete_if { |r| r.rate_class_type == 'F & A' && @overhead==false }
   end
 
   def copy_mutatis_mutandis opts={}
@@ -157,7 +182,25 @@ class NonPersonnelCost < DataFactory
                     end
       end
     end
-    self.class.new(@browser, opts)
+    npc = self.class.new(@browser, opts)
+    npc.get_rates
+    npc.calc_tbc
+    npc
+  end
+
+  private
+
+  def calc_cost(cost_type)
+    amounts = []
+    fna = @rates.f_and_a
+    if fna.count==1
+      amounts << @total_base_cost*(fna[0].applicable_rate/100)
+    else
+      fna.each { |rate|
+        amounts << rate_days(rate)*cost_type*(rate.applicable_rate/100)
+      } unless fna.empty?
+    end
+    amounts.inject(0, :+)
   end
 
 end
@@ -166,10 +209,41 @@ class NonPersonnelCostsCollection < CollectionFactory
 
   contains NonPersonnelCost
 
+  def direct
+    self.collect{ |npc| npc.total_base_cost.to_f }.inject(0, :+)
+  end
+
+  def f_and_a
+    self.collect{ |npc| npc.f_and_a }.inject(0, :+)
+  end
+
   # NOTE: This method is written assuming that there's only one item
   # with this category type in the collection...
   def category_type(category_type)
     self.find { |np_item| np_item.category_type==category_type }
+  end
+
+  # NOTE: This method is written assuming that there's only one item
+  # with this object code in the collection...
+  def object_code_name(obcdnm)
+    self.find { |np_item| np_item.object_code_name==obcdnm }
+  end
+
+  def delete(obcdnm)
+    object_code_name(obcdnm).delete
+    self.delete_if { |np_item| np_item.object_code_name==obcdnm }
+  end
+
+  # this method is basically for debugging purposes, as it gets rid of things
+  # that we don't care about when examining contents of the collection...
+  def details
+    self.collect{ |npc|
+      hash = {}
+      [:category_type, :category_code, :object_code_name, :total_base_cost,
+       :cost_sharing, :start_date, :end_date, :rates, :apply_inflation, :submit_cost_sharing,
+       :on_campus, :f_and_a, :inflation_amount, :f_and_a_cost_sharing, :total_days, :daily_total_base_cost, :daily_cost_share].each{ |iv| hash.store(iv, npc.send(iv)) }
+      hash
+    }
   end
 
 end

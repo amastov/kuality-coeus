@@ -92,7 +92,10 @@ class BudgetVersionsObject < DataFactory
 
   def view(tab)
     @open_budget.call
-    on(BudgetSidebar).send(damballa(tab.to_s))
+    on BudgetSidebar do |page|
+      page.send(damballa(tab.to_s))
+      page.loading
+    end
   end
 
   def copy_all_periods new_name
@@ -153,8 +156,24 @@ class BudgetVersionsObject < DataFactory
     on(Budgets).include_for_submission @name
   end
 
-  def save_and_apply_to_other(period, line_item)
+  def save_npc_and_apply_to_later(per, line_item)
+    per.view :non_personnel_costs
+    on(NonPersonnelCosts).view_period(per.number)
+    line_item.save_and_apply_to_later
+    @budget_periods[per.number..-1].each_with_index do |p, i|
+      p.copy_non_personnel_item period(i+per.number).non_personnel_costs.object_code_name(line_item.object_code_name)
+    end
+  end
 
+  def autocalculate_periods
+    view :periods_and_totals
+    on(PeriodsAndTotals).autocalculate_periods
+    @budget_periods[1..-1].each_with_index do |period, i|
+      @budget_periods[i].non_personnel_costs.each do |npc|
+        period.copy_non_personnel_item(npc)
+        warn 'Must add the copying of personnel items to the autocalculate periods method!'
+      end
+    end
   end
 
   def complete
@@ -208,14 +227,7 @@ class BudgetVersionsObject < DataFactory
       1.upto(page.period_count) do |number|
         period = make BudgetPeriodObject, open_budget: @open_budget,
                       start_date: page.start_date_of(number).value,
-                      end_date: page.end_date_of(number).value,
-                      total_sponsor_cost: page.total_sponsor_cost_of(number).value.groom,
-                      direct_cost: page.direct_cost_of(number).value.groom,
-                      f_and_a_cost: page.f_and_a_cost_of(number).value.groom,
-                      unrecovered_f_and_a: page.unrecovered_f_and_a_of(number).value.groom,
-                      cost_sharing: page.cost_sharing_of(number).value.groom,
-                      cost_limit: page.cost_limit_of(number).value.groom,
-                      direct_cost_limit: page.direct_cost_limit_of(number).value.groom
+                      end_date: page.end_date_of(number).value
         period.get_rates(@institute_rates)
         @budget_periods << period
       end
