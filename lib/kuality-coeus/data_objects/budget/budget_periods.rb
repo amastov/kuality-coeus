@@ -88,7 +88,10 @@ class BudgetPeriodObject < DataFactory
     if @browser.header(id: 'PropBudget-ConfirmPeriodChangesDialog_headerWrapper').present?
       on(ConfirmPeriodChanges).yes
     end
-    defaults = { period_rates: @period_rates }
+    defaults = { period_rates: @period_rates,
+                 start_date: @start_date,
+                 end_date: @end_date
+    }
     @non_personnel_costs.add defaults.merge(opts)
   end
 

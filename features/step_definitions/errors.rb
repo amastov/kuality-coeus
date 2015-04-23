@@ -8,7 +8,7 @@ Then /^an error should appear that says (.*)$/ do |error|
             'the credit split is not a valid percentage' => 'Must be a non-negative fixed point number, with no more than 5 total digits and 2 digits to the right of the decimal point.',
             'the Award has no PI' => 'There is no Principal Investigator selected. Please enter a Principal Investigator',
             'only one PI is allowed in the Contacts' => 'Only one Principal Investigator is allowed',
-            "the IP can not be added because it's not fully approved" => 'Cannot add this funding proposal. The associated Development Proposal has "Approval Pending - Submitted" status.',
+            'the IP can not be added because it\'s not fully approved' => 'Cannot add this funding proposal. The associated Development Proposal has "Approval Pending - Submitted" status.',
             'the approval should occur later than the application' => 'Approval Date should be the same or later than Application Date.',
             'not to select other roles alongside aggregator' => 'Do not select other roles when Aggregator is selected.',
             'a revision type must be selected' => 'S2S Revision Type must be selected when Proposal Type is Revision.',
@@ -17,16 +17,15 @@ Then /^an error should appear that says (.*)$/ do |error|
             'the prior award number is required'=> %|require the sponsor's prior award number in the "sponsor proposal number."|,
             'a valid sponsor is required' => 'Sponsor: A valid Sponsor (Sponsor) must be selected.',
             'the Account ID may only contain letters or numbers' => 'The Account ID (Account ID) may only consist of letters or digits.',
-            "the Award's title contains invalid characters" => 'The Award Title (Title) may only consist of visible characters, spaces, or tabs.',
+            'the Award\'s title contains invalid characters' => 'The Award Title (Title) may only consist of visible characters, spaces, or tabs.',
             'the anticipated amount must be equal to or more than obligated' => 'The Anticipated Amount must be greater than or equal to Obligated Amount.',
             'the project period has a typo' => 'Project Period is not formatted correctly.',
             'cost share type is required' => 'Cost Share Type Code is a required field.',
             'the fiscal year is not valid' => 'not found is not a valid date.',
-            "the approved equipment can't have duplicates" => 'Approved Equipment Vendor, Model and Item must be unique',
+            'the approved equipment can\'t have duplicates' => 'Approved Equipment Vendor, Model and Item must be unique',
             'the invoiced exceeds the obligated amount' => 'Cumulative Invoiced Amount would exceed the Obligated Subaward Amount.',
             'the start date must be before the end' => 'Project Start Date: The Project Start Date (Start Dt) must be before the Project End Date (End Dt).',
-            "the project title can't contain special characters" => 'Project Title: Can be any character',
-            'the project title can\'t contain special characters' => 'Project Title: Must be an alphanumeric character or punctuation.',
+            'the project title can\'t contain special characters' => 'Project Title: Can be any character',
             'the IP ID can only have alphanumeric characters' => 'Original Institutional Proposal ID: Can only be alphanumeric characters ',
             'the Award ID is invalid' => 'Award ID: Award ID is invalid.',
             'the deadline time is not valid' => 'Sponsor Deadline Time: DeadlineTime is invalid.',
@@ -37,7 +36,6 @@ Then /^an error should appear that says (.*)$/ do |error|
             'organization id is required' => 'Organization Id is a required field.',
             'organization type is required' => 'Organization Type is a required field.',
             'a project start date is required for the T&M Document' => 'Project Start Date is required when creating a Time & Money document'
-
   }
   expect($current_page.errors).to include errors[error]
 end

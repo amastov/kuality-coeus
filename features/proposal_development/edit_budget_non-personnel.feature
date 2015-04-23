@@ -10,23 +10,26 @@ Feature: Editing a Budget's Non-Personnel Costs
 
   Scenario: Syncing non-personnel line items in all periods with direct cost limits
     Given the Proposal Creator adds a direct cost limit to all of the Budget's periods
-    And   adds a non-personnel cost with an 'Equipment' category type to all Budget Periods
+    And   adds a non-personnel cost to each Budget Period that exceeds the direct cost limit
     When  the non-personnel cost is synced with the direct cost limit for each period
     Then  the direct cost is equal to the direct cost limit in all periods
-
+  @failing
   Scenario: Syncing non-personnel line items in all periods with total cost limits
     Given the Proposal Creator adds a total cost limit to all of the Budget's periods
-    And   adds a non-personnel cost with an 'Equipment' category type to all Budget Periods
-    And   adds a non-personnel cost with a 'Travel' category type to all Budget Periods
-    When  the Equipment cost is synced with the total cost limit for each period
-  @failing
+    And   adds a non-personnel cost to each Budget Period that exceeds the cost limit
+    And   adds an NPC with a base cost lower than the lowest cost limit to the 1st period and copies it to the others
+    When  the first non-personnel cost is synced with the total cost limit for each period
+    Then  the Period's total sponsor cost should equal the cost limit
+
   Scenario: Removing F&A charges, applying to all Budget periods
     Given the Proposal Creator adds a non-personnel cost with a narrow date range and a 'Travel' category type to the first Budget period
     When  the MTDC rate for the non-personnel item is unapplied for all periods
     Then  the Budget's F&A costs are zero for all periods
     And   the Budget's unrecovered F&A amounts are as expected for all periods
-  @test
+
   Scenario: Deleting line items from later periods
-    *  adds an 'Equipment' item to the first period and copies it to the later ones
-    *  edits the total cost and cost sharing amounts for the Equipment item in period 2
-    *  deletes the equipment items in periods 3 through 5
+    Given the Proposal Creator adds some Non-Personnel Costs to the first period
+    And   auto-calculates the budget periods
+    And   edits the total cost and cost sharing amounts for the Non-Personnel Cost in period 2
+    When  the Non-Personnel Cost item in periods 3 through 5 are deleted
+    Then  the Budget's Periods & Totals should be as expected
