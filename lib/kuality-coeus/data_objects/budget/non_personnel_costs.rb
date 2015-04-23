@@ -13,15 +13,25 @@ class NonPersonnelCost < DataFactory
     @browser = browser
 
     defaults = {
-      category_type:    '::random::',
-      object_code_name: '::random::',
-      total_base_cost:  random_dollar_value(1000000).to_f,
-      cost_sharing:     0.0,
-      ird:              []
+      category_type:       '::random::',
+      object_code_name:    '::random::',
+      total_base_cost:     random_dollar_value(1000000).to_f,
+      cost_sharing:        0.0,
+      ird:                 [],
+      on_campus:           'Yes',
+      apply_inflation:     'Yes',
+      submit_cost_sharing: 'Yes'
     }
 
     set_options(defaults.merge(opts))
-    requires :period_rates
+    # Requiring the start and end dates is an artifact of the
+    # system UI, which does not include the dates on the Add screen.
+    # This means that if you simply add an item then when you try to
+    # copy it later the data object will not have "seen" the dates for the item.
+    # If in the future this unusual UI configuration is changed, this code can be
+    # improved...
+    requires :period_rates, :start_date, :end_date
+    get_rates
   end
 
   def create
@@ -45,14 +55,8 @@ class NonPersonnelCost < DataFactory
     # Method assumes we're already in the right place
     on(NonPersonnelCosts).details_of @object_code_name
     on EditAssignedNonPersonnel do |page|
-      @start_date ||= page.start_date.value
-      @end_date ||= page.end_date.value
-
       edit_fields opts, page, :apply_inflation, :submit_cost_sharing,
                   :start_date, :end_date, :on_campus, :total_base_cost
-      opts[:on_campus] |= page.on_campus.set?
-      opts[:apply_inflation] |= page.apply_inflation.set?
-      opts[:submit_cost_sharing] |= page.submit_cost_sharing.set?
       page.cost_sharing_tab
       edit_fields opts, page, :cost_sharing
       # Note: code order is a little unusual, here, but necessary in order
@@ -91,6 +95,16 @@ class NonPersonnelCost < DataFactory
     on EditAssignedNonPersonnel do |page|
       page.sync_to_period_direct_cost_limit
       on(SyncDirectCostLimit).yes
+      page.save_changes
+    end
+  end
+
+  def sync_to_period_c_limit
+    # Method assumes we're already in the right place
+    on(NonPersonnelCosts).details_of @object_code_name
+    on EditAssignedNonPersonnel do |page|
+      page.sync_to_period_cost_limit
+      on(SyncPeriodCostLimit).yes
       page.save_changes
     end
   end
@@ -154,14 +168,13 @@ class NonPersonnelCost < DataFactory
   end
 
   def calc_tbc
+    @total_base_cost = @total_base_cost.to_f
     @total_base_cost+=inflation_amount
   end
 
   def get_rates
     @rates = @period_rates.non_personnel.in_range(start_date_datified, end_date_datified)
-    if @on_campus != nil
-      @rates.delete_if { |r| r.on_campus != Transforms::YES_NO[@on_campus] }
-    end
+    @rates.delete_if { |r| r.on_campus != Transforms::YES_NO[@on_campus] }
     @rates.delete_if { |r| r.rate_class_type=='Inflation' && !@ird.include?(r.description) }
     @rates.delete_if { |r| r.rate_class_type=='Inflation' && start_date_datified < r.start_date }
     @rates.delete_if { |r| r.rate_class_type == 'F & A' && @overhead==false }
@@ -218,7 +231,8 @@ class NonPersonnelCostsCollection < CollectionFactory
   end
 
   # NOTE: This method is written assuming that there's only one item
-  # with this category type in the collection...
+  # with this category type in the collection. If there's more than one then
+  # this will return the first one...
   def category_type(category_type)
     self.find { |np_item| np_item.category_type==category_type }
   end

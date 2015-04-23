@@ -7,7 +7,7 @@ class NonPersonnelCosts < BasePage
 
   p_element(:period_title) { |number, b| b.h3(id: "PropBudget-NonPersonnelCosts-LineItemDetails_#{number}_header").span }
 
-  p_action(:view_period) { |number, b| b.link(text: "Period #{number}").click unless b.period_title(number).visible? }
+  p_action(:view_period) { |number, b| b.link(text: "Period #{number}").click unless b.period_title(number).visible?; b.loading }
 
   action(:assign_non_personnel) { |b| b.active_tab.button(text: 'Assign Non-Personnel...').click; b.loading }
 

@@ -179,8 +179,9 @@ And /^auto-calculates the budget periods$/ do
 end
 
 And /adds a (direct|total) cost limit to all of the Budget's periods$/ do |type|
+  cls = {direct: :direct_cost_limit, total: :cost_limit }
   @budget_version.budget_periods.each do |period|
-    period.edit "#{type}_cost_limit".to_sym => random_dollar_value(50000)
+    period.edit cls[type.to_sym] => random_dollar_value(50000)
   end
 end
 
@@ -201,5 +202,21 @@ Then /^the Budget's Periods & Totals should be as expected$/ do
       expect(page.direct_cost_of(period.number).to_f).to be_within(0.05).of period.direct_cost
       expect(page.f_and_a_cost_of(period.number).to_f).to be_within(0.05).of period.f_and_a_cost
     end
+  }
+end
+
+Then /^the Period's total sponsor cost should equal the cost limit$/ do
+  @budget_version.view 'Periods And Totals'
+  on PeriodsAndTotals do |page|
+    1.upto(page.period_count) do |x|
+      expect(page.cost_limit_of(x).value).to eq page.total_sponsor_cost_of(x)
+    end
+  end
+end
+
+And /^the Budget's unrecovered F&A amounts are as expected for all periods$/ do
+  @budget_version.view :periods_and_totals
+  @budget_version.budget_periods.each { |period|
+    expect(on(PeriodsAndTotals).unrecovered_f_and_a_of(period.number).to_f).to be_within(0.05).of period.f_and_a_cost
   }
 end
