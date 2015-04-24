@@ -7,7 +7,7 @@ Feature: Editing a Budget's Non-Personnel Costs
     * Users exist with the following roles: Proposal Creator
     * the Proposal Creator creates a 5-year, 'Research' Proposal
     * creates a Budget Version for the Proposal
-
+  @smoke
   Scenario: Syncing non-personnel line items in all periods with direct cost limits
     Given the Proposal Creator adds a direct cost limit to all of the Budget's periods
     And   adds a non-personnel cost to each Budget Period that exceeds the direct cost limit
@@ -20,10 +20,10 @@ Feature: Editing a Budget's Non-Personnel Costs
     And   adds an NPC with a base cost lower than the lowest cost limit to the 1st period and copies it to the others
     When  the first non-personnel cost is synced with the total cost limit for each period
     Then  the Period's total sponsor cost should equal the cost limit
-
+  @test
   Scenario: Removing F&A charges, applying to all Budget periods
     Given the Proposal Creator adds a non-personnel cost with a narrow date range and a 'Travel' category type to the first Budget period
-    When  the MTDC rate for the non-personnel item is unapplied for all periods
+    When  the F & A rates for the non-personnel item are unapplied for all periods
     Then  the Budget's F&A costs are zero for all periods
     And   the Budget's unrecovered F&A amounts are as expected for all periods
 

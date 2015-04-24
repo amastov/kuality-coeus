@@ -13,14 +13,15 @@ class NonPersonnelCost < DataFactory
     @browser = browser
 
     defaults = {
-      category_type:       '::random::',
-      object_code_name:    '::random::',
-      total_base_cost:     random_dollar_value(1000000).to_f,
-      cost_sharing:        0.0,
-      ird:                 [],
-      on_campus:           'Yes',
-      apply_inflation:     'Yes',
-      submit_cost_sharing: 'Yes'
+      category_type:        '::random::',
+      object_code_name:     '::random::',
+      total_base_cost:      random_dollar_value(1000000).to_f,
+      cost_sharing:         0.0,
+      ird:                  [],
+      on_campus:            'Yes',
+      apply_inflation:      'Yes',
+      submit_cost_sharing:  'Yes',
+      apply_indirect_rates: 'Yes'
     }
 
     set_options(defaults.merge(opts))
@@ -65,9 +66,17 @@ class NonPersonnelCost < DataFactory
       # Grab the inflation rate descriptions for reference (they're used in #get_rates)...
       @ird = page.inflation_rates.map { |r| r[:description] }.uniq
       @overhead = page.rates_table.exist?
+      if @overhead && !opts[:apply_indirect_rates].nil?
+        page.rates_tab
+        page.apply(@rates.f_and_a[0].rate_class_code, @rates.f_and_a[0].rate_class_type).fit opts[:apply_indirect_rates]
+      end
       update_options opts
       get_rates
-      page.save_changes
+      if opts[:save_type].nil?
+        page.save_changes
+      else
+        page.send(opts[:save_type])
+      end
     end
   end
 

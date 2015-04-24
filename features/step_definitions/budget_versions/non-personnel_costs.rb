@@ -62,14 +62,11 @@ And /^adds a non\-personnel cost with an? '(.*)' category type to each Budget Pe
   end
 end
 
-And /^the MTDC rate for the non-personnel item is unapplied for all periods$/ do
+And /^the F & A rates for the non-personnel item are unapplied for all periods$/ do
   @budget_version.view :non_personnel_costs
-  on(NonPersonnelCosts).details_of @budget_version.period(1).non_personnel_costs.last.object_code_name
-  on EditAssignedNonPersonnel do |page|
-    page.rates_tab
-    page.apply('MTDC', 'MTDC').clear
-    page.save_and_apply_to_other_periods
-  end
+  #FIXME - This shouldn't be hard-coded. The stepdef is a bit vague about which non-personnel item we are talking about
+  on(NonPersonnelCosts).view_period 1
+  @budget_version.period(1).non_personnel_costs.last.edit save_type: :save_and_apply_to_other_periods, apply_indirect_rates: 'No'
   on(NonPersonnelCosts).save_and_continue
   @budget_version.budget_periods[1..-1].each_with_index do |period, index|
     period.copy_non_personnel_item @budget_version.period(index+1).non_personnel_costs.last
@@ -117,9 +114,6 @@ end
 And /^adds an NPC with a base cost lower than the lowest cost limit to the 1st period and copies it to the others$/ do
   lowest_cost_limit = @budget_version.budget_periods.collect{ |p| p.cost_limit }.sort[0]
   @budget_version.period(1).assign_non_personnel_cost total_base_cost: (lowest_cost_limit.to_f/5).round(2)
-
-  DEBUG.inspect @budget_version.period(1).non_personnel_costs.last.object_code_name
-
   @budget_version.save_npc_and_apply_to_later(@budget_version.period(1), @budget_version.period(1).non_personnel_costs.last)
 end
 
