@@ -36,7 +36,7 @@ Feature: Basic Award Validations
   Scenario: The anticipated amount is less than the obligated amount
     When  the Award Modifier creates an Award with more obligated than anticipated amounts
     Then  an error should appear that says the anticipated amount must be equal to or more than obligated
-  @proposal @broken
+  @proposal @wip
   Scenario: Attempt to link an IP that has not been approved
     Given the Proposal Creator submits a new Proposal into routing
     And   the OSP Administrator submits the Proposal to its sponsor

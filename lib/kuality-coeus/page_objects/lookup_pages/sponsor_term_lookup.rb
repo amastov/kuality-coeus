@@ -1,10 +1,6 @@
 class SponsorTermLookup < Lookups
 
-  results_multi_select
-
   expected_element :sponsor_term_id
-
-  old_ui
 
   old_ui
   #needed in  Sponsor Template Term lookup

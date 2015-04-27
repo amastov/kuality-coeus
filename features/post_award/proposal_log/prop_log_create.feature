@@ -1,4 +1,4 @@
-@Proposal_Log
+@proposal_log
 Feature: Creating Proposal Logs
 
   As a researcher I want the ability to create a Proposal Log document

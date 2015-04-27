@@ -1,4 +1,4 @@
-@Proposal
+@proposal
 Feature: Creating/Editing Budget Versions in Proposal Documents
 
   As a researcher I want to be able to create budgets in my proposals
@@ -13,7 +13,7 @@ Feature: Creating/Editing Budget Versions in Proposal Documents
     When  I push the Proposal's project start date ahead 1 year
     Then  opening the Budget Version will display a warning about the date change
     And   correcting the Budget Version date will remove the warning
-  @test
+
   Scenario: Copied budget periods have expected values
     Given I enter dollar amounts for all the budget periods
     When  I copy the Budget Version (all periods)

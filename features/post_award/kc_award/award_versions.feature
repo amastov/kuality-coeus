@@ -1,4 +1,4 @@
-@Award @Smoke
+@Award @smoke
 Feature: Award Versions
 
   Summary to be written

@@ -6,4 +6,6 @@ class AddAssignedNonPersonnel < BasePage
 
   action(:add_non_personnel_item) { |b| b.button(text: /Add Non-Personnel Item to/).click; b.loading }
 
+  value(:object_code_list) { |b| b.no_frame_noko.select(name: 'addProjectBudgetLineItemHelper.budgetLineItem.costElement').options.map {|opt| opt.text }[1..-1] }
+
 end

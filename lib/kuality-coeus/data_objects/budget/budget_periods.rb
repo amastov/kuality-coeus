@@ -3,7 +3,6 @@ class BudgetPeriodObject < DataFactory
   include StringFactory, Utilities
 
   attr_reader :start_date, :end_date,
-              :unrecovered_f_and_a,
               :cost_sharing,
               :cost_limit, :direct_cost_limit, :datified,
               :budget_name, :cost_sharing_distribution_list,
@@ -138,7 +137,7 @@ class BudgetPeriodObject < DataFactory
 
   def direct_cost
     if @direct_cost.nil?
-      non_personnel_costs.direct.round(2) #+ assigned_personnel.direct
+      non_personnel_costs.direct #+ assigned_personnel.direct
     else
       @direct_cost
     end
@@ -146,9 +145,17 @@ class BudgetPeriodObject < DataFactory
 
   def f_and_a_cost
     if @f_and_a_cost.nil?
-      non_personnel_costs.f_and_a.round(2) #+ assigned_personnel.f_and_a
+      non_personnel_costs.f_and_a #+ assigned_personnel.f_and_a
     else
       @f_and_a_cost
+    end
+  end
+
+  def unrecovered_f_and_a
+    if @unrecovered_f_and_a.nil?
+      non_personnel_costs.unrecovered_f_and_a #+ assigned_personnel.unrecovered_f_and_a
+    else
+      @unrecovered_f_and_a
     end
   end
 

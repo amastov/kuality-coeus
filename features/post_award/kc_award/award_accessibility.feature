@@ -1,4 +1,4 @@
-@Award
+@Award @wip
 Feature: Accessing Awards (Permissions, Rights, Access)
 
   Summary to be written

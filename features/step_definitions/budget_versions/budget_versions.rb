@@ -217,6 +217,6 @@ end
 And /^the Budget's unrecovered F&A amounts are as expected for all periods$/ do
   @budget_version.view :periods_and_totals
   @budget_version.budget_periods.each { |period|
-    expect(on(PeriodsAndTotals).unrecovered_f_and_a_of(period.number).to_f).to be_within(0.05).of period.f_and_a_cost
+    expect(on(PeriodsAndTotals).unrecovered_f_and_a_of(period.number).to_f).to be_within(0.05).of period.unrecovered_f_and_a
   }
 end

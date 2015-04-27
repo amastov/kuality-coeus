@@ -121,13 +121,23 @@ end
 
 class SyncDirectCostLimit < Dialogs
 
+  undefine :yes, :yes_element
+
   element(:dialog_header) { |b| b.header(id: 'PropBudget-NonPersonnelCosts-SyncToDirectCostLimit_headerWrapper') }
+
+  element(:yes_element) { |b| b.section(id: 'PropBudget-NonPersonnelCosts-SyncToDirectCostLimit').button(text: 'Yes') }
+  action(:yes) { |b| b.yes_element.click; b.loading }
 
 end
 
 class SyncPeriodCostLimit < Dialogs
 
+  undefine :yes, :yes_element
+
   element(:dialog_header) { |b| b.header(id: 'PropBudget-NonPersonnelCosts-SyncToPeriodCostLimit_headerWrapper') }
+
+  element(:yes_element) { |b| b.section(id: 'PropBudget-NonPersonnelCosts-SyncToPeriodCostLimit').button(text: 'Yes') }
+  action(:yes) { |b| b.yes_element.click; b.loading }
 
 end
 
@@ -142,6 +152,17 @@ end
 
 class ConfirmPeriodChanges < Dialogs
 
+  undefine :yes, :yes_element
+
   element(:dialog_header) { |b| b.header(id: 'PropBudget-ConfirmPeriodChangesDialog_headerWrapper') }
+
+  element(:yes_element) { |b| b.section(id: 'PropBudget-ConfirmPeriodChangesDialog').button(text: 'Yes') }
+  action(:yes) { |b| b.yes_element.click; b.loading }
+  
+end
+
+class ConfirmAutocalculate < Dialogs
+
+  element(:dialog_header) { |b| b.header(id: 'u1839u1b_headerWrapper') }
 
 end

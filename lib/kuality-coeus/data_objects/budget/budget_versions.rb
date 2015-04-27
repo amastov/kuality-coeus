@@ -168,6 +168,7 @@ class BudgetVersionsObject < DataFactory
   def autocalculate_periods
     view :periods_and_totals
     on(PeriodsAndTotals).autocalculate_periods
+    on(ConfirmAutocalculate).yes
     @budget_periods[1..-1].each_with_index do |period, i|
       @budget_periods[i].non_personnel_costs.each do |npc|
         period.copy_non_personnel_item(npc)

@@ -1,4 +1,4 @@
-@Proposal
+@proposal
 Feature: Project Personnel in Proposal Budget Versions
 
   User story to be written...
@@ -7,12 +7,12 @@ Feature: Project Personnel in Proposal Budget Versions
     * a User exists with the role: 'Proposal Creator'
     * the Proposal Creator creates a Proposal with a 'Research' activity type
     * creates a Budget Version for the Proposal
-  @failing
+
   Scenario: Proposal and Budget Personnel
     Given various personnel are added to the Proposal
     When  the Proposal Creator syncs the Budget's personnel with the Proposal
     Then  the Budget personnel should match the Proposal personnel
-  @failing
+
   Scenario: Personnel info imported from Person record
     Given a User exists with a 'SUMMER EMPLOYEE' appointment type
     When  the Proposal Creator adds the 'SUMMER EMPLOYEE' User to the Budget personnel

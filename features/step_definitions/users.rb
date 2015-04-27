@@ -90,7 +90,6 @@ end
 
 # TODO: This will need to be changed to add "in the same unit" as a qualifier
 Given /^Users exist with the following roles: (.*)$/ do |roles|
-  DEBUG.message "roles are #{roles}"
   roles.split(', ').each do |r|
     if $users.with_role(r).nil?
       user = make_user role: r
