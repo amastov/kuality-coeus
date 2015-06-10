@@ -3,6 +3,10 @@ Given /I? ?add a Sponsor Contact to the Award$/ do
   @award.add_sponsor_contact
 end
 
+Given /I? ?add a nonrandom Sponsor Contact to the Award$/ do
+  @award.add_sponsor_contact non_employee_id: '4056', project_role: 'Authorizing Official'
+end
+
 When /^an Account ID with special characters is added to the Award details$/ do
   @award.edit account_id: random_string(5, %w{~ ! @ # $ % ^ & ž}.sample(2))
 end
@@ -28,6 +32,16 @@ When /completes? the Award requirements$/ do
    steps '* add a Sponsor Contact to the Award'
    steps '* add a PI to the Award'
    steps '* give the Award valid credit splits'
+end
+
+When /completes? the nonrandom Award requirements$/ do
+  # steps '* add a report to the Award'
+  steps '* add nonrandom Terms to the Award' #TODO Look at award_terms.rb data object to make changes for faster times.
+  # steps '* add the required Custom Data to the Award'
+  steps '* add a nonrandom Payment & Invoice item to the Award'
+  steps '* add a nonrandom Sponsor Contact to the Award'
+  steps '* add a PI to the Award'
+  steps '* give the Award valid credit splits'
 end
 
 When /^data validation is turned on for the Award$/ do
@@ -61,6 +75,11 @@ end
 And /the Award Modifier edits the finalized Award$/ do
   steps '* log in with the Award Modifier user'
   @award.edit transaction_type: '::random::', anticipated_direct: '5', obligated_direct: '5'
+end
+
+And /the Award Modifier edits the finalized Award deterministically$/ do
+  steps '* log in with the Award Modifier user'
+  @award.edit transaction_type: 'Correction', anticipated_direct: '5', obligated_direct: '5'
 end
 
 When /^the original Award is edited again$/ do

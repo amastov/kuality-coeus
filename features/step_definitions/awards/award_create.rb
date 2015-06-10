@@ -13,6 +13,21 @@ When /^the (.*) creates an Award$/ do |role_name|
   @award = create AwardObject, lead_unit_id: lead_unit
 end
 
+When /^the (.*) creates a nonrandom Award$/ do |role_name|
+  steps %{ * I log in with the #{role_name} user }
+  # Implicit in this step is that the Award creator
+  # is creating the Award in the unit they have
+  # rights to. This is why this step specifies what the
+  # Award's unit should be...
+  lead_unit = $current_user.roles.name($current_user.role).qualifiers[0][:unit]
+  raise 'Unable to determine a lead unit for the selected user. Please debug your scenario.' if lead_unit.nil?
+  @award = create AwardObject, lead_unit_id: lead_unit, description: 'Smoke Test Description', transaction_type: 'New',
+      award_status: 'Active', activity_type: 'Construction', award_type: 'Contract',
+      award_title: 'Smoke Test', obligation_start_date: right_now[:date_w_slashes],
+      obligation_end_date: in_a_year[:date_w_slashes],
+      obligated_direct: '9999.99', anticipated_direct: '10000.00'
+end
+
 Given /^the Award Modifier creates? an Award with (.*) as the Lead Unit$/ do |lead_unit|
   steps '* I log in with the Award Modifier user'
   @award = create AwardObject, lead_unit_id: lead_unit

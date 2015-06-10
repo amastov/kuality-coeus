@@ -10,8 +10,32 @@ When /I? ?adds? Terms to the Award$/ do
   @award.add_terms
 end
 
+When /I? ?adds? nonrandom Terms to the Award$/ do
+  @award.add_terms equipment_approval:  1,
+                   invention:           3,
+                   prior_approval:      4,
+                   property:            6,
+                   publication:         14,
+                   referenced_document: 15,
+                   rights_in_data:      29,
+                   subaward_approval:   19,
+                   travel_restrictions: 5
+end
+
 Given /I? ?add a Payment & Invoice item to the Award$/ do
   @award.add_payment_and_invoice
+end
+
+Given /I? ?add a nonrandom Payment & Invoice item to the Award$/ do
+  @award.add_payment_and_invoice payment_basis:   'Fixed price',
+                                 payment_method:  'Special Handling',
+                                 payment_and_invoice_requirements:
+                                     # Dangerously close to needing to be a Data Object proper...
+                                     { payment_type: 'KFS Invoicing',
+                                       frequency: 'Annual',
+                                       frequency_base: 'As Required',
+                                       osp_file_copy: 'Report' },
+                                 invoice_instructions: 'THIS IS A SMOKE TEST'
 end
 
 When /^I start adding a Payment & Invoice item to the Award$/ do
