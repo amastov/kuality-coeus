@@ -1,6 +1,6 @@
 class UnrecoveredFAObject < DataFactory
 
-  include StringFactory, DateFactory, Navigation
+  include StringFactory, DateFactory
 
   attr_reader :fiscal_year, :applicable_rate, :campus, :source_account, :amount,
               # Note: Numbering is based on the number in the table!

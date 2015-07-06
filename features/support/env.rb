@@ -10,8 +10,7 @@ $cas_context = $cas? ENV['CAS_CONTEXT'] : ''
 
 if ENV['HEADLESS']
   require 'headless'
-  headless = Headless.new
-  headless.start
+  Headless.new.start
 end
 
 require "#{File.dirname(__FILE__)}/../../lib/kuality-coeus"

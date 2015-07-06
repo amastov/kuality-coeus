@@ -2,8 +2,8 @@ class BudgetSettings < BasePage
 
   buttons 'Apply Changes'
 
-  value(:project_start_date) { |b| b.div(data_label: 'Project Start Date').text }
-  value(:project_end_date) { |b| b.div(data_label: 'Project End Date').text }
+  value(:project_start_date) { |b| b.no_frame_noko.div(data_label: 'Project Start Date').text }
+  value(:project_end_date) { |b| b.no_frame_noko.div(data_label: 'Project End Date').text }
   element(:total_direct_cost_limit) { |b| b.text_field(name: 'budget.totalDirectCostLimit') }
   element(:total_cost_limit) { |b| b.text_field(name: 'budget.totalCostLimit') }
   element(:status) { |b| b.select(name: 'budget.budgetStatus') }

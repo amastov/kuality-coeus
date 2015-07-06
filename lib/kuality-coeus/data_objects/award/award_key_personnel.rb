@@ -1,6 +1,6 @@
 class AwardKeyPersonObject < DataFactory
 
-  include Navigation, Personnel
+  include Personnel
 
   attr_reader :employee_user_name, :non_employee_id, :project_role,
               :key_person_role, :units, :first_name, :last_name, :full_name,
@@ -20,7 +20,7 @@ class AwardKeyPersonObject < DataFactory
 
     set_options(defaults.merge(opts))
     @full_name = @type=='employee' ? "#{@first_name} #{@last_name}" : "#{@last_name}, #{@first_name}"
-
+    requires :navigate
   end
 
   # Navigation done by parent object...
@@ -40,7 +40,7 @@ class AwardKeyPersonObject < DataFactory
           #capture full_name last_name first_name
           lookup.select_random_with_name
         end
-        #need to view person to get the first and last name because full name is given and
+        #need to view person to get the first and last name because full name is given
         on KCPerson do |gather|
           @last_name = gather.last_name
           @first_name = gather.first_name
@@ -140,8 +140,9 @@ class AwardKeyPersonObject < DataFactory
     @units.delete(unit_number)
   end
 
-  def update_from_parent(id)
+  def update_from_parent(id, navigation_lambda)
     @document_id=id
+    @navigate=navigation_lambda
   end
 
   def update_splits opts={}
@@ -155,12 +156,11 @@ class AwardKeyPersonObject < DataFactory
   end
 
   def view(tab)
-    open_document
+    @navigate.call
     unless on(Award).send(StringFactory.damballa("#{tab}_element")).parent.class_name=~/tabcurrent$/
       on(Award).send(StringFactory.damballa(tab.to_s))
     end
   end
-
 
   def update_unit_splits(unit_number, opts)
     on CombinedCreditSplit do |page|
@@ -170,14 +170,6 @@ class AwardKeyPersonObject < DataFactory
       page.save
     end
     # @units.find{ |u| u[:number]==unit_number}.merge!(opts)
-  end
-
-  # ===========
-  private
-  # ===========
-
-  def page_class
-    AwardContacts
   end
 
 end

@@ -15,7 +15,7 @@ class IPContacts < KCInstitutionalProposal
 
   # This returns an array of hashes, like so:
   # [{:name=>"Unit1 Name", :number=>"Unit1 Number"}, {:name=>"Unit2 Name", :number=>"Unit2 Number"}]
-  p_action(:units) { |full_name, p| units = []; p.unit_div(full_name).table.to_a[2..-1].each { |unit| units << {name: unit[2].strip, number: unit[3].strip} }; units }
+  p_action(:units) { |full_name, p| p.unit_div(full_name).table.to_a[2..-1].map { |unit| {name: unit[2].strip, number: unit[3].strip} } }
 
   # =======
   private

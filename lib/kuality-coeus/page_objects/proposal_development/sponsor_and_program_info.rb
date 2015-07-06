@@ -20,6 +20,6 @@ class SponsorAndProgram < BasePage
   # Because the NSF Science Code select list is long, we have this
   # Nokogiri code here, which returns the list much faster than Watir does.
   # This enables, for example, a faster randomized item selection from the list...
-  value(:science_codes) { |b| b.no_frame_noko.select(name: 'document.developmentProposal.nsfCode').options.map {|opt| opt.text }[1..-1] }
+  value(:science_codes) { |b| b.no_frame_noko.select(name: 'document.developmentProposal.nsfCode').options.map {|opt| opt.text }.tap(&:shift) }
 
 end

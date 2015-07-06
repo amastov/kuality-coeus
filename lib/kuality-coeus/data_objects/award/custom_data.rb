@@ -1,6 +1,6 @@
 class AwardCustomDataObject < DataFactory
 
-include Navigation, DateFactory, StringFactory, DocumentUtilities
+include DateFactory, StringFactory, DocumentUtilities
 
 attr_accessor :graduate_student_count, :billing_element
 
@@ -15,7 +15,6 @@ def initialize(browser, opts={})
     set_options(defaults.merge(opts))
 end
 
-
 def create
     view 'Custom Data'
     on AwardCustomData do |page|
@@ -27,10 +26,9 @@ def create
 end #create
 
 def view(tab)
-    # open_document
     unless on(Award).send(StringFactory.damballa("#{tab}_element")).parent.class_name=~/tabcurrent$/
         on(Award).send(StringFactory.damballa(tab.to_s))
     end
 end
 
-end #contacts
+end

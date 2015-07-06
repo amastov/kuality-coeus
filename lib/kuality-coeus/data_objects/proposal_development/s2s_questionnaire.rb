@@ -1,5 +1,7 @@
 class S2SQuestionnaireObject < DataFactory
 
+  include Utilities
+
   # Convenient gathering of all Yes/No questions. Makes it possible to
   # do simple iterations through them.
   YN_QUESTIONS = [:civil_service, :total_ftes, :potential_effects, :international_support,
@@ -11,7 +13,7 @@ class S2SQuestionnaireObject < DataFactory
                  :international_activities, :other_agencies, :subject_to_review,
                  :novice_applicants]
 
-  include StringFactory, Navigation, Utilities
+  include StringFactory, Utilities
 
   attr_reader :document_id, :civil_service, :total_ftes, :potential_effects, :explain_potential_effects,
               :international_support, :explain_support, :pi_in_govt, :pis_us_govt_agency, :total_amount_requested,
@@ -63,7 +65,7 @@ class S2SQuestionnaireObject < DataFactory
     }
 
     set_options(defaults.merge(opts))
-    requires :document_id, :doc_header
+    requires :navigate
   end
 
   def create
@@ -110,7 +112,7 @@ class S2SQuestionnaireObject < DataFactory
   end
 
   def view
-    open_document
+    #FIXME!!!
     on(Proposal).questions unless on_page?(on(Questions).questions_header)
   end
 

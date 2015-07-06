@@ -6,8 +6,8 @@ class ExpeditedApproval < KCProtocol
   element(:expiration_date) { |b| b.frm.text_field(name: 'actionHelper.protocolExpeditedApprovalBean.expirationDate') }
 
   # Maybe TODO: roll these into the above methods...
-  value(:approval_date_ro) { |b| b.frm.table(id: 'status-dates-table').div(text: 'Approval Date:').parent.parent.td(align: 'left').text }
-  value(:expiration_date_ro) { |b| b.frm.table(id: 'status-dates-table').div(text: 'Expiration Date:').parent.parent.td(align: 'left').text }
+  value(:approval_date_ro) { |b| b.noko.table(id: 'status-dates-table').div(text: 'Approval Date:').parent.parent.td(align: 'left').text }
+  value(:expiration_date_ro) { |b| b.noko.table(id: 'status-dates-table').div(text: 'Expiration Date:').parent.parent.td(align: 'left').text }
 
   element(:comments) { |b| b.frm.textarea(name: 'actionHelper.protocolExpeditedApprovalBean.comments') }
   element(:include_in_agenda) { |b| b.frm.checkbox(name: 'actionHelper.protocolExpeditedApprovalBean.assignToAgenda') }

@@ -11,7 +11,7 @@ class BudgetActions < BasePage
   element(:add_file_name) { |b| b.frm.file_field(name: 'newSubAward.newSubAwardFile') }
   action(:add_subaward_budget) { |b| b.frm.button(name: 'methodToCall.addSubAward.anchorSubawardBudget').click; b.loading }
   action(:look_up_organization) { |b| b.frm.button(name: 'methodToCall.performLookup.(!!org.kuali.kra.bo.Organization!!).(((organizationId:newSubAward.organizationId,organizationName:newSubAward.organizationName))).((`newSubAward.organizationId:organizationId`)).((<>)).(([])).((**)).((^^)).((&&)).((//)).((~~)).(::::;;::::).anchorSubawardBudget').click }
-  value(:organization_name) { |b| b.frm.div(id: 'newSubAward.organizationName.div').text }
+  value(:organization_name) { |b| b.noko.div(id: 'newSubAward.organizationName.div').text }
 
   # editing...
   action(:organization_id) { |name, b| b.frm.text_field(name: "document.budget.budgetSubAwards[#{b.target_subaward(name)}].organizationId") }

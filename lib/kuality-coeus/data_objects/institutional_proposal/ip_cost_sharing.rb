@@ -1,6 +1,6 @@
 class IPCostSharingObject < DataFactory
 
-  include StringFactory, Navigation
+  include StringFactory
 
   attr_reader :project_period, :percentage, :type,
               :source_account, :amount

@@ -1,13 +1,13 @@
 class ProposalAttachmentObject < DataFactory
 
-  include Navigation
+  include Utilities
 
-  attr_reader :type, :file_name, :status, :description, :document_id, :doc_type
+  attr_reader :type, :file_name, :status, :description, :doc_type
 
   def initialize(browser, opts={})
     @browser = browser
     set_options opts
-    requires :document_id, :type, :file_name
+    requires :type, :file_name, :navigate
   end
 
   def create
@@ -24,12 +24,12 @@ class ProposalAttachmentObject < DataFactory
   end
 
   def view
-    open_document
+    @navigate.call
     on(Proposal).abstracts_and_attachments unless on_page?(on(AbstractsAndAttachments).proposal_attachment_type)
   end
 
-  def update_from_parent(id)
-    @document_id=id
+  def update_from_parent(navigation_lambda)
+    @navigate=navigation_lambda
   end
 
 end

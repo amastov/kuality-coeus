@@ -1,10 +1,8 @@
 class SponsorTemplateLookup < Lookups
 
-  # expected_element :sponsor_term_type_code
-
   old_ui
 
-  element(:sponsor_template_code) { |b| b.frm.text_field(name: 'templateCode')}
+  element(:sponsor_template_code) { |b| b.frm.text_field(name: 'templateCode') }
 
   element(:description) { |b| b.frm.text_field(name: 'description') }
   element(:sponsor_template_status) { |b| b.frm.select(name: 'statusCode') }

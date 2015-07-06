@@ -1,10 +1,10 @@
 class SpecialReviewObject < DataFactory
 
-  include StringFactory, Navigation
+  include StringFactory, Utilities
 
   attr_reader :type, :approval_status, :document_id, :protocol_number,
               :application_date, :approval_date, :expiration_date,
-              :exemption_number, :doc_type
+              :exemption_number, :doc_type, :index
 
   def initialize(browser, opts={})
     @browser = browser
@@ -20,6 +20,7 @@ class SpecialReviewObject < DataFactory
     }
 
     set_options(defaults.merge(opts))
+    requires :navigate, :index
   end
 
   def create
@@ -40,32 +41,22 @@ class SpecialReviewObject < DataFactory
   def edit opts={}
     view
     on SpecialReview do |edit|
-      the_type_array =[]
-      edit.add_type.options.each { |optns| the_type_array << optns.text }
-      the_approval_status_array = []
-      edit.approval_status_options.each { |stat| the_approval_status_array << stat.text }
-      #need to remove the current type from array to ensure the proper edit
-      current_type = edit.type_added(opts[:index]).selected_options.first.text
-      opts[:type] = (the_type_array - ['select', 'Human Subjects', 'Animal Usage', current_type ]).sample if opts[:edit_type] == true
-
-      #need to remove the current status from array to ensure the proper edit
-      current_status = edit.approval_status_added(opts[:index]).selected_options.first.text
-      opts[:approval_status] = (the_approval_status_array - ['select', current_status]).sample if opts[:edit_approval_status] == true
-
-      edit.type_added(opts[:index]).pick! opts[:type]
-      edit.approval_status_added(opts[:index]).pick! opts[:approval_status]
-      edit.exemption_number_added(opts[:index]).pick! opts[:exemption_number]
-      edit.protocol_number_added(opts[:index]).fit opts[:protocol_number]
-      edit.application_date_added(opts[:index]).fit opts[:application_date]
-      edit.approval_date_added(opts[:index]).fit opts[:approval_date]
-      edit.expiration_date_added(opts[:index]).fit opts[:expiration_date]
-      edit.send(opts[:press]) unless opts[:press].nil?
+      opts[:type] = (edit.type_list - ['select', 'Human Subjects', 'Animal Usage', @type]).sample if opts[:type]=='::random::'
+      opts[:approval_status] = (edit.approval_status_list - [@approval_status]).sample if opts[:approval_status]=='::random::'
+      edit.type_added(@index).pick! opts[:type]
+      edit.approval_status_added(@index).pick! opts[:approval_status]
+      edit.exemption_number_added(@index).pick! opts[:exemption_number]
+      edit.protocol_number_added(@index).fit opts[:protocol_number]
+      edit.application_date_added(@index).fit opts[:application_date]
+      edit.approval_date_added(@index).fit opts[:approval_date]
+      edit.expiration_date_added(@index).fit opts[:expiration_date]
+      update_options(opts)
+      edit.send(@press) unless @press.nil?
     end
-    update_options(opts)
   end
 
   def view
-    # Navigation assumes already on the document
+    @navigate.call
     on(Proposal).special_review unless on_page?(on(SpecialReview).add_type)
   end
 
@@ -74,8 +65,8 @@ class SpecialReviewObject < DataFactory
     on(SpecialReview).delete(index[line_index])
   end
 
-  def update_from_parent(id)
-    @document_id=id
+  def update_from_parent(navigation_lambda)
+    @navigate=navigation_lambda
   end
 
 end # SpecialReviewObject

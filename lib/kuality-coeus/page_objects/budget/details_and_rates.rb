@@ -17,30 +17,26 @@ class DetailsAndRates < BasePage
   # Inflation Rates
   element(:inflation_rates_table) { |b| b.table(id: 'InflationRateTable') }
   value(:inflation_rates) { |b|
-    array = []
-    b.inflation_rates_table.tbody.trs.each { |tr|
-      array << {
+    b.inflation_rates_table.tbody.trs.map { |tr|
+      {
           description: tr[0].text,
           start_date: Utilities.datify(tr[1].text),
           institution_rate: tr[2].text.groom,
           applicable_rate: tr[3].text.groom
       }
     }
-    array
   }
 
   # Rates
   value(:rate_amounts) { |b|
-    array = []
-    b.noko_rates_table.trs.each do |tr|
-      array << {
+    b.noko_rates_table.trs.map do |tr|
+      {
                  class: tr[0].text,
                   type: tr[1].text,
              rate_cost: tr[2].text.groom,
      rate_cost_sharing: tr[3].text.groom
            }
     end
-    array
   }
 
   p_element(:apply) { |type, b| b.rates_table.trs.find{ |tr| tr[1].text==type }.checkbox }

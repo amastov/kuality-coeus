@@ -4,6 +4,6 @@ class ProposalSummary < BasePage
         'View Route Log', 'More Actions', 'Compliance', 'Attachments', 'Keywords'
   buttons 'Submit for Review', 'Approve', 'Disapprove', 'Reject', 'Recall', 'Submit to Sponsor'
 
-  value(:messages) { |b| b.lis(class: 'uif-infoMessageItem').map{|li| li.text} }
+  value(:messages) { |b| b.no_frame_noko.lis(class: 'uif-infoMessageItem').map{|li| li.text} }
 
 end

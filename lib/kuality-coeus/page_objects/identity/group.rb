@@ -27,7 +27,7 @@ class Group < BasePage
   private
   # =========
   
-  element(:overview_tab) { |b| b.frm.div(id: 'tab-Overview-div') }
+  element(:overview_tab) { |b| b.noko.div(id: 'tab-Overview-div') }
   element(:assignees_tab) { |b| b.frm.div(id: 'tab-Assignees-div') }
   element(:gnspc_select) { |b| b.frm.select(name: 'document.groupNamespace') }
   value(:gnspc_ro) { |b| b.overview_tab.table[1][1].text }

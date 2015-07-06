@@ -1,6 +1,6 @@
 class ProjectPersonnelObject < DataFactory
 
-  include Navigation, Personnel
+  include Personnel
 
   attr_reader :full_name, :first_name, :last_name, :role, :lead_unit,
               :units, :faculty, :total_effort, :academic_year_effort,
@@ -15,7 +15,7 @@ class ProjectPersonnelObject < DataFactory
         role: 'Principal Investigator'
     }
     set_options(defaults.merge(opts))
-    requires :lookup_class, :search_key, :doc_header, :document_id
+    requires :lookup_class, :search_key, :doc_header, :document_id, :navigate
   end
 
   def create
@@ -23,7 +23,7 @@ class ProjectPersonnelObject < DataFactory
   end
 
   def edit opts={}
-    open_document
+    @navigate.call
     on(InstitutionalProposal).contacts
     on page_class do |update|
       update.expand_all
@@ -40,8 +40,9 @@ class ProjectPersonnelObject < DataFactory
     update_options(opts)
   end
 
-  def update_from_parent(id)
+  def update_from_parent(id, navigation_lambda)
     @document_id=id
+    @navigate=navigation_lambda
   end
 
   # =======

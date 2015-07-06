@@ -5,7 +5,6 @@ class ProtocolPersonnel < KCProtocol
   action(:non_employee_search) { |b| b.frm.button(name: /NonOrganizationalRolodex/).click }
   action(:add_person) { |b| b.frm.button(name: 'methodToCall.addProtocolPerson').click; b.loading }
 
-  #added people
-  p_element(:added_personnel_name) { |full_name, role, b| b.frm.div(id: 'workarea').table(text: "#{full_name}" + ' ' + "#{role}") }
+  value(:added_people) { |b| b.noko.div(id: 'workarea').h3s.map { |h| onespace(h.span(class: 'subhead-left').text) } }
 
 end

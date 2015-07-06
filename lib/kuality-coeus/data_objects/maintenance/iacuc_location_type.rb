@@ -9,7 +9,7 @@ class IACUCLocationTypeMaintenanceObject < DataFactory
 
     defaults = {
         description:        random_alphanums,
-        location_type_code: rand(900...999),
+        location_type_code: rand(900...999).to_s,
         location_type:      random_alphanums,
         press:              'blanket_approve'
     }
@@ -25,4 +25,7 @@ class IACUCLocationTypeMaintenanceObject < DataFactory
       page.send(@press) unless @press.nil?
     end
   end
+
+
+
 end

@@ -1,6 +1,6 @@
 class GroupAssigneeObject < DataFactory
 
-  include StringFactory, Navigation
+  include StringFactory
 
   attr_reader :type_code, :member_identifier, :save_type
 

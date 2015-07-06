@@ -23,12 +23,11 @@ class AwardTermsObject < DataFactory
     set_options(defaults.merge(opts))
   end
 
+  # TODO: Refactor this...
   def create
     on PaymentReportsTerms do |page|
       page.expand_all
       if @random_terms == '::random::'
-        # the_terms = ['EquipmentApproval', 'Invention','Property', 'Publication',
-        #              'ReferencedDocument', 'RightsInData' 'SubawardApproval', 'TravelRestrictions']
 
         the_terms = ['Equipment Approval', 'Invention', 'Prior Approval', 'Property', 'Publication',
               'Referenced Document', 'Rights In Data', 'Subaward Approval', 'Travel Restrictions']

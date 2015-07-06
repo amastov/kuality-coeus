@@ -182,7 +182,7 @@ end
 #------------------------#
 And /^error messages should appear for invalid dates on the Special Review$/ do
   special_review_dates = [:application_date, :approval_date, :expiration_date]
-  special_review_dates.map! {|date_type| "#{@special_review.send(date_type)} is not a valid date."}
+  special_review_dates.map! {|date_type| "#{@iacuc_protocol.special_review[0].send(date_type)} is not a valid date."}
 
   special_review_dates.each do |err|
     expect($current_page.errors).to include err

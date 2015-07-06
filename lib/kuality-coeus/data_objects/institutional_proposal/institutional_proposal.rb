@@ -1,6 +1,6 @@
 class InstitutionalProposalObject < DataFactory
 
-  include StringFactory, DateFactory, Navigation, DocumentUtilities
+  include StringFactory, DateFactory, DocumentUtilities
 
   attr_reader :document_id, :proposal_number, :dev_proposal_number, :project_title,
               :doc_status, :sponsor_id, :activity_type, :proposal_type, :proposal_status,
@@ -46,12 +46,7 @@ class InstitutionalProposalObject < DataFactory
 
     set_options(defaults.merge(opts))
     @key_personnel = @project_personnel
-    @lookup_class=InstitutionalProposalLookup
-    # Unfortunately this has to be hard-coded because
-    # most of the time this object's #make will not also
-    # run the #create
-    @doc_header='KC Institutional Proposal'
-    @search_key={ institutional_proposal_number: @proposal_number }
+    @navigate=navigate
   end
 
   # This method is appropriate only in the context of creating an
@@ -104,7 +99,7 @@ class InstitutionalProposalObject < DataFactory
   end
 
   def view(tab)
-    open_document
+    @navigate.call
     on(KCInstitutionalProposal).send(StringFactory.damballa(tab.to_s))
   end
 
@@ -153,6 +148,44 @@ class InstitutionalProposalObject < DataFactory
   private
   # =========
 
+  def navigate
+    lambda {
+      begin
+        there = on(DocumentHeader).document_id==@document_id && @browser.frm.div(id: 'headerarea').h1.text.strip=='KC Institutional Proposal'
+      rescue Watir::Exception::UnknownObjectException, Selenium::WebDriver::Error::StaleElementReferenceError, WatirNokogiri::Exception::UnknownObjectException, Watir::Wait::TimeoutError
+        there = false
+      end
+      unless there
+        on(BasePage).close_extra_windows
+        visit InstitutionalProposalLookup do |page|
+          page.institutional_proposal_number.set @proposal_number
+          page.search
+          # This rescue is a sad necessity, due to
+          # Coeus's poor implementation of the Lookup pages
+          # in conjunction with user Roles.
+          begin
+            page.results_table.wait_until_present(5)
+          rescue Watir::Wait::TimeoutError
+            if on(Header).doc_search_element.present?
+              on(Header).doc_search
+            else #you are on old ui and navigate to doc search this way
+              visit(Researcher).doc_search
+            end
+            on DocumentSearch do |search|
+              search.document_id.set @document_id
+              search.search
+              search.open_doc @document_id
+            end
+            return
+          end
+          page.medusa
+        end
+        # Must update the document id, now:
+        @document_id=on(DocumentHeader).document_id
+      end
+    }
+  end
+
   def set_sponsor_code
     if @sponsor_id=='::random::'
       on(InstitutionalProposal).find_sponsor_code
@@ -174,7 +207,8 @@ class InstitutionalProposalObject < DataFactory
         document_id: @document_id,
         lookup_class: @lookup_class,
         search_key: @search_key,
-        doc_header: @doc_header
+        doc_header: @doc_header,
+        navigate: navigate
     }
     opts.merge!(defaults)
   end
@@ -184,7 +218,7 @@ class InstitutionalProposalObject < DataFactory
       @prior_versions << self.data_object_copy
       @version += 1
       @document_id=$current_page.document_id
-      notify_collections(@document_id)
+      notify_collections(@document_id, navigate)
     end
   end
 

@@ -1,4 +1,5 @@
-@award
+#RESKC-567
+@award @system_failure
 Feature: Award Versions
 
   Summary to be written
@@ -17,13 +18,13 @@ Feature: Award Versions
     When  the original Award is edited again
     Then  a confirmation screen asks if you want to edit the existing pending version
     And   selecting 'yes' takes you to the pending version
-  @test
+
   Scenario: Editing finalized Award when a pending new version exists, select 'no'
     Given the Time & Money Modifier submits the Award's T&M document
     And   the Award Modifier edits the finalized Award
     When  the original Award is edited again
     Then  selecting 'no' on the confirmation screen creates a new version of the Award
-  @test
+
   Scenario: Canceling and reopening Time And Money
     Given the Award Modifier edits the finalized Award
     And   the Time And Money Modifier initializes the Award's Time And Money document

@@ -1,37 +1,48 @@
 class AwardReportsObject < DataFactory
 
-  attr_reader :award_id, :report, :type, :frequency,
+  attr_reader :class, :type, :frequency,
               :frequency_base, :osp_file_copy,
-              :due_date, :recipients, :details,
-              # :number is used for field identification in the list
-              :number
+              :due_date, :recipients, :details
+
 
   def initialize(browser, opts={})
     @browser = browser
 
     defaults = {
+      class:          '::random::',
       type:           '::random::',
       frequency:      '::random::',
       frequency_base: '::random::',
       osp_file_copy:  '::random::',
       details:        collection('ReportTracking')
-      #recipients:    collection('ReportRecipients')
-
     }
     set_options(defaults.merge(opts))
-    requires :award_id, :report, :number
   end
 
   def create
     on PaymentReportsTerms do |page|
       page.expand_all
+      set_report_class
       set_report_type
       set_frequency
-      page.add_frequency_base(@report).pick! @frequency_base
-      page.add_osp_file_copy(@report).pick! @osp_file_copy
-      page.add_due_date(@report).fit @due_date
-      page.add_report(@report)
-      page.save
+      page.add_frequency_base(@class).pick! @frequency_base
+      page.add_osp_file_copy(@class).pick! @osp_file_copy
+      page.add_due_date(@class).fit @due_date
+      page.add_report(@class)
+
+
+
+      DEBUG.do {
+        DEBUG.message 'Saving Report...'
+        begin
+          page.save
+        rescue
+          DEBUG.message 'A screw up!'
+          #DEBUG.pause 6090
+        end
+      }
+
+
     end
   end
 
@@ -40,21 +51,37 @@ class AwardReportsObject < DataFactory
   def set_frequency
     if @frequency == '::random::'
       @frequency = 'None'
+      # We can't have a frequency of 'None' due to bugs on this page, so we must
+      # reject it as a randomized selection...
       while @frequency == 'None'
-        @frequency = on(PaymentReportsTerms).add_frequency(@report).options.map(&:text).sample
+        @frequency = on(PaymentReportsTerms).add_frequency(@class).options.map(&:text).sample
       end
     end
-    on(PaymentReportsTerms).add_frequency(@report).pick! @frequency
+    on PaymentReportsTerms do |page|
+      page.add_frequency(@class).pick! @frequency
+      page.refresh_selection_lists
+    end
   end
 
   def set_report_type
     if @type == '::random::'
       @type = 'None'
+      # We can't have a type of 'None' due to bugs on this page, so we must
+      # reject it as a randomized selection...
       while @type == 'None'
-        @type = on(PaymentReportsTerms).add_report_type(@report).options.map(&:text).sample
+        @type = on(PaymentReportsTerms).add_report_type(@class).options.map(&:text).sample
       end
     end
-    on(PaymentReportsTerms).add_report_type(@report).pick! @type
+    on PaymentReportsTerms do |page|
+      page.add_report_type(@class).pick! @type
+      page.refresh_selection_lists
+    end
+  end
+
+  def set_report_class
+    if @class == '::random::'
+      @class = on(PaymentReportsTerms).report_classes.sample
+    end
   end
 
 end # AwardReportsObject

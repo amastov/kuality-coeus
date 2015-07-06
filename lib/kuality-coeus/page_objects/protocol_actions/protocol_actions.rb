@@ -1,5 +1,7 @@
 class ProtocolActions < KCProtocol
 
+  expected_element :review_comments_table
+
   # For the "Request an Action" subpanel methods,
   # please see the respective page classes.
 

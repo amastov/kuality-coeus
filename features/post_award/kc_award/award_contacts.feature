@@ -22,7 +22,7 @@ Feature: Award Contacts
     And   adds a PI to the Award
     When  another Principal Investigator is added to the Award
     Then  an error should appear that says only one PI is allowed in the Contacts
-  @wip
+
   Scenario: Same Contact with two roles
     Given the Award Modifier creates an Award
     And   adds a PI to the Award

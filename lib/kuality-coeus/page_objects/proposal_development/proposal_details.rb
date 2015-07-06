@@ -4,10 +4,10 @@ class ProposalDetails < BasePage
   document_buttons
   new_error_messages
   
-  element(:doc_title) { |b| b.h1(id: 'PropDev-DefaultView_header').span.text }
+  element(:doc_title) { |b| b.no_frame_noko.span(class: 'uif-headerText-span').text }
 
   element(:proposal_type) { |b| b.select(name: 'document.developmentProposal.proposalTypeCode') }
-  value(:lead_unit) { |b| b.div(data_label: 'Lead Unit').text }
+  value(:lead_unit) { |b| b.no_frame_noko.div(data_label: 'Lead Unit').text }
   element(:activity_type) { |b| b.select(name: 'document.developmentProposal.activityTypeCode') }
   element(:project_start_date) { |b| b.text_field(name: 'document.developmentProposal.requestedStartDateInitial') }
   element(:project_end_date) { |b| b.text_field(name: 'document.developmentProposal.requestedEndDateInitial') }

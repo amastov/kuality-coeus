@@ -31,8 +31,8 @@ class Role < BasePage
   private
   # ===========
 
-  element(:overview_tab) { |b| b.frm.div(id: 'tab-Overview-div') }
+  element(:overview_tab) { |b| b.noko.div(id: 'tab-Overview-div') }
   element(:nmsp_ed) { |b| b.frm.select(name: 'document.roleNamespace') }
-  element(:nmsp_ro) { |b| b.overview_tab.table[1][1].text }
+  value(:nmsp_ro) { |b| b.overview_tab.table[1][1].text }
 
 end

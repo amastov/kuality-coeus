@@ -1,6 +1,6 @@
 class SubawardObject < DataFactory
 
-  include StringFactory, Navigation
+  include StringFactory
 
   attr_reader :document_id, :subaward_id, :version, :subaward_status,
               :document_status, :requisitioner, :requisitioner_unit,
@@ -26,7 +26,8 @@ class SubawardObject < DataFactory
     }
 
     set_options(defaults.merge(opts))
-    @lookup_class = SubawardLookup
+    #@lookup_class = SubawardLookup
+    @navigate=navigate
   end
 
   def create
@@ -129,7 +130,7 @@ class SubawardObject < DataFactory
   end
 
   def view(tab)
-    open_document
+    @navigate.call
     unless on(Subaward).send(StringFactory.damballa("#{tab}_button")).parent.class_name=~/tabcurrent$/
       on(Subaward).send(StringFactory.damballa(tab.to_s))
     end

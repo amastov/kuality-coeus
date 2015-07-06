@@ -138,7 +138,6 @@ end # UserYamlCollection
 
 class UserObject < DataFactory
 
-  include Navigation
   include StringFactory
 
   attr_reader :user_name, :principal_id,

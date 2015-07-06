@@ -1,6 +1,6 @@
-class SpeciesObject < DataFactory
+class SpeciesGroupsObject < DataFactory
 
-  include StringFactory #, Navigation, DateFactory, Protocol
+  include StringFactory
 
   attr_reader :group, :species, :pain_category, :count_type, :count,
               :strain, :usda_covered, :procedure_summary, :index
@@ -14,10 +14,10 @@ class SpeciesObject < DataFactory
         pain_category: '::random::',
         count_type: '::random::',
         count: rand(1..21),
-        press: 'save',
-        index: 0
+        press: 'save'
     }
     set_options(defaults.merge(opts))
+    requires :index, :navigate
   end
 
   def create
@@ -65,7 +65,30 @@ class SpeciesObject < DataFactory
   end
 
   def view(tab)
+    @navigate.call
     on(IACUCProtocolOverview).send(damballa(tab))
   end
 
-end #SpeciesObject
+  def delete
+    on SpeciesGroups do |page|
+      page.delete(@index)
+    end
+    on(Confirmation).yes
+  end
+
+  def update_from_parent(navigation_lambda)
+    @navigate=navigation_lambda
+  end
+
+end #SpeciesGroupsObject
+
+class SpeciesGroupsCollection < CollectionsFactory
+
+  contains SpeciesGroupsObject
+
+  def delete(index)
+    self[index].delete
+    self.delete_at(index)
+  end
+
+end

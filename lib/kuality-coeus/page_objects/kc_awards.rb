@@ -8,11 +8,11 @@ class KCAwards < BasePage
           'Payment, Reports & Terms', 'Special Review', 'Custom Data',
           'Comments, Notes & Attachments', 'Award Actions', 'Medusa'
 
-  value(:doc_title) { |b| b.frm.div(id: 'headerarea').h1.text.strip }
+  value(:doc_title) { |b| b.noko.div(id: 'headerarea').h1.text.strip }
   action(:time_and_money) { |b| b.t_m_button.when_present.click; b.loading }
   element(:t_m_button) { |b| b.frm.button(name: 'methodToCall.timeAndMoney') }
   element(:horzontal_links) { |b| b.div(id: 'horz-links') }
-  element(:headerinfo_table) { |b| b.frm.div(class: 'headerbox').table(class: 'headerinfo') }
+  element(:headerinfo_table) { |b| b.noko.div(class: 'headerbox').table(class: 'headerinfo') }
   # The 'header' prefix on these method names is to prevent collision...
   value(:header_pi) { |b| b.headerinfo_table[0][1].text }
   value(:header_lead_unit) { |b| b.headerinfo_table[1][1].text }

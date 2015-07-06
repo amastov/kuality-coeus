@@ -1,6 +1,6 @@
 class IPUnrecoveredFAObject < DataFactory
 
-  include StringFactory, DateFactory, Navigation
+  include StringFactory, DateFactory
 
   attr_reader :fiscal_year, :rate_type, :applicable_rate,
               :on_campus_contract, :source_account, :amount
@@ -17,6 +17,7 @@ class IPUnrecoveredFAObject < DataFactory
         amount:             random_dollar_value(1000)
     }
     set_options(defaults.merge(opts))
+    requires :navigate
   end
 
   def create
@@ -36,6 +37,7 @@ class IPUnrecoveredFAObject < DataFactory
   def view
     # Note: Currently assumes we're already viewing
     # the institutional proposal!
+    # TODO: Add the @navigation stuff here
     on(InstitutionalProposal).distribution
   end
 
@@ -49,8 +51,9 @@ class IPUnrecoveredFAObject < DataFactory
     update_options(opts)
   end
 
-  def update(id)
+  def update(id, navigation_lambda)
     @document_id=id
+    @navigate=navigation_lambda
   end
 
 end

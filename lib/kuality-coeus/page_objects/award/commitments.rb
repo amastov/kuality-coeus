@@ -17,7 +17,7 @@ class Commitments < KCAwards
 
   element(:cost_sharing_comments) { |b| b.frm.textarea(name: 'document.awardList[0].awardCostShareComment.comments') }
 
-  value(:cost_share_sources) { |b| b.noko.table(id: 'cost-share-table').text_fields(title: 'Source').collect{ |field| field.value }[1..-1] }
+  value(:cost_share_sources) { |b| b.noko.table(id: 'cost-share-table').text_fields(title: 'Source').collect{ |field| field.value }.tap(&:shift) }
 
   action(:recalculate) { |b| b.frm.button(name: 'methodToCall.recalculateCostShareTotal.anchor').click }
   action(:sync_to_template) { |b| b.frm.button(name: 'methodToCall.syncAwardTemplate.scopes:COST_SHARE.anchor').click }
@@ -44,7 +44,7 @@ class Commitments < KCAwards
   p_element(:fna_destination) { |index,b| b.frm.text_field(name: /document.awardList\[0\].awardFandaRate\[#{index}\].destinationAccount/) }
   p_element(:fna_amount) { |index,b| b.frm.text_field(name: /document.awardList\[0\].awardFandaRate\[#{index}\].underrecoveryOfIndirectCost/) }
 
-  value(:fna_sources) { |b| b.noko.div(id: 'tab-Rates:FARates-div').text_fields(title: 'Source').collect{ |field| field.value }[1..-1] }
+  value(:fna_sources) { |b| b.noko.div(id: 'tab-Rates:FARates-div').text_fields(title: 'Source').collect{ |field| field.value }.tap(&:shift) }
   value(:unrecovered_fna_total) { |b| b.fa_rates_table.trs[-2].td(index: 1).text }
 
   element(:fna_delete_buttons) { |b| b.frm.buttons(name: /deleteFandaRate/) }

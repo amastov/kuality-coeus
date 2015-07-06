@@ -36,13 +36,11 @@ class KeyPersonnel < BasePage
   # than 10 units. This is such an unlikely scenario, however, that we are not
   # coding for it.
   p_value(:units_of) { |name, b|
-    units= []
     begin
-      b.section_of(name).table.rows[1..-1].each{ |row| units << {name: row.td.text, number: row.td(index: 1).text} }
+      b.section_of(name).table.rows[1..-1].map{ |row| {name: row.td.text, number: row.td(index: 1).text} }
     rescue Watir::Exception::UnknownObjectException
-      # do nothing
+      []
     end
-    units
   }
 
   p_value(:lead_unit_of) { |name, b| b.section_of(name).table.row(text: /Lead Unit - Cannot delete/).td(index: 1).text }

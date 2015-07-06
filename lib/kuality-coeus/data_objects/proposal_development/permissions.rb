@@ -1,6 +1,6 @@
 class PermissionsObject < DataFactory
 
-  include Navigation
+  include Utilities
 
   attr_reader :document_id, :aggregators, :budget_creators, :narrative_writers,
               :viewers, :approvers, :delete_proposals
@@ -17,7 +17,7 @@ class PermissionsObject < DataFactory
     }
 
     set_options(defaults.merge(opts))
-    requires :document_id, :aggregators, :doc_header, :search_key, :lookup_class
+    requires :document_id, :aggregators, :doc_header, :navigate
   end
 
   # It's important to realize that this method assigns
@@ -103,12 +103,8 @@ class PermissionsObject < DataFactory
   # Nav Aids...
 
   def open_permissions
-    open_document
+    @navigate.call
     on(Proposal).permissions unless on_page?(on(Permissions).user_name)
-  end
-
-  def lookup_class
-    ProposalDevelopmentDocumentLookup
   end
 
   # Add/Remove roles here, as needed...

@@ -14,7 +14,7 @@ class DegreeObject < DataFactory
         graduation_year: Time.random(year_range: 35).strftime('%Y')
     }
     set_options(defaults.merge(opts))
-    requires :document_id, :person
+    requires :person
   end
 
   def create
@@ -28,8 +28,8 @@ class DegreeObject < DataFactory
     end
   end
 
-  def update_from_parent doc_id
-    @document_id=doc_id
+  def update_from_parent navigation_lambda
+    @navigate=navigation_lambda
   end
 
 end

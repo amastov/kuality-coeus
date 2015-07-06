@@ -53,9 +53,9 @@ class Meeting < BasePage
   #            description: 'text', private: true, final: true,
   #            last_updated_by: 'Stephen Malkmus 07/18/2014 12:48 PM',
   #            created_by: 'AwardDoc Maintainer 07/18/2014 12:47 PM' }
-  value(:minute_entries) { |b| array = []; b.minute_entry_rows.
-                               each { |row|
-                                array << { type: row[1].text,
+  value(:minute_entries) { |b| b.minute_entry_rows.
+                               map { |row|
+                                { type: row[1].text,
                                   protocol: row[2].text,
                                   description: me_textarea(row[3]),
                                   private: me_checkbox(row[4]),
@@ -64,7 +64,6 @@ class Meeting < BasePage
                                   created_by: row[7].text
                                 }
                                }
-                               array
                          }
 
   # Attachments
@@ -85,7 +84,7 @@ class Meeting < BasePage
     element.checkbox.present? ? Transforms::YES_NO[Transforms::CHECK.invert[element.checkbox.set?]] : element.text
   end
 
-  element(:minute_entry_rows) { |b| b.entry_type.present? ? b.frm.table(id: 'minutes-table').rows[2..-1] : b.frm.table(id: 'minutes-table').rows[1..-1] }
+  element(:minute_entry_rows) { |b| b.entry_type.present? ? b.noko.table(id: 'minutes-table').rows[2..-1] : b.noko.table(id: 'minutes-table').rows[1..-1] }
 
   element(:member_absent_table) { |b| b.frm.table(id: 'memberAbsent-table') }
   

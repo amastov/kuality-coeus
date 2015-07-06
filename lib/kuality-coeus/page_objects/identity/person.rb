@@ -6,7 +6,7 @@ class Person < BasePage
   description_field
 
   element(:principal_name) { |b| b.frm.text_field(id: 'document.principalName') }
-  value(:principal_id) { |b| b.frm.div(id: 'tab-Overview-div').table[0][3].text }
+  value(:principal_id) { |b| b.noko.div(id: 'tab-Overview-div').table[0][3].text }
   element(:affiliation_type) { |b| b.frm.select(id: 'newAffln.affiliationTypeCode') }
   element(:campus_code) { |b| b.frm.select(id: 'newAffln.campusCode') }
   element(:affiliation_default) { |b| b.frm.checkbox(id: 'newAffln.dflt') }

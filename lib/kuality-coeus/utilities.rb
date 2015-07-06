@@ -39,6 +39,26 @@ module Utilities
     12*(f.year-first_full.year) + (last_full_month - first_full.month)
   end
 
+  # Use this if the confirmation dialog may appear.
+  # For example: due to missing rates...
+  def confirmation(answer='yes')
+    begin
+      on(Confirmation) do |conf|
+        conf.send(answer) if conf.yes_button.present?
+      end
+    rescue
+      # do nothing because the dialog isn't there
+    end
+  end
+
+  def on_page? element
+    begin
+      element.exist?
+    rescue Selenium::WebDriver::Error::StaleElementReferenceError
+      false
+    end
+  end
+
   private
 
   def snakify(item)

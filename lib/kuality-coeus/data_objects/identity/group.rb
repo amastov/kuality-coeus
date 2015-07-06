@@ -1,6 +1,6 @@
 class GroupObject < DataFactory
 
-  include StringFactory, Navigation
+  include StringFactory
 
   attr_reader :id, :namespace, :name, :type,
               :principal_name, :assignees, :save_type

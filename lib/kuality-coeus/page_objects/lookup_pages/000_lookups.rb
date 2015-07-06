@@ -4,11 +4,6 @@ class Lookups < BasePage
 
   class << self
 
-    # We must override the method in the base page because of the iframe container in the new UI...
-    def select(method_name, attrib, value)
-      element(method_name) { |b| b.execute_script(%{jQuery("select[#{attrib}|='#{value}']").show();}); b.frm.select(attrib => value) }
-    end
-
     def old_ui
       element(:results_table) { |b| b.frm.table(id: 'row') }
 
@@ -32,10 +27,7 @@ class Lookups < BasePage
       #used by Award for adding a key person wher user name is important
       action(:select_random_with_name) { |b| b.results_table.tbody.trs.to_a.sample.link(title: /^with KC Person KcPerson/).click; b.use_new_tab }
 
-      p_value(:docs_w_status) { |status, b| array = []; (b.results_table.rows.find_all{|row| row[3].text==status}).each { |row| array << row[0].text }; array }
-
-      action(:return_random_term) {|b| b.random_term_results.set; b.return_selected }
-      value(:random_term_results) { |b| b.results_table.checkboxes.to_a.sample }
+      p_value(:docs_w_status) { |status, b| (b.results_table.rows.find_all{|row| row[3].text==status}).map { |row| row[0].text } }
 
       # Used as the catch-all "document opening" method for conditional navigation,
       # when we can't know whether the current user will have edit permissions.
@@ -47,8 +39,8 @@ class Lookups < BasePage
       element(:first_name) { |b| b.frm.text_field(id: 'firstName') }
       element(:full_name) { |b| b.frm.text_field(id: 'fullName') }
       element(:user_name) { |b| b.frm.text_field(id: 'userName') }
-      element(:state) { |b| b.frm.select(id: 'state') }
-      action(:search) { |b| b.frm.button(title: 'search', value: 'search').when_present.click; b.loading }
+      element(:state) { |b| b.frm.select(id: 'state') }                                 #DEBUG
+      action(:search) { |b| b.frm.button(title: 'search', value: 'search').when_present(180).click; b.loading }
       element(:create_button) { |b| b.frm.link(title: 'Create a new record') }
       action(:create_new) { |b| b.create_button.click; b.loading }
       alias_method :create, :create_new

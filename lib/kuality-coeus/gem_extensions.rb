@@ -34,6 +34,20 @@ module Watir
           end
       end
     end
+
+    # Adding support for useful custom HTML attributes...
+    alias :old_normalize_selector :normalize_selector
+
+    def normalize_selector(how, what)
+      case how
+        when :proposalnumber
+          [how, what]
+        # add more needed items as additional "when's" here...
+        else
+          old_normalize_selector(how, what)
+      end
+    end
+
   end
 
 end

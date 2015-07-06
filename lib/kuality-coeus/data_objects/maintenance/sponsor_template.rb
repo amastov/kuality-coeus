@@ -1,6 +1,6 @@
 class SponsorTemplateObject < DataFactory
 
-  include StringFactory, DateFactory, Navigation, DocumentUtilities
+  include StringFactory, DateFactory, DocumentUtilities
 
   attr_reader :document_id, :status, :description, :template_description, :template_status, :payment_basis,
               :payment_method, :find_sponsor_term

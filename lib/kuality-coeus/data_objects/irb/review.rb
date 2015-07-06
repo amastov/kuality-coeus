@@ -126,7 +126,10 @@ class ReviewObject < DataFactory
     assign_reviewers 'secondary', reviewers
   end
 
+  # ==========
   private
+  # ==========
+
   def assign_reviewers type, reviewers
     rev = { 'primary' => @primary_reviewers, 'secondary' => @secondary_reviewers }
     existing_reviewers = @primary_reviewers + @secondary_reviewers

@@ -42,14 +42,8 @@ class Proposal < BasePage
   # Keywords
 
   # When the proposal is deleted...
-  value(:error_message) { |b| b.frm.table(class: 'container2').row[1].text }
+  value(:error_message) { |b| b.noko.table(class: 'container2').row[1].text }
   element(:error_table) { |b| b.frm.table(class: 'container2') }
-
-  # Overview tab error divs
-  element(:overview_tab_errors) { |b| b.frm.div(index: 0, class: 'left-errmsg-tab').div(index: 0).divs(style: 'display:list-item;margin-left:20px;') }
-
-  # Required Fields tab error divs
-  element(:required_fields_errors) { |b| b.frm.div(index: 1, class: 'left-errmsg-tab').div(index: 0).divs(style: 'display:list-item;margin-left:20px;') }
 
   element(:error_summary) { |b| b.frm.div(class: 'error') }
 

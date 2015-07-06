@@ -1,7 +1,7 @@
 # coding: UTF-8
 class SupplementalInfoObject < DataFactory
 
-  include StringFactory, Navigation
+  include StringFactory
 
   attr_reader :graduate_student_count, :billing_element
 

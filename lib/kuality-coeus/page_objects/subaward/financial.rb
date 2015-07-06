@@ -9,6 +9,6 @@ class Financial < SubawardDocument
 
   p_value(:invoice_status) { |id, b| b.invoice_tab.tr(text: /#{Regexp.escape(id)}/)[7].text.strip }
 
-  element(:invoice_tab) { |b| b.frm.div(id: 'tab-Invoices-div') }
+  element(:invoice_tab) { |b| b.noko.div(id: 'tab-Invoices-div') }
 
 end

@@ -10,7 +10,7 @@ class Award < KCAwards
   p_action(:delete_funding_proposal) { |match, b| b.delete_funding_proposal_button(match).click }
 
   element(:transaction_type) { |b| b.frm.select(name: 'document.awardList[0].awardTransactionTypeCode') }
-  value(:award_id) { |b| b.frm.div(id: 'tab-DetailsDates:Institution-div').table[0][1].text }
+  value(:award_id) { |b| b.noko.div(id: 'tab-DetailsDates:Institution-div').table[0][1].text }
   element(:award_status) { |b| b.frm.select(name: 'document.awardList[0].statusCode') }
   element(:lead_unit_id) { |b| b.frm.text_field(name: 'document.awardList[0].unitNumber') }
   value(:lead_unit_ro) { |b| b.institution_table[0][3].text.strip }
@@ -45,14 +45,15 @@ class Award < KCAwards
   action(:add_subaward) { |b| b.frm.button(name: 'methodToCall.addApprovedSubaward.anchorSubawards').click }
   element(:approved_subaward_table) { |b| b.frm.table(summary: 'Approved Subaward') }
 
-  element(:tm_table) { |b| b.frm.div(id: 'tab-DetailsDates:TimeMoney-div').table }
+  element(:tm_table) { |b| b.noko.div(id: 'tab-DetailsDates:TimeMoney-div').table }
   element(:institution_table) { |b| b.frm.div(id: 'tab-DetailsDates:Institution-div').table }
 
   element(:current_funding_proposals_table) { |b| b.frm.table(id: 'currentFundingProposalsTable') }
 
   element(:error_summary) { |b| b.frm.div(class: 'error') }
 
-  value(:exception_errors)  { |b| arry=[]; b.divs(align: 'left').each {|d| arry << d.text}; arry }
+  value(:exception_errors)  { |b| b.noko.divs(align: 'left').map{|d| d.text} }
+
   private
 
   p_action(:target_funding_row) { |match, b| b.current_funding_proposals_table.row(text: /#{Regexp.escape(match)}/) }

@@ -24,7 +24,10 @@ class Kuality
 
   def initialize(web_browser)
 
-    @browser = Watir::Browser.new web_browser
+    client = Selenium::WebDriver::Remote::Http::Default.new
+    client.timeout = 180 # seconds – default is 60
+
+    @browser = Watir::Browser.new web_browser, :http_client => client
     @browser.window.resize_to(1500,1000)
     @browser.goto $base_url+$context
 

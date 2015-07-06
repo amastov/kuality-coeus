@@ -191,4 +191,6 @@ class KeyPersonnelCollection < CollectionsFactory
   contains KeyPersonObject
   include People
 
+  # finding methods
+
 end # KeyPersonnelCollection

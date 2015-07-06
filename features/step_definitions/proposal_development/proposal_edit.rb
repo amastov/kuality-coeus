@@ -39,13 +39,11 @@ Then /^The S2S opportunity search should become available$/ do
 end
 
 When /^The Proposal's 'Future Action Requests' should include 'PENDING APPROVE' for the principal investigator$/ do
-  pi = @proposal.key_personnel.principal_investigator
-  name = "#{pi.last_name}, #{pi.first_name}"
   @proposal.view :proposal_actions
   on ProposalActions do |page|
     page.expand_all
     page.show_future_action_requests
-    page.requested_action_for(name).should=="PENDING\nAPPROVE"
+    page.requested_action_for(@proposal.principal_investigator.full_name).should=="PENDING\nAPPROVE"
   end
 end
 

@@ -6,7 +6,7 @@ class PHSFellowshipQuestionnaireObject < DataFactory
                   :have_nih_grant_number, :have_additional_kirschstein_support, :previous_submission,
                   :senior_fellowship_application, :supplement_funding]
 
-  include StringFactory, Navigation, Utilities
+  include StringFactory, Utilities
 
   attr_reader :indefinite_human_subjects, :clinical_trial, :phase_3_trial, :indefinite_vertebrates,
               :human_stem_cells, :specific_cell_line, :field_of_training, :seeking_degree_during_proposed_award,
@@ -78,7 +78,7 @@ class PHSFellowshipQuestionnaireObject < DataFactory
   # Nav Aids...
 
   def open_s2s
-    open_document
+    # TODO: Set up navigation methods
     on(Proposal).questions unless on_page?(on(Questions).questions_header)
   end
 

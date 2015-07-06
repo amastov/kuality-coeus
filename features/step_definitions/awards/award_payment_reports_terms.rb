@@ -6,6 +6,14 @@ When /adds (\d+) reports to the Award$/ do |x|
   x.to_i.times{ @award.add_report }
 end
 
+And /adds a nonrandom report to the Award/ do
+  @award.add_report class:  'Financial',
+      type:                 'Final (Final Report)',
+      frequency:            'Annual',
+      frequency_base:       'As Required',
+      osp_file_copy:        'Report'
+end
+
 When /I? ?adds? Terms to the Award$/ do
   @award.add_terms
 end
@@ -41,20 +49,14 @@ When /^I start adding a Payment & Invoice item to the Award$/ do
   end
 end
 
-Given /I? ?add a nonrandom Payment & Invoice item to the Award$/ do
-  @award.view :payment_reports__terms
-  on PaymentReportsTerms do |page|
-    page.expand_all
-    page.payment_basis.pick 'Fixed price'
-    page.refresh_selection_lists
-    page.payment_method.pick 'Special Handling'
-    page.payment_type.pick 'KFS Invoicing'
-    page.frequency.pick 'Annual'
-    page.frequency_base.pick 'As Required'
-    page.osp_file_copy.pick 'Report'
-    page.add_payment_type
-    page.invoice_instructions.set 'This is a SMOKE TEST'
-  end
+Given /add a nonrandom Payment & Invoice item to the Award$/ do
+  @award.add_payment_and_invoice payment_basis: 'Fixed price',
+    payment_method: 'Special Handling',
+    payment_and_invoice_requirements: { payment_type: 'KFS Invoicing',
+                                        frequency: 'Annual',
+                                        frequency_base: 'As Required',
+                                        osp_file_copy: 'Report' },
+    invoice_instructions: 'This is a SMOKE TEST'
 end
 
 

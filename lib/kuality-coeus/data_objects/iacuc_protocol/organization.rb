@@ -1,6 +1,6 @@
 class OrganizationObject < DataFactory
 
-  include StringFactory, Navigation, DateFactory, Protocol
+  include StringFactory, Protocol
 
   attr_reader  :organization_id, :organization_type, :clear_contact, :add_contact_info,
                :old_organization_address, :organization_address, :organization_name
@@ -27,7 +27,7 @@ class OrganizationObject < DataFactory
           lookup.search
           return_random_organization
         end
-        @organization_id = page.organization_id.value
+        @organization_id = page.organization_id.value.strip
       else
         page.organization_id.fit @organization_id
       end
@@ -42,7 +42,7 @@ class OrganizationObject < DataFactory
     on OrganizationLookup do |lookup|
     the_row = rand(lookup.return_value_links.length)
     #need to capture the organization data that will be selected
-    @organization_id = lookup.return_value_links[the_row].parent.parent.td(index: 1).text
+    @organization_id = lookup.return_value_links[the_row].parent.parent.td(index: 1).text.strip
     @organization_name = lookup.return_value_links[the_row].parent.parent.td(index: 2).text
     @organization_address = lookup.return_value_links[the_row].parent.parent.td(index: 3).text
     @federal_employer_id =  lookup.return_value_links[the_row].parent.parent.td(index: 4).text
@@ -52,23 +52,29 @@ class OrganizationObject < DataFactory
     end
   end
 
-  def clear_contact(org_id)
+  def clear_contact
     on IACUCProtocolOverview do |page|
-      @old_organization_address = page.contact_address(org_id)
-      page.clear_contact(org_id)
+      @old_organization_address = page.contact_address(@organization_id)
+      page.clear_contact(@organization_id)
     end
   end
 
-  def add_contact_info(org_id)
-    on(IACUCProtocolOverview).add_contact(org_id)
+  def add_contact_info
+    on(IACUCProtocolOverview).add_contact(@organization_id)
     on AddressBookLookup do |search|
       search.search
       search.return_random
     end
 
     on IACUCProtocolOverview do |page|
-      @organization_address = page.contact_address(org_id)
+      @organization_address = page.contact_address(@organization_id)
     end
   end
+
+end # OrganizationObject
+
+class OrganizationCollection < CollectionsFactory
+
+  contains OrganizationObject
 
 end

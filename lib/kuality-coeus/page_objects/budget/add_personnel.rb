@@ -13,7 +13,7 @@ class AddProjectPersonnel < Dialogs
 
   element(:results_table) { |b| b.div(data_parent: 'PropBudget-ProjectPersonnelPage-Wizard').table }
 
-  value(:returned_full_names) { |b| names=[]; b.results_table.rows.each{ |row| names << row[1].text }; names[1..-1] }
+  value(:returned_full_names) { |b| b.results_table.rows.map{ |row| row[1].text }.tap(&:shift) }
 
   p_action(:select_person) { |person, b| b.results_table.row(text: /#{person}/).checkbox.set }
 

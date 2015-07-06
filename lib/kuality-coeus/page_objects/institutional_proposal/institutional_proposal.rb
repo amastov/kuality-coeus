@@ -19,7 +19,7 @@ class InstitutionalProposal < KCInstitutionalProposal
   # ===========
   
   element(:document_overview_tab) { |b| b.frm.div(id: 'tab-DocumentOverview-div') }
-  element(:institutional_proposal_tab) { |b| b.frm.div(id: 'tab-InstitutionalProposal-div') }
+  element(:institutional_proposal_tab) { |b| b.noko.div(id: 'tab-InstitutionalProposal-div') }
   element(:sponsor_program_info_tab) { |b| b.frm.div(id: 'tab-SponsorProgramInformation-div') }
   element(:financial_tab) { |b| b.frm.div(id: 'tab-Financial-div') }
   element(:graduate_students_tab) { |b| b.frm.div(id: 'tab-GraduateStudents-div') }

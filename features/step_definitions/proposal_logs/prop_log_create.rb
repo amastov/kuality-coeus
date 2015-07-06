@@ -56,8 +56,9 @@ When /^the Create Proposal Log user submits a new temporary Proposal Log with a 
   visit PersonLookup do |page|
     page.search
 
-    # TODO: This is really really slow. The HTML on the page needs improving.
-    @pi = page.returned_principal_names.shuffle[0]
+    # TODO: This is really really slow. The HTML on the page needs improving. There is currently
+    # no reliable way to improve how we parse the HTML.
+    @pi = page.returned_principal_names.sample
 
   end
   @temp_proposal_log = create ProposalLogObject,
@@ -66,7 +67,7 @@ When /^the Create Proposal Log user submits a new temporary Proposal Log with a 
 end
 
 Then /^merges the new proposal log with the previous temporary proposal log$/ do
-  raise "This step needs to be done!!!"
+  on(ProposalLog).merge_proposal_log @temp_proposal_log.number
 end
 
 When /^the Create Proposal Log user submits a new Temporary Proposal Log$/ do
@@ -93,4 +94,8 @@ Then /^the Create Proposal Log user submits the Proposal Log$/ do
   end
   steps %{ * I log in with the Create Proposal Log user }
   @proposal_log.submit
+end
+
+Then /^the permanent Proposal Log should show it has merged with the temporary one$/ do
+  expect(on(ProposalLog).proposal_merged_with).to eq @temp_proposal_log.number
 end

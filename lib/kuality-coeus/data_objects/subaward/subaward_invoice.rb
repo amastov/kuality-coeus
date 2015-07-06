@@ -1,6 +1,6 @@
 class SubawardInvoiceObject < DataFactory
 
-  include StringFactory, DateFactory, Navigation
+  include StringFactory, DateFactory, Utilities
 
   attr_reader :document_id, :invoice_id, :start_date, :end_date,
               :amount_released, :effective_date, :description

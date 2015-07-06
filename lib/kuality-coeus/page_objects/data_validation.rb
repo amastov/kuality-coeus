@@ -10,7 +10,7 @@ class DataValidation < BasePage
 
   #Error section
   action(:expand_all_error_sections) { |b| b.data_validation_div.buttons(title: 'show').each {|btn| btn.click }  }
-  value(:validation_errors_and_warnings) { |b| errs=[]; b.expand_all_error_sections; b.data_validation_div.tds.collect {|txt| errs << txt.text }; errs }
+  value(:validation_errors_and_warnings) { |b| b.expand_all_error_sections; b.data_validation_div.tds.collect {|txt| txt.text } }
 
 end
 

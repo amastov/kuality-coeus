@@ -41,6 +41,7 @@ class ProtocolPersonnelObject < DataFactory
 
   private
 
+  # Needed by the Personnel module
   def page_class
     ProtocolPersonnel
   end

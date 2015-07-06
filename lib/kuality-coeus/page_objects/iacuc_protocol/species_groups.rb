@@ -5,7 +5,7 @@ class SpeciesGroups < KCProtocol
   # The number of species that are in the Species selection list is very large.
   # This makes Watir take too long to parse it and select an item at random.
   # So we have this list built by Nokogiri, which will make random select a lot faster.
-  value(:species_list) { |b| b.noko.select(name: 'iacucProtocolSpeciesHelper.newIacucProtocolSpecies.speciesCode').options.map {|opt| opt.text }[1..-1] }
+  value(:species_list) { |b| b.noko.select(name: 'iacucProtocolSpeciesHelper.newIacucProtocolSpecies.speciesCode').options.map {|opt| opt.text }.tap(&:shift) }
   element(:strain) { |b| b.frm.text_field(name: 'iacucProtocolSpeciesHelper.newIacucProtocolSpecies.strain') }
   element(:pain_category) { |b| b.frm.select(name: 'iacucProtocolSpeciesHelper.newIacucProtocolSpecies.painCategoryCode') }
   element(:usda_covered) { |b| b.frm.checkbox(name: 'iacucProtocolSpeciesHelper.newIacucProtocolSpecies.usdaCovered') }
@@ -23,7 +23,6 @@ class SpeciesGroups < KCProtocol
   #These select lists need special handling for finding the selected option '<select_list>.selected_options.first.text'
   p_element(:species_added) { |index, b| b.frm.select(name: "document.protocolList[0].iacucProtocolSpeciesList[#{index}].speciesCode") }
   p_value(:species_added_value) { |index, b| b.species_added(index).selected_options.first.text }
-  # p_value(:species_added_value) { |index, b| b.frm.select(name: "document.protocolList[0].iacucProtocolSpeciesList[#{index}].speciesCode").selected_options.first.text }
 
   p_element(:strain_added) { |index, b| b.frm.text_field(name: "document.protocolList[0].iacucProtocolSpeciesList[#{index}].strain") }
 

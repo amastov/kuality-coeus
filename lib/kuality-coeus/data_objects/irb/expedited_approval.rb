@@ -1,6 +1,6 @@
 class ExpeditedApprovalObject < DataFactory
 
-  include StringFactory, DateFactory, Navigation
+  include StringFactory, DateFactory
 
   attr_reader :approval_date, :expiration_date, :action_date, :comments,
               :include_in_agenda, :schedule_date, :risk_level

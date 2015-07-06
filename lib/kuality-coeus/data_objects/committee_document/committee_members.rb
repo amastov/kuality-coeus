@@ -35,12 +35,6 @@ class CommitteeMemberObject < DataFactory
         letter = %w{l s r o h e t b g j f}.sample
         page.first_name.set "*#{letter}*"
         page.search
-
-
-        DEBUG.show_time
-
-
-
         # This code removes names that contain 3 words, which
         # can screw things up elsewhere...
         @name = 'William Lloyd Garrison'
@@ -48,19 +42,7 @@ class CommitteeMemberObject < DataFactory
           @name = (page.returned_full_names - existing_members - $users.full_names).sample
         end
         @user_name = page.user_name_of @name
-
-
-        DEBUG.show_time
-
-
         page.return_value @name
-
-
-
-        DEBUG.message 'returned value:'
-        DEBUG.show_time
-
-
       end
       on(Members).add_member
     else

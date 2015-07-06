@@ -6,8 +6,10 @@ class KCProtocol < BasePage
   error_messages
 
   buttons_frame 'Protocol', 'Personnel', 'Questionnaire', 'Custom Data', 'Special Review',
-          'Permissions', 'Notes & Attachments', 'Protocol Actions', 'Medusa', 'Online Review',
+          'Permissions', 'Notes & Attachments', 'Medusa', 'Online Review',
           "The Three R's", 'Species/Groups', 'Procedures', 'Protocol Exception', 'IACUC Protocol Actions'
+
+  element(:application) { |b| b.frm.div(id: 'Uif-Application') }
 
   # This removes the methods created in the BasePage, because
   # the Protocol child classes need their own specialized versions...
@@ -44,13 +46,10 @@ class KCProtocol < BasePage
       p_action(:clear_contact) { |org_id, b| b. frm.div(align: 'left', text: /^#{org_id}/).parent.parent.button(title: 'Clear organization address').click; b.loading }
       p_action(:add_contact) {|org_id, b| b.frm.div(align: 'left', text: /^#{org_id}/).parent.parent.td(index: 2).div.button(title: 'Search ').click; b.loading }
 
-
-      #Returns the organization id and the name as they are wrapped in the same div.
-      p_value(:added_organization_id_with_name) { |index, b| b.frm.div(id: 'tab-Organizations-div').tbody(index: 2).tr(index: "#{index}".to_f.round).td(index: 0).text.gsub(/\n/, ' ') }
       p_element(:direct_inquiry_button) { |org_id,b| b.frm.div(align: 'left', text: /^#{org_id}/).button(alt: 'Direct Inquiry') }
       p_action(:direct_inquiry) { |org_id,b| b.direct_inquiry_button(org_id).click; b.use_new_tab}
 
-
+      value(:organization_ids) { |b| b.noko.table(id: 'location-table').tbody(index: 2).hiddens(name: /organizationId/).map { |h| h.value } }
 
       #TODO: Create table options so that we can deal with the 'clear contact' and 'delete org' options.
 

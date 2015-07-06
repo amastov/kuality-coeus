@@ -16,8 +16,9 @@ class PaymentReportsTerms < KCAwards
 
   # Adding Reports...
 
-  # Strings that will work with these methods:
-  # 'Financial', 'IntellectualProperty', 'Procurement', 'Property', 'ProposalsDue', 'TechnicalManagement'
+  # The report parameter should be one of the elements from this array. The AwardReportsObject stores this in its @class variable...
+  value(:report_classes) { |b| b.noko.divs(id: /tab-ReportClasses:/).map { |div| div.id[/(?<=:).+(?=-)/]} }
+
   p_element(:add_report_type) { |report, b| b.report_div(report).select(name: /newAwardReportTerms\[\d+\].reportCode/) }
   p_element(:add_frequency) { |report, b| b.report_div(report).select(name: /awardReportsBean.newAwardReportTerms\[\d+\].frequencyCode/) }
   p_element(:add_frequency_base) { |report, b| b.report_div(report).select(name: /awardReportsBean.newAwardReportTerms\[\d+\].frequencyBaseCode/) }
@@ -73,6 +74,9 @@ class PaymentReportsTerms < KCAwards
 
   element(:generate_report_tracking_button) { |b| b.frm.button(alt: 'Generate Reports') }
   action(:generate_report_tracking) { |b| b.generate_report_tracking_button.click }
+
+  undefine :save_button
+  element(:save_button) { |b| b.frm.div(id: 'globalbuttons').button(name: 'methodToCall.save') }
 
   # ========
   private

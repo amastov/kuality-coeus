@@ -6,7 +6,7 @@ class S2S < BasePage
   element(:find_opportunity_button) { |b| b.button(text: 'Find an opportunity') }
 
   # Opportunity
-  element(:opp_div) { |b| b.frm.div(id: 'tab-OpportunitySearch:Opportunity-div') }
+  element(:opp_div) { |b| b.noko.div(id: 'tab-OpportunitySearch:Opportunity-div') }
   element(:submission_type) { |b| b.frm.select(name: 'document.developmentProposalList[0].s2sOpportunity.s2sSubmissionTypeCode') }
   element(:s2s_revision_type) { |b| b.frm.select(name: 'document.developmentProposalList[0].s2sOpportunity.revisionCode') }
   element(:revision_specify) { |b| b.frm.text_field(name: 'document.developmentProposalList[0].s2sOpportunity.revisionOtherDescription') }
@@ -17,7 +17,7 @@ class S2S < BasePage
   value(:competition_id) { |b| b.opp_div.table.table[5][1].text }
 
   # Submission Details
-  element(:submission_details_table) { |b| b.frm.div(id: 'tab-OpportunitySearch:SubmissionDetails-div').table }
+  element(:submission_details_table) { |b| b.noko.div(id: 'tab-OpportunitySearch:SubmissionDetails-div').table }
   element(:refresh_submission_details_button) { |b| b.frm.button(alt: 'Refresh Submission Details') }
   action(:refresh_submission_details) { |b| b.refresh_submission_details_button.click; b.loading }
   value(:received_date) { |b| b.submission_details_table[0][1].text }
@@ -29,7 +29,7 @@ class S2S < BasePage
 
   # Forms
   element(:forms_table) { |b| b.frm.div(id: 'tab-OpportunitySearch:Forms-div').table }
-  action(:include_form) { |name, b| b.forms_table.row(text: /#{Regexp.escape(name)}/).checkbox(title: 'Include') }
-  action(:form_names) { |b| array = []; b.forms_table.rows.each { |row| array << row[0].text }; array }
+  element(:include_form) { |name, b| b.forms_table.row(text: /#{Regexp.escape(name)}/).checkbox(title: 'Include') }
+  value(:form_names) { |b| b.forms_table.rows.map { |row| row[0].text } }
   
 end

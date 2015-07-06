@@ -1,9 +1,12 @@
 class IACUCProtocolOverview < KCProtocol
 
+  expected_element :application
+
   description_field
   tiny_buttons
-
   protocol_common
+
+  alias :status :document_status
 
   # Required Fields
   element(:protocol_project_type) { |b| b.frm.select(name: 'document.protocolList[0].protocolProjectTypeCode') }

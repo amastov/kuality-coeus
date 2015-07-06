@@ -7,7 +7,8 @@ class BasePage < PageFactory
   action(:close_children) { |b| b.windows[0].use; b.windows[1..-1].each{ |w| w.close} }
   action(:close_parents) { |b| b.windows[0..-2].each{ |w| w.close} }
   action(:loading_old) { |b| b.frm.image(alt: 'working...').wait_while_present }
-  action(:loading) { |b| b.image(alt: 'Loading...').wait_while_present(60) }
+                                                                      #DEBUG
+  action(:loading) { |b| b.image(alt: 'Loading...').wait_while_present(180) }
   element(:return_to_portal_button) { |b| b.frm.button(title: 'Return to Portal') }
   action(:awaiting_doc) { |b| b.return_to_portal_button.wait_while_present }
   action(:processing_document) { |b| b.frm.div(text: /The document is being processed. You will be returned to the document once processing is complete./ ).wait_while_present }
@@ -44,7 +45,7 @@ class BasePage < PageFactory
     end
 
     def document_header_elements
-      value(:doc_title) { |b| b.headerarea.h1.text.strip }
+      value(:doc_title) { |b| b.headerarea.h1.text.gsub(/\W+$/,'') }
       value(:headerinfo_table) { |b| b.noko.div(id: 'headerarea').table(class: 'headerinfo') }
       value(:document_id) { |p| p.headerinfo_table[0].text[/\d{5}/] }
       alias_method :doc_nbr, :document_id
@@ -61,21 +62,21 @@ class BasePage < PageFactory
       value(:committee_name) { |p| p.headerinfo_table[2][3].text }
       alias_method :pi, :committee_name
       alias_method :expiration_date, :committee_name
-      element(:headerarea) { |b| b.frm.div(id: 'headerarea') }
-      value(:headerinfo_table_no_frame) { |b| b.div(id: 'headerarea').table(class: 'headerinfo') }
+      element(:headerarea) { |b| b.noko.div(id: 'headerarea') }
+      value(:headerinfo_table_no_frame) { |b| b.headerarea.table(class: 'headerinfo') }
 
     end
 
     def new_doc_header
       element(:title_element) { |b| b.h1(id: /header/).span(class: 'uif-headerText-span') }
       value(:document_title) { |b| b.title_element.text }
-      value(:section_header) { |b| b.h3.span(class: 'uif-headerText-span').text }
+      value(:section_header) { |b| b.no_frame_noko.h3.span(class: 'uif-headerText-span').text }
       action(:more) { |b| b.link(text: 'more...').click }
-      value(:document_id) { |b| b.div(data_label: 'Doc Nbr').p.text }
-      value(:document_status) { |b| b.div(data_label: 'Status').p.text }
-      value(:created) { |b| b.div(data_label: 'Created').p.text }
-      value(:initiator) { |b| b.div(data_label: 'Initiator').text }
-      value(:proposal_number) { |b| b.div(data_label: 'Proposal Nbr').text }
+      value(:document_id) { |b| b.no_frame_noko.div(data_label: 'Doc Nbr').p.text }
+      value(:document_status) { |b| b.no_frame_noko.div(data_label: 'Status').p.text }
+      value(:created) { |b| b.no_frame_noko.div(data_label: 'Created').p.text }
+      value(:initiator) { |b| b.no_frame_noko.div(data_label: 'Initiator').text }
+      value(:proposal_number) { |b| b.no_frame_noko.div(data_label: 'Proposal Nbr').text }
     end
 
     # Included here because this is such a common field in KC
@@ -105,8 +106,8 @@ class BasePage < PageFactory
       action(:send_fyi) { |b| b.send_button.click; b.loading; b.awaiting_doc }
     end
 
-    def tab_buttons
-      action(:expand_all) { |b| b.frm.button(name: 'methodToCall.showAllTabs').when_present(60).click; b.loading; b.loading_old }
+    def tab_buttons                                                                        #DEBUG
+      action(:expand_all) { |b| b.frm.button(name: 'methodToCall.showAllTabs').when_present(180).click; b.loading; b.loading_old }
       element(:expand_all_button) { |b| b.frm.button(name: 'methodToCall.showAllTabs') }
       element(:show_button) { |b| b.button(src: '/kc-dev/kr/static/images/tinybutton-show.gif') }
     end
@@ -172,9 +173,9 @@ class BasePage < PageFactory
     end
 
     def special_review
-      value(:type_options) { |b| b.add_type.options }
       element(:add_type) { |b| b.frm.select(id: 'specialReviewHelper.newSpecialReview.specialReviewTypeCode') }
-      value(:approval_status_options) {|b| b.add_approval_status.options }
+      value(:type_list) { |b| b.noko.select(id: 'specialReviewHelper.newSpecialReview.specialReviewTypeCode').options.map {|opt| opt.text }[1..-1] }
+      value(:approval_status_list) {|b| b.noko.select(id: 'specialReviewHelper.newSpecialReview.approvalTypeCode').options.map {|opt| opt.text }[1..-1] }
       element(:add_approval_status) { |b| b.frm.select(id: 'specialReviewHelper.newSpecialReview.approvalTypeCode') }
       element(:add_protocol_number) { |b| b.frm.text_field(id: 'specialReviewHelper.newSpecialReview.protocolNumber') }
       element(:add_application_date) { |b| b.frm.text_field(id: 'specialReviewHelper.newSpecialReview.applicationDate') }
@@ -248,12 +249,8 @@ class BasePage < PageFactory
     end
 
     def new_error_messages
-      value(:errors) do |b|
-        errs = []
-        b.error_lis.each { |li| errs << li.text }
-        errs.flatten
-      end
-      element(:error_lis) { |b| b.lis(class: 'uif-errorMessageItem') }
+      value(:errors) { |b| b.error_lis.map { |li| li.text } }
+      element(:error_lis) { |b| b.no_frame_noko.lis(class: 'uif-errorMessageItem') }
     end
 
     def validation_elements
@@ -295,11 +292,6 @@ class BasePage < PageFactory
 
     def buttons(*buttons_text)
       buttons_text.each { |button| elementate(:button, button) }
-    end
-
-    # TODO: This probably should be removed...
-    def select(method_name, attrib, value)
-      element(method_name) { |b| b.execute_script(%{jQuery("select[#{attrib}|='#{value}']").show();}) unless b.select(attrib => value).visible?; b.select(attrib => value) }
     end
 
     def buttons_frame(*buttons_text)

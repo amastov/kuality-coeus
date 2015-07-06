@@ -1,6 +1,6 @@
 class RoleObject < DataFactory
 
-  include StringFactory, Navigation
+  include StringFactory
 
   attr_reader :id, :name, :type, :namespace, :description,
               :permissions, :save_type
@@ -111,9 +111,9 @@ class RoleObject < DataFactory
   end
 
   def view
-    exists?
-    # TODO: Add conditional navigation code here
-    on(RoleLookup).edit_item @name
+    if exists?
+      on(RoleLookup).edit_item @name
+    end
   end
 
   def exists?

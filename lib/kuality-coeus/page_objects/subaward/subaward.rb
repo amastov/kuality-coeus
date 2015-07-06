@@ -32,7 +32,7 @@ class Subaward < SubawardDocument
   action(:person_lookup) { |b| b.frm.button(name: 'methodToCall.performLookup.(!!org.kuali.kra.bo.Rolodex!!).(((rolodexId:newSubAwardContact.rolodexId))).((`newSubAwardContact.rolodexId:rolodexId`)).((<>)).(([])).((**)).((^^)).((&&)).((//)).((~~)).(::::;;::::).anchorContacts').click }
   element(:project_role) { |b| b.frm.select(name: 'newSubAwardContact.contactTypeCode') }
   action(:add_contact) { |b| b.frm.button(name: 'methodToCall.addContacts.anchorContacts').click }
-  value(:contact_name) { |b| b.frm.div(id: 'org.fullName.div').text.strip }
+  value(:contact_name) { |b| b.noko.div(id: 'org.fullName.div').text.strip }
 
   # Closeout
   element(:closeout_type) { |b| b.frm.select(name: 'newSubAwardCloseout.closeoutTypeCode') }

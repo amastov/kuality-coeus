@@ -1,15 +1,15 @@
 class IACUCProtocolObject < DataFactory
 
-  include StringFactory, Navigation, DateFactory, Protocol
+  include StringFactory, DateFactory, Protocol, Utilities
 
   attr_reader  :description, :organization_document_number, :protocol_type, :title, :lead_unit,
                :protocol_project_type, :lay_statement_1,
                #theThreeRs
                :alternate_search_required, :reduction, :refinement, :replacement,
                #others
-               :procedures, :location, :document_id,
-               :species, :organization, :old_organization_address, :species_modify, :withdrawal_reason,
-               :principles, :doc, :amendment
+               :procedures, :location, :document_id, :special_review,
+               :species_groups, :organizations, :withdrawal_reason,
+               :amendment, :personnel
 
   def initialize(browser, opts={})
     @browser = browser
@@ -22,17 +22,20 @@ class IACUCProtocolObject < DataFactory
         protocol_project_type: '::random::',
         lay_statement_1:     random_alphanums_plus,
         alternate_search_required: 'No',
-        personnel:           collection('ProtocolPersonnel')
+        personnel:           collection('IACUCPersonnel'),
+        special_review:      collection('SpecialReview'),
+        species_groups:      collection('SpeciesGroups'),
+        # TODO: Need code for when an organization is already added to protocol by default
+        organizations:       collection('Organization')
     }
 
-    @lookup_class = IACUCProtocolLookup
     set_options(defaults.merge(opts))
+    @navigate = navigate
   end
 
   def create
     on(Header).researcher
     on(ResearcherMenu).create_iacuc_protocol
-
     on IACUCProtocolOverview do |doc|
       @document_id=doc.document_id
       @doc_header=doc.doc_title
@@ -46,7 +49,6 @@ class IACUCProtocolObject < DataFactory
       fill_out doc, :description, :protocol_type, :title, :lay_statement_1
       @protocol_project_type = doc.protocol_project_type_options.sample if @protocol_project_type == '::random::'
       fill_out doc, :protocol_project_type
-
     end
     unless @lead_unit==' '
       set_lead_unit
@@ -60,97 +62,38 @@ class IACUCProtocolObject < DataFactory
         doc.send_it if doc.send_button.present? #send notification
       end
       @protocol_number=doc.protocol_number
-      @search_key = { protocol_number: @protocol_number }
     end
   end
 
   def view(tab)
     raise 'Please pass a string for the Protocol\'s view method.' unless tab.kind_of? String
-    on IACUCProtocolOverview do |page|
-      if page.protocol_element.exists?
-        if page.protocol_number == @protocol_number
-          # 'on document, moving on'
-        else
-          view_document
-        end
-      else
-        view_document
-      end
-      page.send(damballa(tab))
-    end
+    @navigate.call
+    on(IACUCProtocolOverview).send(damballa(tab))
   end
 
-  def view_document
-    #use this view when you are on the document and want to completely reload the document.
-    on(Header).doc_search
-    on DocumentSearch do |search|
-      search.document_id.set @document_id
-      search.search
-      search.open_item @document_id
-    end
-  end
-
-  def navigate
-    if on(Header).krad_portal_element.exists?
-      on(Header).krad_portal
-    end
-
-    #we have gotten to a strange place without a header because of time and money need to get back from there
-    @browser.goto $base_url+$context unless on(Header).header_div.exists?
-    unless on_protocol?
-
-      on(Header).doc_search
-      on DocumentSearch do |search|
-        search.document_id.set @document_id
-        search.search
-        search.open_item @document_id
-      end
-
-    end
-  end
-
-  def on_protocol?
-    false
-    # if on(ProtocolOverview).headerinfo_table.present?
-    #   on(ProtocolOverview).protocol_number==@protocol_number
-    # else
-    #   false
-    # end
-  end
-
-
-  def view_by_protocol_number(protocol_number=@protocol_number)
-    on(Header).doc_search
-    on(Header).researcher
-    on(ResearcherMenu).iacuc_search_protocols
-    on ProtocolLookup do |search|
-      search.protocol_number.set protocol_number
-      search.search
-      search.active('yes')
-      #Parameter needed for Amendment which creates a unique protocol number with 4 extra digits at the end
-      #example base protocol number 1410000010 then amendment becomes 1410000010A001
-      search.edit_item("#{protocol_number}")
-    end
-  end
-
-  def theThreeRs opts={}
-    @principles = {
-      alternate_search_required: 'No'
+  def add_the_three_rs opts={}
+    defaults = {
+      alternate_search_required: 'No',
+      reduction: random_alphanums,
+      refinement: random_alphanums,
+      replacement: random_alphanums
     }
-    @principles.merge!(opts)
+    defaults.merge!(opts)
 
     view "The Three R's"
     on TheThreeRs do |page|
       page.expand_all
 
-      page.reduction.fit @principles[:reduction]
-      page.refinement.fit @principles[:refinement]
-      page.replacement.fit @principles[:replacement]
+      page.reduction.fit defaults[:reduction]
+      page.refinement.fit defaults[:refinement]
+      page.replacement.fit defaults[:replacement]
 
-      page.alternate_search_required.fit @principles[:alternate_search_required]
+      page.alternate_search_required.fit defaults[:alternate_search_required]
       page.save
     end
+    set_options defaults
   end
+  alias_method :update_the_three_rs, :add_the_three_rs
 
   def send_notification_to_employee
     on(IACUCProtocolOverview).send_notification
@@ -167,13 +110,46 @@ class IACUCProtocolObject < DataFactory
     end
   end
 
-  def add_organization opts={}
-    view 'Protocol'
-    raise 'There\'s already an Organization added to the Protocol. Please fix your scenario!' unless @organization.nil?
-    @organization = make OrganizationObject, opts
-    @organization.create
+  def add_personnel opts={}
+    defaults = {
+
+    }
+    @personnel.add defaults.merge(opts)
   end
 
+  def add_organization opts={}
+    view 'Protocol'
+    # TODO: Add code to index multiple organizations...
+    @organizations.add opts
+  end
+
+  def add_special_review opts={}
+    defaults = {
+        navigate: @navigate,
+        index: @special_review.size
+    }
+    @special_review.add defaults.merge(opts)
+  end
+
+  def add_species_groups opts={}
+    defaults = {
+        navigate: @navigate,
+        index: @species_groups.size
+    }
+    @species_groups.add defaults.merge(opts)
+  end
+  alias_method :add_species_group, :add_species_groups
+
+  def add_procedure opts={}
+    raise 'You have already made a @procedures variable in your protocol. Please interact with this object directly, now.' unless @procedures.nil?
+    defaults = {
+        navigate: @navigate
+    }
+    @procedures = make IACUCProceduresObject, defaults.merge(opts)
+    @procedures.create
+  end
+
+  # FIXME - Needs its own data object and collection classes.
   def add_protocol_exception opts={}
     @protocol_exception ||= {
         exception: '::random::',
@@ -196,6 +172,7 @@ class IACUCProtocolObject < DataFactory
   # Protocol Actions
   # -----
 
+  #FIXME: This does not updating instance variables properly...
   def submit_for_review opts={}
     review ||= {
         submission_type: '::random::',
@@ -203,7 +180,6 @@ class IACUCProtocolObject < DataFactory
         type_qualifier: '::random::'
     }
     review.merge!(opts)
-
     view 'IACUC Protocol Actions'
     on IACUCSubmitForReview do |page|
       page.expand_all
@@ -225,7 +201,6 @@ class IACUCProtocolObject < DataFactory
   end
 
   def admin_approve_amendment
-    view_by_protocol_number(@amendment[:protocol_number])
     view 'IACUC Protocol Actions'
     on AdministrativelyApproveProtocol do |page|
       page.expand_all
@@ -237,9 +212,9 @@ class IACUCProtocolObject < DataFactory
     # because when approving an amendment this information changes
     # and user is left on the amendment without any indication
     # of what the new document id is.
-    view_by_protocol_number
+    visit Landing
+    @navigate.call
     on ProtocolActions do |page|
-      page.headerarea.wait_until_present
       @document_id = page.document_id
     end
   end
@@ -247,9 +222,6 @@ class IACUCProtocolObject < DataFactory
   def request_to_deactivate
     view 'IACUC Protocol Actions'
     on RequestToDeactivate do |page|
-      page.expand_all
-      page.submit
-      #First time the status changes to 'pending' and need to deactivate a second time
       page.expand_all
       page.submit
     end
@@ -284,36 +256,10 @@ class IACUCProtocolObject < DataFactory
     on(NotificationEditor).send_it if on(NotificationEditor).send_button.present?
   end
 
-  def create_amendment opts={}
-    @amendment = {
-        summary: random_alphanums_plus,
-        sections: [['General Info', 'Funding Source', 'Protocol References and Other Identifiers',
-                    'Protocol Organizations', 'Questionnaire', 'General Info',
-                    'Areas of Research', 'Special Review', 'Protocol Personnel', 'Others'].sample]
-    }
-    @amendment.merge!(opts)
-    view_by_protocol_number
+  def add_amendment opts={}
+    @amendment = make IACUCAmendmentObject, opts
     view 'IACUC Protocol Actions'
-
-    on CreateAmendment do |page|
-      page.expand_all
-      page.summary.set @amendment[:summary]
-      @amendment[:sections].each do |sect|
-        page.amend(sect).set
-      end
-      page.create
-    end
-    confirmation('yes')
-    on(NotificationEditor).send_it if on(NotificationEditor).send_button.present?
-    on(CreateAmendment).save
-
-    #Amendment has a different header with 9 fields instead of the normal 6 fields
-    gather_document_info
-    @amendment[:protocol_number] = @doc[:protocol_number]
-    @amendment[:document_id] = @doc[:document_id]
-
-    @document_id = on(IACUCProtocolActions).document_id
-    on(IACUCProtocolOverview).send_it if on(IACUCProtocolOverview).send_button.present? #send notification
+    @amendment.create
   end
 
   def suspend
@@ -354,22 +300,30 @@ class IACUCProtocolObject < DataFactory
     on(NotificationEditor).send_it if on(NotificationEditor).send_button.present?
   end
 
-  # For Amendment document with 9 header area fields
-  def gather_document_info
-    keys=[]
-    values=[]
-    @doc={}
+  # ============
+  private
+  # ============
 
-    on IACUCProtocolOverview do |page|
-      # collecting the keys from the header table
-      page.headerarea.ths.each {|k| keys << k.text.gsub(':', ' ').gsub('#', 'number').strip.gsub(' ', '_').downcase.to_sym }
-      # collecting the values from the header table
-      page.headerarea.tds.each {|v| values << v.text }
-    end
-    # turning the two arrays into a usable hash
-    @doc = Hash[[keys, values].transpose]
-    #removing empty key value pairs
-    @doc.delete_if {|k,v| v.nil? or k==:"" }
+  def navigate
+    lambda {
+      begin
+        there = on(DocumentHeader).document_id==@document_id && @browser.frm.div(id: 'headerarea').h1.text.gsub(/\W+$/,'')==@doc_header
+      rescue Watir::Exception::UnknownObjectException, Selenium::WebDriver::Error::StaleElementReferenceError, WatirNokogiri::Exception::UnknownObjectException, Watir::Wait::TimeoutError
+        there = false
+      end
+      unless there
+        on(BasePage).close_extra_windows
+        on(Header).researcher
+        on(ResearcherMenu).iacuc_search_protocols
+        on ProtocolLookup do |search|
+          fill_out search, :protocol_number
+          search.search
+          #TODO: Parameter needed for Amendment which creates a unique protocol number with 4 extra digits at the end
+          #example base protocol number 1410000010 then amendment becomes 1410000010A001
+          search.edit_item(@protocol_number)
+        end
+      end
+    }
   end
 
 end #IACUCProtocolObject

@@ -63,6 +63,7 @@ class ProposalDevelopmentObject < DataFactory
       @proposal_number=page.proposal_number
       page.save
       return if page.errors.size > 0
+      # Removed until permissions is working again...
       #@permissions = make PermissionsObject, merge_settings(aggregators: [@initiator])
     end
     on(ProposalSidebar).sponsor_and_program_info

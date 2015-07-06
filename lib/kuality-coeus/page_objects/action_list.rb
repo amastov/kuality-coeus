@@ -11,7 +11,6 @@ class ActionList < BasePage
 
   action(:open_first_document_id) { |p| p.results_table.tbody.link(href: /command=displayActionListView$/).click; p.use_new_tab; p.close_parents }
 
-
   action(:item_row) { |match, b| b.results_table.row(text: /#{Regexp.escape(match)}/m) }
   # Note: Use this when you need to click the "open" link on the target row
   action(:open) { |match, p| p.results_table.row(text: /#{Regexp.escape(match)}/m).link(text: 'open').click; p.use_new_tab; p.close_parents }
@@ -24,7 +23,7 @@ class ActionList < BasePage
   action(:return_random) { |b| b.return_value_links[rand(b.return_value_links.length)].click }
   element(:return_value_links) { |b| b.results_table.links(text: 'return value') }
 
-  p_value(:docs_w_status) { |status, b| array = []; (b.results_table.rows.find_all{|row| row[3].text==status}).each { |row| array << row[0].text }; array }
+  p_value(:docs_w_status) { |status, b| (b.results_table.rows.find_all{|row| row[3].text==status}).map { |row| row[0].text } }
 
   # Used as the catch-all "document opening" method for conditional navigation,
   # when we can't know whether the current user will have edit permissions.
