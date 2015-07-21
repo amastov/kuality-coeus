@@ -1,3 +1,4 @@
+# coding: UTF-8
 #----------------------#
 # Add to the error message hash in situations that throw uncomplicated errors.
 # $current_page makes this possible.
@@ -26,7 +27,8 @@ Then /^an error should appear that says (.*)$/ do |error|
             'the invoiced exceeds the obligated amount' => 'Cumulative Invoiced Amount would exceed the Obligated Subaward Amount.',
             'the start date must be before the end' => 'Project Start Date: The Project Start Date (Start Dt) must be before the Project End Date (End Dt).',
             'the project title can\'t contain special characters' => 'Project Title: Must be an alphanumeric character or punctuation.',
-            'the IP ID can only have alphanumeric characters' => 'Original Institutional Proposal ID: Can only be alphanumeric characters ',
+            # Note the trailing "space" in this string. It is NOT a space. It's some weird invisible character...
+            'the IP ID can only have alphanumeric characters' => 'Original Institutional Proposal ID: Can only be alphanumeric characters ',
             'the Award ID is invalid' => 'Award ID: Award ID is invalid.',
             'the deadline time is not valid' => 'Sponsor Deadline Time: DeadlineTime is invalid.',
             'a valid IP ID must be selected' => 'Original Institutional Proposal ID: A valid Original Institutional Proposal ID (Original Institutional Proposal ID) must be selected.',
@@ -117,7 +119,7 @@ Then /^an error message says (the date must be in a valid format|the start date 
 end
 
 Then /^errors appear on the Contacts page, saying the credit splits for the PI aren't equal to 100\%$/ do
-  @award.view_tab :contacts
+  @award.view :contacts
   on AwardContacts do |page|
     page.expand_all
     DocumentUtilities::CREDIT_SPLITS.values.each do |type|

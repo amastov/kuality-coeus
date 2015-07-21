@@ -16,8 +16,16 @@ Given /^(the (.*) |)submits an IACUC Protocol for admin review$/ do |text, role_
   @iacuc_protocol.submit_for_review review_type: 'Administrative Review'
 end
 
+Given /^(the (.*) |)submits an IACUC Protocol for designated member review/ do |text, role_name|
+  steps %{ * I log in with the #{role_name} user } unless text == ''
+  @iacuc_protocol = create IACUCProtocolObject
+  @iacuc_protocol.add_the_three_rs
+  @iacuc_protocol.submit_for_review review_type: 'Designated Member Review'
+end
+
 And /^the (.*) approves the IACUC Protocol$/ do |role_name|
   steps %{ * log in with the #{role_name} user }
+  @iacuc_protocol.view 'IACUC Protocol Actions'
   @iacuc_protocol.admin_approve
 end
 

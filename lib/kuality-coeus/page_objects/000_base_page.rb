@@ -7,8 +7,7 @@ class BasePage < PageFactory
   action(:close_children) { |b| b.windows[0].use; b.windows[1..-1].each{ |w| w.close} }
   action(:close_parents) { |b| b.windows[0..-2].each{ |w| w.close} }
   action(:loading_old) { |b| b.frm.image(alt: 'working...').wait_while_present }
-                                                                      #DEBUG
-  action(:loading) { |b| b.image(alt: 'Loading...').wait_while_present(180) }
+  action(:loading) { |b| b.image(alt: 'Loading...').wait_while_present }
   element(:return_to_portal_button) { |b| b.frm.button(title: 'Return to Portal') }
   action(:awaiting_doc) { |b| b.return_to_portal_button.wait_while_present }
   action(:processing_document) { |b| b.frm.div(text: /The document is being processed. You will be returned to the document once processing is complete./ ).wait_while_present }
@@ -324,14 +323,14 @@ class BasePage < PageFactory
       el_name=damballa("#{text}_element")
       act_name=damballa(text)
 
-      if frame == true
+      if frame
         #for the old UI with a frame element (aka: Non-Krad)
         element(el_name) { |b| b.frm.send(type, text: text) }
         action(act_name) { |b| b.frm.send(type, text: text).click; b.loading }
       else
         element(el_name) { |b| b.send(type, text: text) }
         action(act_name) { |b| b.send(type, text: text).click; b.loading }
-     end
+      end
 
     end
 
@@ -349,6 +348,11 @@ class BasePage < PageFactory
 
     def onespace(string)
       string.gsub('  ', ' ')
+    end
+
+    # Used by the Lead Unit field in CreateProposal
+    def select(method_name, attrib, value)
+      element(method_name) { |b| b.execute_script(%{jQuery("select[#{attrib}|='#{value}']").show();}) unless b.select(attrib => value).visible?; b.select(attrib => value) }
     end
 
   end # self

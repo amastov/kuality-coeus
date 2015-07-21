@@ -1,6 +1,8 @@
 Then /^the IACUC Protocol (submission status|status) should be (.*)$/ do |status_field, status_message|
-    @iacuc_protocol.view 'Protocol'
-    expect(on(IACUCProtocolOverview).send(damballa(status_field))).to eq status_message
+  on(Header).researcher
+  on(ResearcherMenu).search_proposals
+  @iacuc_protocol.view 'Protocol'
+  expect(on(IACUCProtocolOverview).send(damballa(status_field))).to eq status_message
 end
 
 Then /^the summary will display the location of the procedure$/ do
@@ -135,4 +137,10 @@ Then /^the procedures summary will display qualifications for the personnel$/ do
     page.view_qualification(@iacuc_protocol.procedures.personnel[0].full_name)
     expect(page.qualification_dialog).to include @iacuc_protocol.procedures.personnel[0].qualifications
   end
+end
+
+Then /^the IACUC Administrator cannot delete the Protocol$/ do
+  steps '* log in with the IACUC Administrator user'
+  @iacuc_protocol.view 'IACUC Protocol Actions'
+  expect(on(IACUCProtocolActions).unavailable_actions).to include 'Delete Protocol, Amendment, or Renewal'
 end

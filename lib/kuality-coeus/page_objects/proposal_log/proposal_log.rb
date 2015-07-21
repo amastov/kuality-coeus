@@ -11,9 +11,9 @@ class ProposalLog < BasePage
 
   element(:save_button) { |b| b.frm.button(title: 'save') }
 
-  value(:proposal_number) { |b| b.noko.span(id: 'document.newMaintainableObject.proposalNumber.div').text }
+  value(:proposal_number) { |b| b.noko.span(id: 'document.newMaintainableObject.proposalNumber.div').text.gsub(/\W+$/,'') }
   element(:proposal_log_type) { |b| b.frm.select(id: 'document.newMaintainableObject.proposalLogTypeCode') }
-  value(:proposal_log_status) { |b| b.noko.span(id: 'document.newMaintainableObject.logStatus.div').text }
+  value(:proposal_log_status) { |b| b.noko.span(id: 'document.newMaintainableObject.logStatus.div').text.gsub(/\W+$/,'') }
   value(:proposal_merged_with) { |b| b.noko.span(id: 'document.newMaintainableObject.mergedWith.span').text }
   element(:proposal_type) { |b| b.frm.select(id: 'document.newMaintainableObject.proposalTypeCode') }
   element(:title) { |b| b.frm.text_field(id: 'document.newMaintainableObject.title') }
@@ -23,7 +23,7 @@ class ProposalLog < BasePage
   element(:principal_investigator_employee) { |b| b.frm.text_field(id: 'document.newMaintainableObject.person.userName') }
   action(:employee_lookup) { |b| b.frm.button(title: 'Search Principal Investigator (Employee)').click }
   element(:principal_investigator_non_employee) { |b| b.frm.text_field(id: 'document.newMaintainableObject.rolodexId') }
-  value(:pi_full_name) { |b| b.noko.span(id: 'document.newMaintainableObject.person.fullName.div').text.strip.gsub('  ', ' ') }
+  value(:pi_full_name) { |b| b.noko.span(id: 'document.newMaintainableObject.person.fullName.div').text.gsub(/\W+$/,'').gsub('  ', ' ') }
 
   #Table for temporary proposal logs to be merged
   element(:temporary_proposal_log_table) { |b| b.merge_list.table }

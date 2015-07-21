@@ -1,3 +1,4 @@
+@iacuc
 Feature: Error Validations in IACUC Protocols
 
   As a Protocol Creator, I would like to know when I have entered

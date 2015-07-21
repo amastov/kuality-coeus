@@ -6,16 +6,17 @@ class Lookups < BasePage
 
     def old_ui
       element(:results_table) { |b| b.frm.table(id: 'row') }
+      element(:noko_results) { |b| b.noko.table(id: 'row') }
 
-      action(:edit_item) { |match, p| p.results_table.row(text: /#{Regexp.escape(match)}/m).link(text: 'edit').click; p.use_new_tab; p.close_parents }
+      action(:edit_item) { |match, b| b.frm.link(title: b.noko_results.row(text: /#{Regexp.escape(match)}/m).link(text: /edit/).title).click; b.use_new_tab; b.close_parents }
       alias_method :edit_person, :edit_item
 
-      action(:edit_first_item) { |b| b.frm.link(text: 'edit').when_present.click; b.use_new_tab; b.close_parents }
+      action(:edit_first_item) { |b| b.frm.link(text: /edit/).when_present.click; b.use_new_tab; b.close_parents }
       action(:view_first_item) { |b| b.frm.link(text: 'view').when_present.click; b.use_new_tab; b.close_parents }
 
       action(:item_row) { |match, b| b.results_table.row(text: /#{Regexp.escape(match)}/m) }
       # Note: Use this when you need to click the "open" link on the target row
-      action(:open) { |match, p| p.results_table.row(text: /#{Regexp.escape(match)}/m).link(text: 'open').click; p.use_new_tab; p.close_parents }
+      action(:open) { |match, p| p.link(id: p.noko_results.row(text: /#{Regexp.escape(match)}/m).link(text: 'open').id).click; p.use_new_tab; p.close_parents }
       # Note: Use this when the link itself is the text you want to match
       p_action(:open_item) { |match, b| b.frm.link(text: /#{Regexp.escape(match)}/).click; b.use_new_tab; b.close_parents }
       p_action(:delete_item) { |match, p| p.item_row(match).link(text: 'delete').click; p.use_new_tab; p.close_parents }
@@ -49,8 +50,10 @@ class Lookups < BasePage
     def dialog_ui
       action(:search) { |b| b.frm.button(id: 'ufuknop').click; b.results_table.wait_until_present }
       element(:results_table) { |b| b.frm.table(id: 'uLookupResults_layout') }
-      action(:select_random) { |b| b.select_links.to_a.sample.click; b.loading }
+      action(:select_random) { |b| b.frm.link(id: b.select_link_ids.sample).click; b.loading }
       element(:select_links) { |b| b.results_table.links(text: 'select') }
+      value(:select_link_ids) { |b| b.noko_results.links(text: 'select').map { |link| link.id } }
+      element(:noko_results) { |b| b.noko.table(id: 'uLookupResults_layout') }
     end
 
     def url_info(title, class_name)

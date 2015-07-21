@@ -10,7 +10,7 @@ class Award < KCAwards
   p_action(:delete_funding_proposal) { |match, b| b.delete_funding_proposal_button(match).click }
 
   element(:transaction_type) { |b| b.frm.select(name: 'document.awardList[0].awardTransactionTypeCode') }
-  value(:award_id) { |b| b.noko.div(id: 'tab-DetailsDates:Institution-div').table[0][1].text }
+  value(:award_id) { |b| b.noko.div(id: 'tab-DetailsDates:Institution-div').table[0][1].text.gsub(/\W+$/,'') }
   element(:award_status) { |b| b.frm.select(name: 'document.awardList[0].statusCode') }
   element(:lead_unit_id) { |b| b.frm.text_field(name: 'document.awardList[0].unitNumber') }
   value(:lead_unit_ro) { |b| b.institution_table[0][3].text.strip }
@@ -52,7 +52,9 @@ class Award < KCAwards
 
   element(:error_summary) { |b| b.frm.div(class: 'error') }
 
-  value(:exception_errors)  { |b| b.noko.divs(align: 'left').map{|d| d.text} }
+  value(:exception_errors) { |b| b.noko.divs(align: 'left').map{|d| d.text} }
+
+  element(:error_message) { |b| b.frm.div(text: 'Error Message') }
 
   private
 

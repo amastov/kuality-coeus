@@ -1,4 +1,7 @@
+# This class can be used for both IACUC and IRB...
 class OnlineReview < KCProtocol
+
+  expected_element :tabs_div, 180
 
   # Document Overview
   p_value(:review_doc_nbr) { |name, b| b.reviewer_panel(name).table(title: 'view/edit document overview information').tr.td.text }
@@ -34,5 +37,6 @@ class OnlineReview < KCProtocol
   private
 
   p_element(:reviewer_panel) { |name, b| b.frm.div(id: "tab-OnlineReview#{nospace(name)}-div") }
+  element(:tabs_div) { |b| b.frm.div(id: 'tabs') }
 
 end

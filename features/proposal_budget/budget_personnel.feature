@@ -18,7 +18,7 @@ Feature: Project Personnel in Proposal Budget Versions
     Given a User exists with a 'SUMMER EMPLOYEE' appointment type
     When  the Proposal Creator adds the 'SUMMER EMPLOYEE' User to the Budget personnel
     Then  the Budget personnel list shows the SUMMER EMPLOYEE's job code, salary, and appointment type info
-
+  @test
   Scenario: Adding Project Person with Salary and no Inflation Rate
     Given the Proposal Creator adds an employee to the Budget personnel
     And   adds a to-be-named person to the Budget personnel

@@ -30,6 +30,6 @@ class BudgetPersonnel < BasePage
 
   p_element(:person_row) { |name, b| b.personnel_table.row(text: /#{name}/) }
   element(:personnel_table) { |b| b.div(class: 'dataTables_wrapper').tbody }
-  element(:personnel_rows) { |b| b.no_frame_noko.personnel_table.trs(class: /(even|odd)/) }
+  element(:personnel_rows) { |b| b.no_frame_noko.div(class: 'dataTables_wrapper').tbody.trs(class: /(even|odd)/) }
 
 end

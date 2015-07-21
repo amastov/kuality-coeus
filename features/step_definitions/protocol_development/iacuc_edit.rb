@@ -38,7 +38,8 @@ When /lifts the hold placed on the IACUC Protocol$/ do
   @iacuc_protocol.lift_hold
 end
 
-When /withdraws the IACUC Protocol$/ do
+When /^(the (.*) |)withdraws the IACUC Protocol$/ do |text, role_name|
+    steps %{ * I log in with the #{role_name} user } unless text == ''
   @iacuc_protocol.withdraw
 end
 
@@ -73,7 +74,7 @@ When /^(the (.*) |)adds? a Species with non\-integers for the species count$/ do
 end
 
 When /saves the IACUC Protocol after modifying the required fields for the Species$/ do
-  @iacuc_protocol.species_groups[0].edit group:             random_alphanums_plus(10, 'Species '),
+  @iacuc_protocol.species_groups[0].edit group: random_alphanums_plus(10, 'Species '),
                 species:           '::random::',
                 pain_category:     '::random::',
                 count_type:        '::random::',
@@ -107,7 +108,7 @@ When /adding a Special Review with incorrect data$/ do
 end
 
 When /adding a Special Review for human subjects, status approved, and an exemption$/ do
-  @iacuc_protocol.add_special_review type:    'Human Subjects',
+  @iacuc_protocol.add_special_review type: 'Human Subjects',
                             approval_status:  'Approved',
                             exemption_number: '::random::',
                             protocol_number:  nil,
@@ -156,4 +157,20 @@ end
 And /^a qualification and procedure are added to the procedure person$/ do
   @iacuc_protocol.procedures.personnel[0].add_procedure @iacuc_protocol.procedures.categories[0].name
   @iacuc_protocol.procedures.personnel[0].update_qualifications random_alphanums
+end
+
+Given /^(the (.*) |)assigns committee members to review the submission$/ do |text, role_name|
+  steps %{* I log in with the #{role_name} user } unless text ==''
+                                            #DEBUG:
+  @iacuc_protocol.modify_submission_request schedule_date: nil # We have this in here because of a bug about selecting schedule items
+end
+
+And /^the (.*) modifies the IACUC Protocol's submission request so the non-employee is a reviewer$/ do |role_name|
+  steps %{ * log in with the #{role_name} user }
+  @iacuc_protocol.modify_submission_request primary_reviewers: ['Guest, David'], schedule_date: nil
+end
+
+Then /^(the (.*) |)approves the Protocol$/ do |text, role_name|
+  steps %{* I log in with the #{role_name} user } unless text ==''
+  @iacuc_protocol.approve
 end

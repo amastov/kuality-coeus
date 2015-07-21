@@ -44,7 +44,7 @@ class EditAssignedNonPersonnel < BasePage
     end
   }
 
-  p_element(:apply) { |rate_class, type, b| b.rates_table.trs.find{ |tr| tr[0].text==rate_class && tr[1].text==type }.checkbox }
+  p_element(:apply) { |rate_class, type, b| b.checkbox(name: b.noko_rates_table.trs.find{ |tr| tr[0].text==rate_class && tr[1].text==type }.checkbox.name) }
 
   private
 

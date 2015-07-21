@@ -9,7 +9,7 @@ class IACUCProtocolObject < DataFactory
                #others
                :procedures, :location, :document_id, :special_review,
                :species_groups, :organizations, :withdrawal_reason,
-               :amendment, :personnel
+               :amendment, :personnel, :exceptions, :submission
 
   def initialize(browser, opts={})
     @browser = browser
@@ -26,7 +26,8 @@ class IACUCProtocolObject < DataFactory
         special_review:      collection('SpecialReview'),
         species_groups:      collection('SpeciesGroups'),
         # TODO: Need code for when an organization is already added to protocol by default
-        organizations:       collection('Organization')
+        organizations:       collection('Organization'),
+        exceptions:          collection('Exceptions')
     }
 
     set_options(defaults.merge(opts))
@@ -149,55 +150,34 @@ class IACUCProtocolObject < DataFactory
     @procedures.create
   end
 
-  # FIXME - Needs its own data object and collection classes.
   def add_protocol_exception opts={}
-    @protocol_exception ||= {
-        exception: '::random::',
-        justification: random_alphanums_plus
-    }
-    @protocol_exception.merge!(opts)
-
     view 'Protocol Exception'
-    on ProtocolException do |page|
-      page.expand_all
-      @protocol_exception[:exception] = page.exception_list.sample if @protocol_exception[:exception] == '::random::'
-      page.exception.pick! @protocol_exception[:exception]
-      page.species.pick!  @species[:species]
-      page.justification.fit @protocol_exception[:justification]
-      page.add_exception
-    end
+    @exceptions.add opts
   end
 
   # -----
   # Protocol Actions
   # -----
 
-  #FIXME: This does not updating instance variables properly...
   def submit_for_review opts={}
-    review ||= {
-        submission_type: '::random::',
-        review_type: '::random::',
-        type_qualifier: '::random::'
-    }
-    review.merge!(opts)
     view 'IACUC Protocol Actions'
-    on IACUCSubmitForReview do |page|
-      page.expand_all
-      page.submission_type.pick! review[:submission_type]
-      page.review_type.pick! review[:review_type]
-      page.type_qualifier.pick! review[:type_qualifier]
-
-      page.submit
-    end
+    @submission = make IACUCSubmissionObject, opts
+    @submission.create
   end
 
-  def admin_approve
+  def modify_submission_request opts={}
     view 'IACUC Protocol Actions'
-    on AdministrativelyApproveProtocol do |page|
+    @submission.edit opts
+  end
+
+  def approve
+    view 'IACUC Protocol Actions'
+    on IACUCApproveAction do |page|
       page.expand_all
+      # TODO: Someday make this more involved than just submitting.
       page.submit
     end
-    on(NotificationEditor).send_it
+
   end
 
   def admin_approve_amendment
@@ -223,6 +203,7 @@ class IACUCProtocolObject < DataFactory
     view 'IACUC Protocol Actions'
     on RequestToDeactivate do |page|
       page.expand_all
+      page.reason.set random_alphanums
       page.submit
     end
     on(NotificationEditor).send_it
@@ -293,7 +274,6 @@ class IACUCProtocolObject < DataFactory
     pageKlass = Kernel.const_get(page_class.split.map(&:capitalize).join(''))
     on pageKlass do |page|
       page.expand_all
-
       #TODO:: Add to this method to make more robust
       page.submit
     end

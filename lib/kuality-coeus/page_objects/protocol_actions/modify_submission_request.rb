@@ -14,4 +14,5 @@ class ModifySubmissionRequest < KCProtocol
   p_element(:exempt_checklist) { |i, b| b.frm.checkbox(name: "actionHelper.protocolModifySubmissionBean.expeditedReviewCheckList[#{i}].checked") }
 
   action(:submit) { |b| b.frm.button(name: 'methodToCall.modifySubmissionAction.anchor:ModifySubmissionRequest').click; b.loading }
+
 end

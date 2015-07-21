@@ -360,16 +360,6 @@ class ProposalDevelopmentObject < DataFactory
     opts.merge!(defaults)
   end
 
-  def set_lead_unit
-    on(Proposal)do |prop|
-      if prop.lead_unit.present?
-        prop.lead_unit.pick! @lead_unit
-      else
-        @lead_unit=prop.lead_unit_ro
-      end
-    end
-  end
-
   def prep(object_class, opts)
     merge_settings(opts)
     object = make object_class, opts

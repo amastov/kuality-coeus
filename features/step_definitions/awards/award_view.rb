@@ -242,7 +242,7 @@ end
 
 When /^the unassigned user visits the Award$/  do
   steps "* I'm logged in with unassigneduser"
-  @award.view_award
+  @award.view :award
 end
 
 Then /^an error notification will indicate that the user cannot access the Award$/ do

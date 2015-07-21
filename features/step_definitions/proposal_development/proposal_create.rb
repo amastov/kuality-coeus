@@ -233,3 +233,15 @@ Given /^(the (.*) user |)creates a Proposal with these Performance Site Location
   locations = psl.split(',')
   @proposal = create ProposalDevelopmentObject, performance_site_locations: locations
 end
+
+When /^mresearcher creates a non\-random Proposal$/ do
+  steps %{ * I'm logged in with mresearcher }
+  @proposal = create ProposalDevelopmentObject, :sponsor_id=> '000127',
+                     :lead_unit=>'BIO - Dept of Biology',
+                     :activity_type=>'Instruction',
+                     :project_title=>'SMOKE TEST',
+                     :project_start_date=>next_week[:date_w_slashes],
+                     :project_end_date=>next_year[:date_w_slashes],
+                     :sponsor_deadline_date=>next_year[:date_w_slashes],
+                     :sponsor_deadline_time=>'99:99'
+end

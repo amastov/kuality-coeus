@@ -2,7 +2,7 @@
 Feature: Accessing Awards (Permissions, Rights, Access)
 
   Summary to be written
-
+  @test
   Scenario: Investigator attempts to access an award without Award Viewer permissions
     Given Users exist with the following roles: Award Modifier
     And   the Award Modifier creates an Award

@@ -5,9 +5,9 @@ class CreateProposal < BasePage
   new_error_messages
   document_buttons
 
-  element(:proposal_type) { |b| b.select(:name=>'document.developmentProposal.proposalTypeCode') }
-  element(:lead_unit) { |b| b.select(:name=>'document.developmentProposal.ownedByUnitNumber') }
-  element(:activity_type) { |b| b.select(:name=>'document.developmentProposal.activityTypeCode') }
+  element(:proposal_type) { |b| b.select(name: 'document.developmentProposal.proposalTypeCode') }
+  select(:lead_unit, :name, 'document.developmentProposal.ownedByUnitNumber')
+  element(:activity_type) { |b| b.select(name: 'document.developmentProposal.activityTypeCode') }
 
   element(:project_start_date) { |b| b.psdf.focus; b.psdf }
   element(:project_end_date) { |b| b.pedf.focus; b.pedf }

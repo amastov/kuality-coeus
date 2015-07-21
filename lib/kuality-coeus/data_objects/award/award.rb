@@ -97,6 +97,7 @@ class AwardObject < DataFactory
 
   def view(tab)
     @navigate.call
+    return if on(Award).error_message.present?
     unless on(Award).send(StringFactory.damballa("#{tab}_element")).parent.class_name=~/tabcurrent$/
       on(Award).send(StringFactory.damballa(tab.to_s))
     end
@@ -386,7 +387,8 @@ class AwardObject < DataFactory
             end
           end
         end
-        on(Award).headerinfo_table.wait_until_present
+        return if on(Award).error_message.present?
+        on(Award).div(class: 'headerbox').table(class: 'headerinfo').wait_until_present
       end
     }
   end

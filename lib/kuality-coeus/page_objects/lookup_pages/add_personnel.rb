@@ -7,14 +7,15 @@ class AddPersonnel < BasePage
   element(:last_name) { |b| b.text_field(name: "addKeyPersonHelper.lookupFieldValues['lastName']") }
 
   element(:results_table) { |b| b.div(data_parent: 'PropDev-PersonnelPage-Wizard').table }
+  element(:noko_results) { |b| b.no_frame_noko.div(data_parent: 'PropDev-PersonnelPage-Wizard').table }
 
-  value(:returned_full_names) { |b| b.results_table.tbody.tr.text=='No records found' ? [] : b.results_table.tbody.trs.map{ |row| row[1].text } - ['Notification System'] }
+  value(:returned_full_names) { |b| b.results_table.tbody.tr.text=='No records found' ? [] : b.noko_results.tbody.trs.map{ |row| row[1].text } - ['Notification System'] }
 
   element(:checkboxes) { |b| b.results_table.checkboxes }
   element(:radios) { |b| b.results_table.radios }
 
   p_action(:check_person) { |person, b| b.results_table.row(text: /#{person}/).checkbox.set }
-  p_action(:select_person) { |person, b| b.results_table.row(text: /#{person}/).radio.set }
+  p_action(:select_person) { |person, b| b.radio(name: b.noko_results.row(text: /#{person}/).radio.name).set }
 
   element(:paginate_buttons) { |b| b.links(class: /paginate_button/) }
   

@@ -41,9 +41,33 @@ class CommitteeSchedule < CommitteeDocument
 
   action(:add_event) { |b| b.frm.button(name: 'methodToCall.addEvent.anchorSchedule').click }
 
+  element(:view_from) { |b| b.frm.text_field(name: 'committeeHelper.scheduleData.filterStartDate') }
+  element(:view_to) { |b| b.frm.text_field(name: 'committeeHelper.scheduleData.filerEndDate') }
+  action(:filter) { |b| b.frm.button(name: 'methodToCall.filterCommitteeScheduleDates.anchorSchedule').click; b.loading }
+  
   # Event list
   element(:schedule_table) { |b| b.frm.table(id: 'schedule-table') }
+  element(:noko_events) { |b| b.noko.table(id: 'schedule-table').trs.to_a.keep_if{ |tr| tr.th(class: 'infoline').exist? } }
   p_action(:maintain) { |date, b| b.schedule_table.row(text: /#{Regexp.escape(date)}/).button(name: /methodToCall.maintainSchedule/).click }
+
+  value(:events) { |b|
+    begin
+    b.noko_events.map { |tr|
+      {
+        item: tr.th.text,
+        date: tr.tds[0].text_field.value,
+        day_of_week: tr.tds[1].text,
+        deadline: tr.tds[2].text_field.value,
+        status:  tr.tds[3].select.selected_options[0].text,
+        place: tr.tds[4].text_field.value,
+        start_time: tr.tds[5].text_field.value,
+        meridian: tr.tds[5].radios.find{ |radio| radio.checked? }.value
+      }
+    }
+    rescue
+      []
+    end
+  }
 
   private
   # Acceptable parameter values: 'XDAY' or 'WEEKDAY'
