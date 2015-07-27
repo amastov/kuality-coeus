@@ -10,7 +10,7 @@ Then /^an error should appear that says (.*)$/ do |error|
             'the Award has no PI' => 'There is no Principal Investigator selected. Please enter a Principal Investigator',
             'only one PI is allowed in the Contacts' => 'Only one Principal Investigator is allowed',
             'the IP can not be added because it\'s not fully approved' => 'Cannot add this funding proposal. The associated Development Proposal has "Approval Pending - Submitted" status.',
-            'the approval should occur later than the application' => 'Approval Date should be the same or later than Application Date.',
+            'the approval should occur later than the application' => 'Approval Date: Approval Date should be the same or later than Application Date.',
             'not to select other roles alongside aggregator' => 'Do not select other roles when Aggregator is selected.',
             'a revision type must be selected' => 'S2S Revision Type must be selected when Proposal Type is Revision.',
             %|I need to select the 'Other' revision type| => %|The revision 'specify' field is only applicable when the revision type is "Other"|,

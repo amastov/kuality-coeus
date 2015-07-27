@@ -114,8 +114,13 @@ Then /^it is still possible to copy the Proposal$/ do
   expect{@proposal.copy_to_new_document '000001 - University'}.not_to raise_error
 end
 
-And /^the Proposal (is|can be) copied to a different lead unit$/ do |x|
+And /^the Proposal is copied to a different lead unit$/ do |x|
   @copied_proposal = @proposal.copy 'BL-BL'
+end
+
+Then /^the Proposal can be copied$/ do
+  @copied_proposal = @proposal.copy @proposal.lead_unit
+  expect(@copied_proposal.document_id).not_to eq @proposal.document_id
 end
 
 And /changes the Proposal's activity type$/ do

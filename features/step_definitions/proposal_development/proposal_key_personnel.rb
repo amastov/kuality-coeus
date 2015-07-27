@@ -102,3 +102,7 @@ And /^(\d+) key persons can be added to the Proposal$/ do |number|
     end
   end
 end
+
+And /^certifies the principal investigator$/ do
+  @proposal.principal_investigator.certification
+end

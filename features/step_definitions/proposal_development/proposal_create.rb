@@ -243,5 +243,5 @@ When /^mresearcher creates a non\-random Proposal$/ do
                      :project_start_date=>next_week[:date_w_slashes],
                      :project_end_date=>next_year[:date_w_slashes],
                      :sponsor_deadline_date=>next_year[:date_w_slashes],
-                     :sponsor_deadline_time=>'99:99'
+                     :sponsor_deadline_time=>'23:59'
 end

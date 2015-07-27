@@ -10,7 +10,7 @@ class Header < BasePage
       break if b.researcher_link.parent.div.visible?
     }
   }
-  action(:kns_portal) { |b| b.link(text: 'SYSTEM ADMIN PORTAL').click }
+  action(:kns_portal) { |b| b.link(text: 'SYSTEM ADMIN PORTAL').click; b.loading }
   alias_method :system_admin_portal, :kns_portal
 
   element(:researcher_link) { |b| b.link(text: 'RESEARCHER') }

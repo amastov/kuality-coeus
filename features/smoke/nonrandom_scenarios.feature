@@ -29,4 +29,4 @@ Feature: Nonrandom Scenarios
 
   Scenario: Copying a Proposal
     Given mresearcher creates a non-random Proposal
-    Then  the Proposal can be copied to a different lead unit
+    Then  the Proposal can be copied

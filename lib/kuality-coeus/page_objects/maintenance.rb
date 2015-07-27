@@ -4,7 +4,7 @@ class Maintenance < BasePage
 
   links 'Institute Rate', 'Sponsor', 'Unit Administrator', 'Budget Editable Columns',
         'Sponsor Template', 'Sponsor Terms',
-        'IACUC Location Name', 'IACUC Location Type'
+        'IACUC Location Name', 'IACUC Location Type', 'Question'
 
 
 end

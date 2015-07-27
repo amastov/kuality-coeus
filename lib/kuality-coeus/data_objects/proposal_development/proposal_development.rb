@@ -309,10 +309,6 @@ class ProposalDevelopmentObject < DataFactory
     on(NewDocumentHeader).copy
     on CopyToNewDocument do |page|
       page.lead_unit.select lead_unit
-      page.include_budget.send(budget)
-      page.budget_version.pick budget_version
-      page.include_attachments.send(attachments)
-      page.include_questionnaire.send(questionnaire)
       page.copy
     end
 

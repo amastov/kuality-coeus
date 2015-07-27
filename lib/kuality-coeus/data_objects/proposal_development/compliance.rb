@@ -30,7 +30,15 @@ class ComplianceObject < DataFactory
 
       # TODO: add.add_exemption_number.fit @exemption_number
 
-      add.add_entry
+      # Need this error-catcher here because of how the UI works.
+      # We want to be able to validate the presence of error messages...
+      begin
+        add.add_entry
+      rescue
+        # An error message has probably been thrown. If so, end the create
+        # so the save button doesn't get pressed...
+        return
+      end
     end
     on(Compliance).save
   end

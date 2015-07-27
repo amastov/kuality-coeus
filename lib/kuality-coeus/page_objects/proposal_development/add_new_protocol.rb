@@ -13,7 +13,7 @@ class AddNewProtocol < BasePage
   # TODO:
   # element(:exemption) { |b| ... }
 
-  action(:add_entry) { |b| b.button(text:'Add Entry').click; b.dialog_box.wait_while_present; b.img(alt: 'Adding...').wait_while_present }
+  action(:add_entry) { |b| b.button(text:'Add Entry').click; b.dialog_box.wait_while_present(4); b.img(alt: 'Adding...').wait_while_present(10) }
 
   element(:dialog_box) { |b| b.section(id: 'PropDev-CompliancePage_AddDialog') }
 

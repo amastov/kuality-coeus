@@ -12,7 +12,7 @@ Feature: Permissions in a Proposal
   Scenario: The proposal creator is automatically an aggregator
     When  the Proposal Creator visits the Proposal's Access page
     Then  the Proposal Creator user is listed as an Aggregator Document Level in the proposal permissions
-  @test
+
   Scenario Outline: A Proposal Aggregator can assign various roles to a proposal documents permissions
     When  I assign the unassigned user as a <Role> in the proposal permissions
     Then  the unassigned user can access the Proposal

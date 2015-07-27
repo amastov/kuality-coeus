@@ -13,7 +13,7 @@ Feature: IRB Protocol Review Comment Visibility
    # * the IRB Administrator assigns reviewers to the Protocol
    # * the IRB Administrator edits the meeting details to make it available to reviewers
    # * the primary reviewer submits review comments
-  @test
+
   Scenario: Approved Primary Reviewer Comments are Private and Final
     * Users exist with the following roles: IRB Administrator, Protocol Creator
     #* the IRB Admin submits a Committee with at least one event and four or more paid, voting members
