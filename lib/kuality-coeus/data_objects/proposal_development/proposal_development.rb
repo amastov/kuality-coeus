@@ -1,6 +1,6 @@
 class ProposalDevelopmentObject < DataFactory
 
-  include StringFactory, DateFactory, DocumentUtilities
+  include StringFactory, DateFactory
   
   attr_reader :proposal_type, :lead_unit, :activity_type, :project_title, :proposal_number,
               :sponsor_id, :sponsor_type_code, :project_start_date, :project_end_date, :document_id,
@@ -119,7 +119,7 @@ class ProposalDevelopmentObject < DataFactory
   end
 
   def fill_out_questionnaire opts={}
-    @questionnaire = prep(QuestionnaireObject, opts)
+    raise 'Please write me.'
   end
 
   def make_institutional_proposal
@@ -323,6 +323,7 @@ class ProposalDevelopmentObject < DataFactory
 
   def set_new_doc_number(new_doc_number)
     @document_id = new_doc_number
+    notify_collections @navigate
     #TODO: What else goes here?
   end
 

@@ -46,9 +46,8 @@ class KeyPersonnel < BasePage
   p_value(:lead_unit_of) { |name, b| b.section_of(name).table.row(text: /Lead Unit - Cannot delete/).td(index: 1).text }
 
   # Person Certification
-  Personnel::CERTIFICATION_QUESTIONS.each_with_index do |methd, index|
-    p_action(methd) { |name, value, b| b.section_of(name).radio(name: /questionnaireHelper.answerHeaders\[\d+\].questions\[#{index}\].answers\[\d+\].answer/, value: value).set }
-  end
+  p_action(:answer) { |name, question, value, b| b.section_of(name).div(data_label: /^#{question[0..20]}/).radio(value: value) }
+  value(:questions) { |name, b| b.section_of(name).divs(data_kc_questionindex: /\d+/).map { |div| div.data_label.gsub(/\W+<0>$/,'') } }
 
   # TODO: Genericize and move this method...
   def self.tabs(*tab_text)

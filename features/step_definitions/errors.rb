@@ -22,7 +22,7 @@ Then /^an error should appear that says (.*)$/ do |error|
             'the anticipated amount must be equal to or more than obligated' => 'The Anticipated Amount must be greater than or equal to Obligated Amount.',
             'the project period has a typo' => 'Project Period is not formatted correctly.',
             'cost share type is required' => 'Cost Share Type Code is a required field.',
-            'the fiscal year is not valid' => 'not found is not a valid date.',
+            'the fiscal year is not valid' => 'Fiscal Year is not formatted correctly.',
             'the approved equipment can\'t have duplicates' => 'Approved Equipment Vendor, Model and Item must be unique',
             'the invoiced exceeds the obligated amount' => 'Cumulative Invoiced Amount would exceed the Obligated Subaward Amount.',
             'the start date must be before the end' => 'Project Start Date: The Project Start Date (Start Dt) must be before the Project End Date (End Dt).',
@@ -47,7 +47,7 @@ Then /^an error requiring at least one unit for the co-investigator is shown$/ d
 end
 
 Then /^an error about un-certified personnel is shown$/ do
-  expect(on(DataValidation).validation_errors_and_warnings).to include %|The Investigators are not all certified. Please certify #{@proposal.key_personnel[0].first_name} #{@proposal.key_personnel[0].last_name}.|
+  expect(on(DataValidation).validation_errors_and_warnings).to include %|The Investigators are not all certified. Please certify #{@proposal.key_personnel[0].full_name}.|
 end
 
 Then /^an error should say the credit split does not equal 100%$/ do
@@ -124,7 +124,7 @@ Then /^errors appear on the Contacts page, saying the credit splits for the PI a
     page.expand_all
     DocumentUtilities::CREDIT_SPLITS.values.each do |type|
       expect(page.errors).to include "The Project Personnel #{type} Credit Split does not equal 100%"
-      expect(page.errors).to include "The Unit #{type} Credit Split for #{@award.key_personnel[:principal_investigator]} does not equal 100%"
+      expect(page.errors).to include "The Unit #{type} Credit Split for #{@award.principal_investigator.full_name} does not equal 100%"
     end
   end
 end
@@ -139,8 +139,8 @@ end
 
 Then /^the Award should throw an error saying (.*)/ do |error|
   errors = {
-    'they are already in the Award Personnel' => "#{@award.key_personnel[:principal_investigator]} is already added to the Award Project Personnel",
-    'the Award\'s PI requires at least one unit' => "At least one Unit is required for #{@award.key_personnel[:principal_investigator]}"
+    'they are already in the Award Personnel' => "#{@award.principal_investigator.full_name} is already added to the Award Project Personnel",
+    'the Award\'s PI requires at least one unit' => "At least one Unit is required for #{@award.principal_investigator.full_name}"
   }
   expect($current_page.errors).to include errors[error]
 end

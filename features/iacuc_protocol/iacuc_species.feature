@@ -1,4 +1,4 @@
-@iacuc
+@iacuc @wip
 Feature: Add, edit, delete species on IACUC protocol
 
   As a researcher I want the ability to add, edit and remove species on an IACUC Protocol
@@ -7,7 +7,7 @@ Feature: Add, edit, delete species on IACUC protocol
 
   Background: Establish a Protocol Creator
     * Users exist with the following roles: IACUC Protocol Creator
-
+  @wip
   Scenario: Verify species count on the IACUC Protocol displays an error when value contains letters
     Given the IACUC Protocol Creator creates an IACUC Protocol
     When the IACUC Protocol Creator adds a Species with non-integers for the species count
@@ -18,7 +18,7 @@ Feature: Add, edit, delete species on IACUC protocol
     When the IACUC Protocol Creator adds a Species with all fields completed
     And saves the IACUC Protocol after modifying the required fields for the Species
     Then the group name, species, pain category, count type, species count should match the modified values
-
+  @wip
   Scenario: Delete a Species on the IACUC Protocol
     Given the IACUC Protocol Creator creates an IACUC Protocol
     And  adds a Species to the IACUC Protocol

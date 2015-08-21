@@ -1,4 +1,4 @@
-@iacuc
+@iacuc @wip
 Feature: Creating IACUC Protocols
 
   As a researcher I want the ability to create a protocol for animal subjects

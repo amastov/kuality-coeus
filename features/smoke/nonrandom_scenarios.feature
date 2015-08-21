@@ -18,15 +18,6 @@ Feature: Nonrandom Scenarios
     Then  a confirmation screen asks if you want to edit the existing pending version
     And   selecting 'yes' takes you to the pending version
 
-  Scenario Outline: Attempt to save a nonrandom proposal with an invalid sponsor code and deadline time
-    Given I'm logged in with mresearcher
-    And the Proposal Creator creates a nonrandom Proposal with an invalid <text>
-    Then an error should appear that says <error>
-  Examples:
-    | text                  | error                          |
-    | sponsor code          | a valid sponsor is required    |
-    | sponsor deadline time | the deadline time is not valid |
-
   Scenario: Copying a Proposal
     Given mresearcher creates a non-random Proposal
     Then  the Proposal can be copied

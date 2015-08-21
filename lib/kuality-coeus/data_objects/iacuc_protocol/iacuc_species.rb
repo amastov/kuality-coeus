@@ -2,8 +2,9 @@ class SpeciesGroupsObject < DataFactory
 
   include StringFactory
 
+  attr_accessor :index
   attr_reader :group, :species, :pain_category, :count_type, :count,
-              :strain, :usda_covered, :procedure_summary, :index
+              :strain, :usda_covered, :procedure_summary
 
   def initialize(browser, opts={})
     @browser = browser
@@ -89,6 +90,7 @@ class SpeciesGroupsCollection < CollectionsFactory
   def delete(index)
     self[index].delete
     self.delete_at(index)
+    # need to reindex collection now...
   end
 
 end

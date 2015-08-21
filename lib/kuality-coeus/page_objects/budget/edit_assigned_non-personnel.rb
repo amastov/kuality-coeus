@@ -44,13 +44,23 @@ class EditAssignedNonPersonnel < BasePage
     end
   }
 
-  p_element(:apply) { |rate_class, type, b| b.checkbox(name: b.noko_rates_table.trs.find{ |tr| tr[0].text==rate_class && tr[1].text==type }.checkbox.name) }
+  p_element(:apply) { |rate_class, type, b|
+
+
+
+    DEBUG.inspect rate_class
+    DEBUG.inspect type
+    DEBUG.inspect b.noko_rates_table.trs.find{ |tr| tr[0].text==rate_class && tr[1].text==type }.checkbox.name
+
+
+
+    b.checkbox(name: b.noko_rates_table.trs.find{ |tr| tr[0].text==rate_class && tr[1].text==type }.checkbox.name) }
 
   private
 
   element(:modal_div) { |b| b.div(data_parent: 'PropBudget-NonPersonnelCostsPage-EditNonPersonnel-Dialog') }
   element(:tab_list) { |b| b.modal_div.ul }
-  value(:noko_rates_table) { |b| b.no_frame_noko.div(data_parent: 'PropBudget-NonPersonnelCostsPage-EditNonPersonnel-Dialog').section(class: 'uif-tableCollectionSection').tbody }
+  value(:noko_rates_table) { |b| b.no_frame_noko.table(id: 'uwcuma2').tbody }
   # FIXME!!! This works perfectly well, now, but that's obviously a machine-generated ID, and prone to changing.
   element(:rates_table) { |b| b.table(id: 'uwcuma2') }
 

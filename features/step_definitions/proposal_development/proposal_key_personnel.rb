@@ -41,12 +41,32 @@ When /^various personnel are added to the Proposal$/ do
   |
 end
 
+And /certifies the Proposal's/ do
+  @proposal.view 'Personnel'
+  @proposal.key_personnel.each do |person|
+    next if person.role == 'Key Person'
+    on KeyPersonnel do |page|
+      page.expand_all_personnel
+      page.proposal_person_certification_of person.full_name
+    end
+    @proposal.key_personnel.questionnaire.answer_for(person.full_name, 'Y')
+    if @proposal.key_personnel.questionnaire.questions.size != on(KeyPersonnel).questions(person.full_name).size
+      warn "The Proposal Person Questionnaire object is out of sync with the system's setup.\nGoing to brute-force answer the questionnaire, so that\nthe Person gets certified and the step definition requirements are met,\nbut the code and the system need to be synced up."
+      on KeyPersonnel do |page|
+        page.questions(person.full_name).each do |ques|
+          page.answer(person.full_name, ques, 'Y')
+        end
+      end
+    end
+  end
+end
+
 Given /^I? ?adds? the Grants.Gov user as the Proposal's PI$/ do
   @proposal.add_principal_investigator last_name: $users.grants_gov_pi.last_name, first_name: $users.grants_gov_pi.first_name
 end
 
 When /^I? ?sets? valid credit splits for the Proposal$/ do
-  @proposal.set_valid_credit_splits
+  @proposal.key_personnel.set_valid_credit_splits
 end
 
 And /can approve the Proposal$/ do
@@ -101,8 +121,4 @@ And /^(\d+) key persons can be added to the Proposal$/ do |number|
       page.add_person
     end
   end
-end
-
-And /^certifies the principal investigator$/ do
-  @proposal.principal_investigator.certification
 end

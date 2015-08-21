@@ -12,7 +12,7 @@ module DocumentUtilities
   def set_valid_credit_splits
     # calculate a "person" split value that will work
     # based on the number of people attached...
-    split = (100.0/@key_personnel.with_units.size).round(2)
+    split = (100.0/self.with_units.size).round(2)
 
     # Now make a hash to use for editing the person's splits...
     splits = {}
@@ -20,7 +20,7 @@ module DocumentUtilities
 
     # Now we update the KeyPersonObjects' instance variables
     # for their own splits as well as for their units
-    @key_personnel.with_units.each do |person|
+    self.with_units.each do |person|
       person.update_splits splits
       units_split = (100.0/person.units.size).round(2)
       unit_splits = {}

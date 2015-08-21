@@ -9,7 +9,7 @@ end
 When /^I? ?complete a valid simple Proposal for a '(.*)' organization$/ do |org|
   @proposal = create ProposalDevelopmentObject, sponsor_type_code: org
   @proposal.add_principal_investigator
-  @proposal.set_valid_credit_splits
+  @proposal.key_personnel.set_valid_credit_splits
   @proposal.add_custom_data
 end
 

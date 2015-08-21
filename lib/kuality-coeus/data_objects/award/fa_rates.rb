@@ -35,6 +35,13 @@ class AwardFARatesObject < DataFactory
         sleep 1.5
         x = 0
         while page.new_rate_start_date.value == ''
+          # This line is here so we can test invalid
+          # entries in the FY field, which will cause
+          # the date fields to not populate...
+          break unless @fiscal_year == /^d+$/
+          page.new_rate.focus
+          page.new_rate_type.focus
+          page.new_rate_fiscal_year.focus
           page.new_rate_fiscal_year.fire_event 'onblur'
           sleep 1.5
           x+=1

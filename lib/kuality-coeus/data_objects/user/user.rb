@@ -322,14 +322,17 @@ class UserObject < DataFactory
   def sign_in
     unless $current_user==self
       $current_user.sign_out if $current_user
-      #begin
-      #  visit Login
-      #rescue Selenium::WebDriver::Error::UnhandledAlertError
-      #  warn 'Modal dialog appeared...'
-      #  puts @browser.alert.text
-      #  @browser.alert.close
-      #  sleep 5
-      #end
+      begin
+        visit(Login).username.present?
+      rescue Selenium::WebDriver::Error::UnhandledAlertError
+        warn 'Modal dialog appeared...'
+        puts @browser.alert.text
+        @browser.alert.close
+        sleep 5
+      rescue Watir::Exception::UnknownObjectException
+        warn 'Blank screen, maybe?'
+        @browser.goto 'www.google.com'
+      end
       visit Login do |log_in|
         log_in.username.set @user_name
         log_in.login

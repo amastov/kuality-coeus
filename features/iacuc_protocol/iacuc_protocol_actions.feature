@@ -1,4 +1,5 @@
-@iacuc
+# https://kualico.atlassian.net/browse/RESKC-522
+@iacuc @system_failure
 Feature: Protocol actions for IACUC Designated Member Review
 
   TBD

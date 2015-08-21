@@ -172,7 +172,12 @@ class AwardKeyPersonObject < DataFactory
     # @units.find{ |u| u[:number]==unit_number}.merge!(opts)
   end
 
-end
+  def delete
+    view :contacts
+    on AwardConatn
+  end
+
+end # AwardKeyPersonObject
 
 class AwardKeyPersonnelCollection < CollectionsFactory
 

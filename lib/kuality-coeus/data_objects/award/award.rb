@@ -11,8 +11,7 @@ class AwardObject < DataFactory
               :anticipated_fna, :obligated_fna,
               :funding_proposals, #TODO: Add Benefits rates and preaward auths...
               :budget_versions, :sponsor_contacts, :payment_and_invoice, :terms, :reports,
-              :approved_equipment,
-              :children
+              :approved_equipment
   attr_accessor :document_status, :document_id, :subawards, :transaction_type, :id, :anticipated_direct, :obligated_direct,
                 # These will probably need to be removed:
                 :anticipated_amount, :obligated_amount,
@@ -284,71 +283,11 @@ class AwardObject < DataFactory
   end
 
   def add_key_person opts={}
-    @key_personnel = { type: 'employee',
-                       project_role: 'Principal Investigator',
-                       key_person_role: random_alphanums(5),
-                       navigate: @navigate,
-                       press: 'save'
-
-                     }
-    @key_personnel.merge!(opts)
-
     view :contacts
-    on(AwardContacts).expand_all
-
-      if @key_personnel[:type] == 'employee'
-        on(AwardContacts).employee_search
-        on KcPersonLookup do |lookup|
-          lookup.last_name.fit @key_personnel[:last_name]
-          lookup.first_name.fit @key_personnel[:first_name]
-          lookup.search
-          lookup.return_random
-        end
-      else
-        on(AwardContacts).non_employee_search
-        on AddressBookLookup do |lookup|
-          lookup.last_name.fit @key_personnel[:last_name]
-          lookup.first_name.fit @key_personnel[:first_name]
-          lookup.search
-          lookup.return_random
-        end
-      end
-
-    on AwardContacts do |page|
-      if @key_personnel[:project_role] == 'Principal Investigator'
-        page.kp_project_role.select_value 'PI'
-      else
-        page.kp_project_role.pick! @key_personnel[:project_role]
-      end
-
-
-      case @key_personnel[:type]
-        when 'employee'
-          person_type = 'kp_employee_user_name'
-        when 'non_employee'
-          person_type = 'kp_non_employee_id'
-      end
-
-      case @key_personnel[:project_role]
-        when 'Principal Investigator'
-          @key_personnel[:principal_investigator] = page.send(person_type).value.gsub('  ', ' ').strip
-        when 'Co-Investigator'
-          @key_personnel[:co_investigator] = page.send(person_type).value.strip
-        when 'Key Person'
-          page.key_person_role.fit @key_person_role
-          @key_personnel[:key_person] = page.send(person_type)
-      end
-
-      if @key_personnel[:type] == 'non-employee'
-        @key_personnel[:added_personnel] = page.send(person_type) if @key_personnel[:type] == 'non-employee'
-      else
-        @key_personnel[:added_personnel] = page.send(person_type)
-      end
-      page.add_key_person
-
-      page.send(@key_personnel[:press]) unless @key_personnel[:press].nil?
-      # set_options(@key_personnel.merge(opts))
-    end
+    defaults = {
+        navigate: @navigate
+                     }
+    @key_personnel.add defaults.merge!(opts)
   end
 
   # ==============

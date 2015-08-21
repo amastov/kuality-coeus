@@ -20,7 +20,7 @@ Given /^(the (.*) |)submits an IACUC Protocol for designated member review/ do |
   steps %{ * I log in with the #{role_name} user } unless text == ''
   @iacuc_protocol = create IACUCProtocolObject
   @iacuc_protocol.add_the_three_rs
-  @iacuc_protocol.submit_for_review review_type: 'Designated Member Review'
+  @iacuc_protocol.submit_for_review review_type: 'Designated Member Review', submission_type: 'Initial Protocol Application'
 end
 
 And /^the (.*) approves the IACUC Protocol$/ do |role_name|

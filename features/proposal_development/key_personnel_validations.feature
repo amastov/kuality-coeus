@@ -22,8 +22,7 @@ Feature: Proposal Key Personnel Validations
     Given I add a Principal Investigator with a Financial credit split of 99.99
     When  data validation is activated
     Then  an error should say the credit split does not equal 100%
-  # https://kualico.atlassian.net/browse/RESKC-666
-  @system_failure
+  @wip
   Scenario: I should see an error when I add a key person without a specified proposal role
     When I add a key person without a key person role
     Then an error should appear that says a key person role is required

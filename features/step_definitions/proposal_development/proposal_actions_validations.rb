@@ -15,5 +15,5 @@ When /^(the (.*) |)creates a Proposal with an un-certified (.*)$/ do |text, role
   steps %{ * I log in with the #{role_name} user } unless text == ''
   @role = role
   @proposal = create ProposalDevelopmentObject
-  @proposal.add_key_person role: @role, certified: false
+  @proposal.add_key_person role: @role
 end

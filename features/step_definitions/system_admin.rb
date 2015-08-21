@@ -1,6 +1,8 @@
 And /^the (.*) parameter is set to (.*)$/ do |parameter, value|
-  $users.admin.sign_in unless $users.admin.logged_in?
-  visit(SystemAdmin).parameter
+  $users.admin.sign_in
+  on(Header).system_admin_portal
+  on(Header).system_admin
+  on(SystemAdmin).parameter
   on ParameterLookup do |look|
     look.parameter_name.set parameter
     look.search

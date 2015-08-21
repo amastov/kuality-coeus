@@ -54,6 +54,7 @@ class BudgetVersionsObject < DataFactory
       get_or_select! :@f_and_a_rate_type, page.f_and_a_rate_type
       get_or_select! :@status, page.status
       get_or_select! :@on_off_campus, page.on_off_campus
+      page.apply_changes
     end
     get_rates
     get_budget_periods

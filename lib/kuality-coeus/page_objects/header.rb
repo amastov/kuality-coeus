@@ -52,6 +52,8 @@ class Header < BasePage
   # }
   # element(:central_admin_link) { |b| b.link(text: 'CENTRAL ADMIN') }
 
+  action(:system_admin) { |b| b.link(title: 'System Admin').click }
+
   #Central Admin not working on kc6 using UNIT for temp fix.
   action(:central_admin) { |b|
     b.navigate_to_header

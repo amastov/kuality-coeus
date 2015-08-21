@@ -1,13 +1,3 @@
-#unused step. Should be removed
-# Given /^the (.*) user submits the Funding Proposal$/ do |role_name|
-#   steps %{ * I log in with the #{role_name} user }
-#   @institutional_proposal.project_personnel << person
-#   @institutional_proposal.add_custom_data
-#   @institutional_proposal.set_valid_credit_splits
-#   on(IPContacts).institutional_proposal_actions
-#   on(InstitutionalProposalActions).submit
-# end
-
 When /^(the (.*) user |)merges the temporary proposal log with the Funding Proposal$/ do |text, role_name|
   steps %{ * I log in with the #{role_name} user } unless text == ''
   visit(Researcher).search_proposal_log

@@ -98,7 +98,7 @@ class CompleteBudget < Dialogs
 
   action(:ok) { |b| b.button(data_dismissdialogid: 'PropDev-CompleteBudgetConfirmationDialog').click; b.loading }
 
-end
+end # CompleteBudget
 
 class CopyThisBudgetVersion < Dialogs
   
@@ -174,5 +174,19 @@ end
 class ConfirmAutocalculate < Dialogs
 
   element(:dialog_header) { |b| b.header(id: 'u1839u1b_headerWrapper') }
+
+end
+
+# Appears when a questionnaire has been modified and will affect 
+# the current document's already answered questions
+# Dialog title is "Please make a selection."
+class UpdateQuestionnaire < Dialogs
+
+  undefine :ok
+  element(:dialog_header) { |b| b.header(id: 'PropDev-PersonnelPage-UpdateCertification-Dialog_headerWrapper') }
+  
+  action(:copy) { |b| b.radio(name: 'updateAnswerHeader.updateOption', value: '0').set }
+  action(:do_not_copy) { |b| b.radio(name: 'updateAnswerHeader.updateOption', value: '1').set }
+  action(:ok) { |b| b.button(id: 'Uif-DialogConfirmButton', text: 'Ok').click; b.loading }
 
 end

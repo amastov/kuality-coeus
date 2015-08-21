@@ -25,7 +25,7 @@ Feature: Creating/Editing Budget Versions in Proposal Documents
     Given the Proposal Creator includes the Budget Version for submission
     When  I copy the Budget Version (all periods)
     Then  the copied budget is not marked 'for submission'
-  @wip
+
   Scenario: Complete Budgets are read-only
     Given the Proposal Creator includes the Budget Version for submission
     When  the Proposal Creator marks the Budget Version complete

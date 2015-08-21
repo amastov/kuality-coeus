@@ -1,4 +1,4 @@
-class Questionnaire < KCProtocol
+class ProtocolQuestionnaire < KCProtocol
 
 
 end

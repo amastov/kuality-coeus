@@ -1,4 +1,4 @@
-@iacuc
+@iacuc @wip
 Feature: Add, edit, delete procedures locations on IACUC protocol
 
   As a researcher I want the ability to create, add, edit and delete procedure locations for an IACUC Protocol

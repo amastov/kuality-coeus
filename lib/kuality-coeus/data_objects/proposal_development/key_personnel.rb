@@ -4,22 +4,18 @@
 
   attr_reader :first_name, :last_name, :type, :role, :document_id, :key_person_role,
               :full_name, :user_name, :home_unit, :organization, :units, :responsibility,
-              :financial, :certified, :certify_info_true,
-              :understand_coi_obligation, :agree_with_sponsor_terms,
-              :other_key_persons, :era_commons_name, :degrees
+              :financial,
+              :era_commons_name, :degrees
 
   # Note that you must pass in both first and last names (or neither).
   def initialize(browser, opts={})
     @browser = browser
 
     defaults = {
-      type:                            'employee',
-      role:                            'Principal Investigator',
-      units:                           [],
-      degrees:                         collection('Degrees'),
-      certified:                       true, # Set this to false if you do not want any Proposal Person Certification Questions answered
-      understand_coi_obligation:      'Y',
-      agree_with_sponsor_terms:       'Y'
+      type:                'employee',
+      role:                'Principal Investigator',
+      units:               [],
+      degrees:             collection('Degrees'),
     }
 
     set_options(defaults.merge(opts))
@@ -38,7 +34,11 @@
     on AddPersonnel do |page|
       page.set_role(role_value[@role])
       page.key_person_role.fit @key_person_role
+
+
+
       page.add_person
+
     end
     on KeyPersonnel do |person|
       person.expand_all_personnel
@@ -49,10 +49,6 @@
       @home_unit=person.home_unit_of(@full_name)
     end
     set_up_units unless @role=='Key Person'
-
-    # Proposal Person Certification
-    certification
-
     # Add gathering/setting of more attributes here as needed
     on KeyPersonnel do |person|
       person.details_of @full_name
@@ -117,20 +113,6 @@
     end
   end
 
-  def certification
-    # TODO: Make this more robust for Key Persons...
-    unless @role=='Key Person'
-      if @certified
-        view 'Personnel'
-        on(KeyPersonnel).proposal_person_certification_of @full_name
-        CERTIFICATION_QUESTIONS.each { |q| on(KeyPersonnel).send(q, @full_name, get(q)) }
-      else
-        CERTIFICATION_QUESTIONS.each { |q| set(q, nil) }
-      end
-      on(KeyPersonnel).save
-    end
-  end
-
   def update_from_parent(navigate)
     @navigate=navigate
     notify_collections navigate
@@ -189,8 +171,13 @@ end # KeyPersonObject
 class KeyPersonnelCollection < CollectionsFactory
 
   contains KeyPersonObject
-  include People
+  include People, DocumentUtilities
 
-  # finding methods
+  attr_reader :questionnaire
+
+  def initialize(browser)
+    @browser=browser
+    @questionnaire = QuestionnaireObject.new @browser, YAML.load_file("#{File.dirname(__FILE__)}/../questions/questionnaires.yml")[:proposal_person_cert]
+  end
 
 end # KeyPersonnelCollection

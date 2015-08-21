@@ -6,7 +6,7 @@ Feature: Basic Award Validations
 
   Background:
     Given Users exist with the following roles: Proposal Creator, Award Modifier
-
+  @wip
   Scenario: Add a Payment & Invoice Req before adding a PI
     Given the Award Modifier creates an Award
     When  I start adding a Payment & Invoice item to the Award
@@ -80,7 +80,7 @@ Feature: Basic Award Validations
     And   adds an item of approved equipment to the Award
     When  the AM adds a duplicate item of approved equipment to the Award
     Then  an error should appear that says the approved equipment can't have duplicates
-
+  @wip
   Scenario: Cancelling and Restarting a T&M document
     Given a User exists with the role: 'Time And Money Modifier'
     And   the Award Modifier creates an Award

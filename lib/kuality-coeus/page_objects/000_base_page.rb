@@ -31,6 +31,22 @@ class BasePage < PageFactory
 
   class << self
 
+    # Overrides the method in PageFactory
+    # The idea here is to see if we can improve test reliability
+    # by retrying a page load when an expected element doesn't appear
+    # the first time, or when a modal dialog is present...
+    def expected_element element_name, timeout=30
+      define_method 'expected_element' do
+        begin
+          self.send(element_name).wait_until_present timeout
+        rescue
+          sleep 10
+          self.refresh
+          self.send(element_name).wait_until_present timeout
+        end
+      end
+    end
+
     def glbl(*titles)
       titles.each do |title|
         action(damballa(title)) { |b| b.frm.button(class: 'globalbuttons', title: title).click; b.loading }
@@ -125,7 +141,7 @@ class BasePage < PageFactory
       action(:select_all_from_this_page) { |b| b.frm.button(title: 'Select all rows from this page').click }
       action(:return_selected) { |b| b.frm.button(title: 'Return selected results').click; b.loading }
       p_action(:check_item) { |item, b| b.item_row(item).checkbox.set }
-      action(:select_random_checkbox) { |b| b.frm.tbody.tr(index: (rand(b.frm.tbody.trs.length))  ).checkbox.set }
+      action(:select_random_checkbox) { |b| b.frm.tbody.checkboxes.to_a.sample.set }
       action(:return_random_checkbox) { |b| b.select_random_checkbox; b.return_selected }
       p_action(:check_item_title) { |item, b| b.item_row_title(item).checkbox.set }
     end
